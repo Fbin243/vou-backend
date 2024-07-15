@@ -1,8 +1,8 @@
 package com.vou.games.controller;
 
 import com.vou.games.dto.GameDto;
-import com.vou.games.dto.ResponseDto;
 import com.vou.games.service.IGamesService;
+import com.vou.pkg.dto.ResponseDto;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,7 +23,7 @@ public class GamesController {
         return ResponseEntity.ok(gameDtos);
     }
 
-    @GetMapping("/games{id}")
+    @GetMapping("/games/{id}")
     public ResponseEntity<GameDto> getGameById(@PathVariable("id") Long id) {
         GameDto gameDto = gamesService.fetchGameById(id);
         return ResponseEntity.ok(gameDto);

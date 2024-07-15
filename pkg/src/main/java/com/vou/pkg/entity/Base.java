@@ -1,4 +1,4 @@
-package com.vou.games.entity;
+package com.vou.pkg.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

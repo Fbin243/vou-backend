@@ -1,4 +1,4 @@
-package com.vou.games.exception;
+package com.vou.pkg.exception;
 
 public class NotFoundException extends RuntimeException {
     public NotFoundException(String resourceName, String fieldName, String fieldValue) {

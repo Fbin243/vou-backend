@@ -2,9 +2,9 @@ package com.vou.games.service;
 
 import com.vou.games.dto.GameDto;
 import com.vou.games.entity.Game;
-import com.vou.games.exception.NotFoundException;
 import com.vou.games.mapper.GameMapper;
 import com.vou.games.repository.GamesRepository;
+import com.vou.pkg.exception.NotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

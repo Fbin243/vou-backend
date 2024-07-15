@@ -1,5 +1,6 @@
 package com.vou.games.entity;
 
+import com.vou.pkg.entity.Base;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,6 +1,7 @@
 package com.vou.games.exception;
 
-import com.vou.games.dto.ResponseDto;
+import com.vou.pkg.dto.ResponseDto;
+import com.vou.pkg.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

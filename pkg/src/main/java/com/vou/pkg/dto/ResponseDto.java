@@ -1,4 +1,4 @@
-package com.vou.games.dto;
+package com.vou.pkg.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
