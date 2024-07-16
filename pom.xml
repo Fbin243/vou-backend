@@ -32,9 +32,9 @@
     </properties>
 
     <modules>
+        <module>pkg</module>
         <module>services/configserver</module>
         <module>services/games</module>
-        <module>pkg</module>
     </modules>
 
     <dependencies>
