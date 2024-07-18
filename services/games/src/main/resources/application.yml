@@ -4,10 +4,13 @@ spring:
   application:
     name: games
   datasource:
-    url: jdbc:mysql://localhost:3306/games
+    url: jdbc:mysql://localhost:3306/gamesdb
     username: root
-    password: 1234
+    password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
+  #  sql:
+  #    init:
+  #      mode: always
   jpa:
     show-sql: true
     hibernate:

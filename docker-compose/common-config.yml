@@ -1,0 +1,27 @@
+services:
+  network-config:
+    networks:
+      - vou_network
+
+  base-config:
+    deploy:
+      resources:
+        limits:
+          memory: 300m
+    extends:
+      service: network-config
+
+  db-config:
+    image: mysql
+    ports:
+      - 3306:3306
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 10s
+      retries: 10
+      interval: 10s
+      start_period: 10s
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    extends:
+      service: network-config

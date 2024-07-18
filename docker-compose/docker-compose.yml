@@ -1,0 +1,29 @@
+services:
+  gamesdb:
+    container_name: gamesdb
+    environment:
+      MYSQL_DATABASE: gamesdb
+    extends:
+      file: common-config.yml
+      service: db-config
+
+  games:
+    image: fbin243/games:0.0.1
+    container_name: games
+    ports:
+      - 8080:8080
+    environment:
+      SPRING_APPLICATION_NAME: "games"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://gamesdb:3306/gamesdb"
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    depends_on:
+      gamesdb:
+        condition: service_healthy
+    extends:
+      file: common-config.yml
+      service: base-config
+
+networks:
+  vou_network:
+    driver: bridge
