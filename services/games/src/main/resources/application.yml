@@ -1,12 +1,13 @@
 server:
   port: 8080
+
 spring:
   application:
     name: games
   datasource:
     url: jdbc:mysql://localhost:3306/gamesdb
     username: root
-    password: root
+    password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
   #  sql:
   #    init:
@@ -18,3 +19,34 @@ spring:
   config:
     import:
       optional:configserver:http://localhost:8071/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    shutdown:
+      enabled: true
+  info:
+    env:
+      enabled: true
+
+endpoints:
+  shutdown:
+    enabled: true
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8070/eureka/
+
+info:
+  app:
+    name: "games"
+    description: "VOU games service"
+    version: "0.0.1"
