@@ -24,4 +24,13 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
     extends:
-      service: network-config
+      service: base-config
+
+  eureka-config:
+    depends_on:
+      eurekaserver:
+        condition: service_healthy
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:8070/eureka/
+    extends:
+      service: base-config

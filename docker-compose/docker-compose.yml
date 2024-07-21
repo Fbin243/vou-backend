@@ -1,4 +1,21 @@
 services:
+  eurekaserver:
+    image: fbin243/eurekaserver:0.0.1
+    container_name: eurekaserver
+    ports:
+      - 8070:8070
+    healthcheck:
+      test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    extends:
+      file: common-config.yml
+      service: base-config
+    environment:
+      SPRING_APPLICATION_NAME: "eurekaserver"
+
   gamesdb:
     container_name: gamesdb
     environment:
@@ -22,7 +39,7 @@ services:
         condition: service_healthy
     extends:
       file: common-config.yml
-      service: base-config
+      service: eureka-config
 
 networks:
   vou_network:
