@@ -1,3 +1,42 @@
+server:
+  port: 8081
+
 spring:
   application:
     name: sessions
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    shutdown:
+      enabled: true
+  info:
+    env:
+      enabled: true
+
+endpoints:
+  shutdown:
+    enabled: true
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8070/eureka/
+
+info:
+  app:
+    name: "sessions"
+    description: "VOU sessions service"
+    version: "0.0.1"
