@@ -16,6 +16,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.time.Instant;
 
@@ -62,16 +63,30 @@ public class SessionsController {
                     hashOps.put(sessionId, playerId, playerStats);
                 }
 
-                int numberOfConnection = Integer.parseInt(stringRedisTemplate.opsForValue().get(KEY_CONNECTION));
-                // Send number of active players
-                messagingTemplate.convertAndSend("/topic/connection", numberOfConnection);
-
                 // Send quiz questions
                 messagingTemplate.convertAndSend("/topic/start/" + playerId, sessionsService.getQuestions(20));
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    @PostMapping("/api/sessions")
+    public void createSession() {
+        sessionsService.createSession();
+    }
+
+    @MessageMapping("/update")
+    public void updateGame(MessageDto message) {
+        log.info("update game ... ");
+    }
+
+    @MessageMapping("/connection")
+    public void getNumberOfConnections() {
+        log.info("getNumberOfConnections ... ");
+        int numberOfConnection = Integer.parseInt(stringRedisTemplate.opsForValue().get(KEY_CONNECTION));
+        // Send number of active players
+        messagingTemplate.convertAndSend("/topic/connection", numberOfConnection);
     }
 
     @Scheduled(fixedRate = 1000)
