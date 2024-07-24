@@ -1,8 +1,5 @@
 package com.vou.sessions.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vou.pkg.exception.NotFoundException;
 import com.vou.sessions.dto.SessionDto;
 import com.vou.sessions.dto.quizgame.PlayerStats;
@@ -19,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,21 +24,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SessionsService implements ISessionsService {
     private static final Logger log = LoggerFactory.getLogger(SessionsService.class);
-    private static final String HASH_KEY = "QUIZ";
-    private static final String KEY_CONNECTION = "CONNECTION";
-    private static final String QUIZ_QUESTION_KEY = "QUIZ_QUESTION_KEY";
-    private static ObjectMapper objectMapper = new ObjectMapper();
+    private static final String CONNECTION_KEY = "CONNECTION";
+    private static final String QUIZ_QUESTION_KEY = "QUIZ_QUESTION";
     @NonNull
     private HQTriviaFeignClient hqTriviaFeignClient;
-    @NonNull
-    private RedisTemplate<String, Object> redisTemplate;
     @NonNull
     private SessionsRepository sessionsRepository;
     @NonNull
     private SessionMapper sessionMapper;
     @NonNull
-    private StringRedisTemplate stringRedisTemplate;
-    private HashOperations<String, String, PlayerStats> hashOps;
+    private RedisTemplate<String, Object> redisTemplate;
+    private HashOperations<String, String, Object> hashOps;
 
     @PostConstruct
     public void init() {
@@ -50,13 +42,13 @@ public class SessionsService implements ISessionsService {
     }
 
     @Override
-    public QuizResponse getQuestions(int amount) {
+    public QuizResponse getQuestionsBySessionId(String sessionId, int amount) {
         // Check cache
-        QuizResponse quizResponse = (QuizResponse) redisTemplate.opsForHash().get(HASH_KEY, QUIZ_QUESTION_KEY);
+        QuizResponse quizResponse = (QuizResponse) hashOps.get(sessionId, QUIZ_QUESTION_KEY);
 
         if (quizResponse == null) {
             quizResponse = hqTriviaFeignClient.getQuestions(amount);
-            redisTemplate.opsForHash().put(HASH_KEY, QUIZ_QUESTION_KEY, quizResponse);
+            redisTemplate.opsForHash().put(sessionId, QUIZ_QUESTION_KEY, quizResponse);
         }
 
         List<QuizQuestion> quizQuestions = quizResponse.getResults();
@@ -78,37 +70,26 @@ public class SessionsService implements ISessionsService {
     }
 
     @Override
-    public String startGame(String payload) {
+    public void createPlayerRecord(String sessionId, String playerId) {
         // Check user id is new or not
-        String playerId, eventId, gameId;
-        try {
-            log.info("payload: {}", payload);
-            JsonNode rootNode = objectMapper.readTree(payload);
-            playerId = rootNode.get("playerId").asText();
-            eventId = rootNode.get("eventId").asText();
-            gameId = rootNode.get("gameId").asText();
-
-            String sessionId = eventId + gameId;
-            PlayerStats playerStats = hashOps.get(sessionId, playerId);
-            if (playerStats == null) {
-                playerStats = new PlayerStats(0, 0);
-                hashOps.put(sessionId, playerId, playerStats);
-            }
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Cannot parse payload");
+        PlayerStats playerStats = (PlayerStats) hashOps.get(sessionId, playerId);
+        if (playerStats == null) {
+            playerStats = new PlayerStats(0, 0);
+            hashOps.put(sessionId, playerId, playerStats);
         }
-
-        return playerId;
     }
 
     @Override
-    public int getNumberOfConnection() {
-        String value = stringRedisTemplate.opsForValue().get(KEY_CONNECTION);
+    public int getNumberOfConnectionBySessionId(String sessionId) {
+        Integer value = (Integer) hashOps.get(sessionId, CONNECTION_KEY);
         if (value == null) {
-            throw new NotFoundException("Redis", "Key", String.format("%s", KEY_CONNECTION));
+            hashOps.put(sessionId, CONNECTION_KEY, 1);
+        } else {
+            value = value + 1;
+            hashOps.put(sessionId, CONNECTION_KEY, value);
         }
-        return Integer.parseInt(value);
+
+        return value == null ? 1 : value;
     }
 }
 

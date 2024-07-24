@@ -4,13 +4,13 @@ import com.vou.sessions.dto.SessionDto;
 import com.vou.sessions.dto.quizgame.QuizResponse;
 
 public interface ISessionsService {
-    QuizResponse getQuestions(int amount);
+    QuizResponse getQuestionsBySessionId(String sessionId, int amount);
 
     void saveSessionDataFromRedis();
 
     SessionDto findSessionByEventIdAndGameId(String eventId, String gameId);
 
-    String startGame(String payload);
+    void createPlayerRecord(String sessionId, String playerId);
 
-    int getNumberOfConnection();
+    int getNumberOfConnectionBySessionId(String sessionId);
 }
