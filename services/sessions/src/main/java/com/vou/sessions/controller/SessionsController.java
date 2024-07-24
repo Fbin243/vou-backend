@@ -1,92 +1,55 @@
 package com.vou.sessions.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vou.sessions.dto.MessageDto;
 import com.vou.sessions.dto.MessageType;
-import com.vou.sessions.dto.quizgame.PlayerStats;
 import com.vou.sessions.service.ISessionsService;
+import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import java.time.Instant;
 
 @Controller
+@AllArgsConstructor
 public class SessionsController {
     private static final Logger log = LoggerFactory.getLogger(SessionsController.class);
-    private static final String sessionId = "session_id";
-    private final static String KEY_CONNECTION = "CONNECTION";
-    private static int currentConnection = 0;
-    private static ObjectMapper objectMapper = new ObjectMapper();
-    private RedisTemplate<String, Object> redisTemplate;
-    private HashOperations<String, String, PlayerStats> hashOps;
     private SimpMessagingTemplate messagingTemplate;
     private ISessionsService sessionsService;
-    private StringRedisTemplate stringRedisTemplate;
 
-
-    @Autowired
-    public SessionsController(RedisTemplate<String, Object> redisTemplate, SimpMessagingTemplate messagingTemplate, ISessionsService sessionsService, StringRedisTemplate stringRedisTemplate) {
-        this.redisTemplate = redisTemplate;
-        this.stringRedisTemplate = stringRedisTemplate;
-        this.messagingTemplate = messagingTemplate;
-        this.sessionsService = sessionsService;
-        this.hashOps = redisTemplate.opsForHash();
-    }
-
-    @MessageMapping("/start")
-    public void startGame(MessageDto message) {
-        log.info("start game ... ");
+    @MessageMapping("/game")
+    public void executeGame(MessageDto message) {
         if (message.getType() == MessageType.START) {
-            // Check user id is new or not
-            String playerId, eventId, gameId;
-            try {
-                log.info("payload: {}", message.getPayload());
-                JsonNode rootNode = objectMapper.readTree(message.getPayload());
-                log.info("Root node: {}", rootNode);
-                playerId = rootNode.get("playerId").asText();
-                eventId = rootNode.get("eventId").asText();
-                gameId = rootNode.get("gameId").asText();
-                log.info("Game session: {}, {}, {}", playerId, eventId, gameId);
-                PlayerStats playerStats = hashOps.get(sessionId, playerId);
-                if (playerStats == null) {
-                    playerStats = new PlayerStats(0, 0);
-                    hashOps.put(sessionId, playerId, playerStats);
-                }
-
-                // Send quiz questions
-                messagingTemplate.convertAndSend("/topic/start/" + playerId, sessionsService.getQuestions(20));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            log.info("Start game ...");
+            String playerId = sessionsService.startGame(message.getPayload());
+            log.info("Game started, playerId {}", playerId);
+            // Send quiz questions
+            messagingTemplate.convertAndSend("/topic/start/" + playerId, sessionsService.getQuestions(20));
         }
     }
 
-    @PostMapping("/api/sessions")
-    public void createSession() {
-        sessionsService.createSession();
-    }
-
-    @MessageMapping("/update")
-    public void updateGame(MessageDto message) {
-        log.info("update game ... ");
-    }
+//    @PostMapping("/api/sessions")
+//    public void createSession() {
+//        SessionDto sessionDto = new SessionDto();
+//        sessionDto.setGameId("1");
+//        sessionDto.setEventId("2");
+//        List<UserRecordDto> userRecordDtos = new ArrayList<>();
+//        userRecordDtos.add(new UserRecordDto("1", 0, 0));
+//        userRecordDtos.add(new UserRecordDto("1", 0, 0));
+//        userRecordDtos.add(new UserRecordDto("1", 0, 0));
+//        userRecordDtos.add(new UserRecordDto("1", 0, 0));
+//        sessionDto.setUsers(userRecordDtos);
+//        sessionsService.createSession(sessionDto);
+//    }
 
     @MessageMapping("/connection")
     public void getNumberOfConnections() {
-        log.info("getNumberOfConnections ... ");
-        int numberOfConnection = Integer.parseInt(stringRedisTemplate.opsForValue().get(KEY_CONNECTION));
+        log.info("Get number of connections ... ");
         // Send number of active players
-        messagingTemplate.convertAndSend("/topic/connection", numberOfConnection);
+        messagingTemplate.convertAndSend("/topic/connection", sessionsService.getNumberOfConnection());
     }
 
     @Scheduled(fixedRate = 1000)
