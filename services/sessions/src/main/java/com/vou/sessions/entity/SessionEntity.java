@@ -1,5 +1,6 @@
 package com.vou.sessions.entity;
 
+import com.vou.sessions.engine.quizgame.QuizRecordEntity;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -10,7 +11,7 @@ import java.util.List;
 
 @Document(collection = "sessions")
 @Data
-public class Session {
+public class SessionEntity {
     @Id
     private ObjectId id;
 
@@ -21,5 +22,5 @@ public class Session {
     private String gameId;
 
     @Field(value = "users")
-    private List<UserRecord> users;
+    private List<QuizRecordEntity> users;
 }

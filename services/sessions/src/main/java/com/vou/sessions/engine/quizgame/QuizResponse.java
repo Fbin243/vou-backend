@@ -1,4 +1,4 @@
-package com.vou.sessions.dto.quizgame;
+package com.vou.sessions.engine.quizgame;
 
 import lombok.Data;
 
@@ -7,6 +7,6 @@ import java.util.List;
 
 @Data
 public class QuizResponse implements Serializable {
-    private int response_code;
+    private int responseCode;
     private List<QuizQuestion> results;
 }

@@ -1,4 +1,4 @@
-package com.vou.sessions.dto.quizgame;
+package com.vou.sessions.engine.quizgame;
 
 import lombok.Data;
 
