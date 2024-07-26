@@ -3,7 +3,6 @@ package com.vou.sessions.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.vou.sessions.dto.MessageDto;
 import com.vou.sessions.engine.GameEngine;
 import com.vou.sessions.service.ISessionsService;
@@ -33,7 +32,6 @@ public class SessionsController {
     public void executeGame(MessageDto message, SimpMessageHeaderAccessor headerAccessor) {
         String playerId, sessionId;
         JsonNode reqNode;
-        ObjectNode resNode;
 
         try {
             log.info("payload: {}", message.getPayload());

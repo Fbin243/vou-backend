@@ -1,6 +1,7 @@
 package com.vou.sessions.engine;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.vou.sessions.service.SessionsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ public abstract class GameEngine {
     protected static final String CONNECTION_KEY = "CONNECTION";
     protected static final Logger log = LoggerFactory.getLogger(SessionsService.class);
     protected static ObjectMapper objectMapper = new ObjectMapper();
+    protected static final ObjectNode objectNode = objectMapper.createObjectNode();
     protected RedisTemplate<String, Object> redisTemplate;
     protected HashOperations<String, String, Object> hashOps;
 

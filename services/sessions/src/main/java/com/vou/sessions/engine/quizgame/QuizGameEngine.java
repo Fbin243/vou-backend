@@ -44,10 +44,14 @@ public class QuizGameEngine extends GameEngine {
                     return tmpQuizRecord;
                 }
         );
-
+        QuizResponse quizResponse = getQuizResponse(sessionId, 20).orElseThrow(
+                () -> new RuntimeException("Failed to get quiz response")
+        );
         quizRecord.setStartPlayTime(now);
         putQuizRecord(sessionId, playerId, quizRecord);
-        return getQuizResponse(sessionId, 20);
+        objectNode.put("quizResponse", objectMapper.valueToTree(quizResponse));
+        objectNode.put("totalScore", quizRecord.getTotalScore());
+        return objectNode;
     }
 
     @Override
