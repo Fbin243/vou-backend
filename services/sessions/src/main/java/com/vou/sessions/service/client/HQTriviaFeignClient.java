@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "HQTriviaClient", url = "https://opentdb.com")
 public interface HQTriviaFeignClient {
 
-    @GetMapping(value = "/api.php", consumes = "application/json")
+    @GetMapping(value = "/api.php?type=multiple", consumes = "application/json")
     QuizResponse getQuestions(@RequestParam("amount") int amount);
 }

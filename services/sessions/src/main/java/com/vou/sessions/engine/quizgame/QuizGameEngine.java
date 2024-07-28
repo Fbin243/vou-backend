@@ -1,8 +1,10 @@
 package com.vou.sessions.engine.quizgame;
 
+import com.amazonaws.services.polly.model.OutputFormat;
 import com.vou.pkg.exception.NotFoundException;
 import com.vou.sessions.engine.GameEngine;
 import com.vou.sessions.service.client.HQTriviaFeignClient;
+import com.vou.sessions.texttospeech.AmazonPollyService;
 import com.vou.sessions.utils.Utils;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +22,13 @@ import java.util.Optional;
 public class QuizGameEngine extends GameEngine {
     private static final String QUIZ_QUESTION_KEY = "QUIZ_QUESTION";
     private HQTriviaFeignClient hqTriviaFeignClient;
+    private AmazonPollyService amazonPollyService;
 
     @Autowired
-    QuizGameEngine(RedisTemplate<String, Object> redisTemplate, HQTriviaFeignClient triviaFeignClient) {
+    QuizGameEngine(RedisTemplate<String, Object> redisTemplate, HQTriviaFeignClient triviaFeignClient, AmazonPollyService amazonPollyService) {
         this.redisTemplate = redisTemplate;
         this.hqTriviaFeignClient = triviaFeignClient;
+        this.amazonPollyService = amazonPollyService;
     }
 
     @PostConstruct
@@ -44,7 +48,7 @@ public class QuizGameEngine extends GameEngine {
                     return tmpQuizRecord;
                 }
         );
-        QuizResponse quizResponse = getQuizResponse(sessionId, 20).orElseThrow(
+        QuizResponse quizResponse = getQuizResponse(sessionId, 10).orElseThrow(
                 () -> new RuntimeException("Failed to get quiz response")
         );
         quizRecord.setStartPlayTime(now);
@@ -88,13 +92,30 @@ public class QuizGameEngine extends GameEngine {
             QuizResponse quizResponse = objectMapper.convertValue(hashOps.get(sessionId, QUIZ_QUESTION_KEY), QuizResponse.class);
             if (quizResponse == null) {
                 quizResponse = hqTriviaFeignClient.getQuestions(amount);
+                quizResponse = shuffleCorrectAnswer(quizResponse);
                 hashOps.put(sessionId, QUIZ_QUESTION_KEY, quizResponse);
+                // Temporarily make audio
+                List<QuizQuestion> quizQuestions = quizResponse.getResults();
+//                for (int i = 0; i < quizQuestions.size(); i++) {
+//                }
+                log.info("{}", quizQuestions.get(0));
+                String ssmlString = amazonPollyService.convertQuizQuestionToSSML(quizQuestions.get(0), 1);
+                log.info("{}", ssmlString);
+                amazonPollyService.playAudio(amazonPollyService.synthesize(ssmlString, OutputFormat.Mp3));
             }
             return Optional.of(quizResponse);
         } catch (Exception ex) {
             ex.printStackTrace();
             return Optional.empty();
         }
+    }
+
+    private QuizResponse shuffleCorrectAnswer(QuizResponse quizResponse) {
+        for (QuizQuestion quizQuestion : quizResponse.getResults()) {
+            quizQuestion.setCorrectAnswerIndex((int) (Math.random() * 4));
+        }
+
+        return quizResponse;
     }
 
     private Optional<QuizRecord> getQuizRecord(String sessionId, String playerId) {
