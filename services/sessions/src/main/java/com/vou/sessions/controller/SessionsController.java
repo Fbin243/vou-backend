@@ -1,6 +1,5 @@
 package com.vou.sessions.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vou.sessions.dto.MessageDto;
@@ -38,7 +37,7 @@ public class SessionsController {
             reqNode = objectMapper.readTree(message.getPayload());
             playerId = reqNode.get("playerId").asText();
             sessionId = reqNode.get("sessionId").asText();
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Cannot parse payload");
         }
