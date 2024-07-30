@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vou.sessions.dto.MessageDto;
 import com.vou.sessions.engine.GameEngine;
+import com.vou.sessions.schedule.SchedulerService;
 import com.vou.sessions.service.ISessionsService;
-import com.vou.sessions.service.SchedulerService;
 import com.vou.sessions.utils.Utils;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -15,7 +15,6 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 @AllArgsConstructor
@@ -67,18 +66,29 @@ public class SessionsController {
     }
 
     @PostMapping("/api/start")
-    public void startNewSession(@RequestBody String cronExpression) {
-        log.info(cronExpression);
+    public void setUpSession() {
+        // This is information received from Broker of Event services
+        String gameId = "1";
+        String eventId = "2";
+        String startDate = "2024-07-30";
+        String endDate = "2024-07-30";
+        String startTime = "10:00:00";
+        String endTime = "21:00:00";
         Runnable runnable = () -> {
-            updateTimeAndLeaderboard("669fedc17ada690bd952c606", 123, 10);
+            // Save data to MongoDB and get sessionId
+            String sessionId = "669fedc17ada690bd952c606";
+            gameEngine.setUp(sessionId);
+//            updateTimeAndLeaderboard("669fedc17ada690bd952c606", 123, 10);
+            log.info("set up session");
         };
-        schedulerService.initializeNewTask(cronExpression, runnable);
+
+        schedulerService.createCronJobs(runnable, startDate, endDate, startTime, endTime);
     }
 
     private void updateTimeAndLeaderboard(String sessionId, long startTime, int duration) {
         long now = Utils.now();
         log.info("Time: {}", now);
-        messagingTemplate.convertAndSend("/topic/time/" + sessionId, now);
+//        messagingTemplate.convertAndSend("/topic/time/" + sessionId, now);
         // Update leaderboard when switch question
 //        if ((now - startTime) % duration == 0) {
 //            sessionsService.getLeaderboardBySessionId(sessionId);

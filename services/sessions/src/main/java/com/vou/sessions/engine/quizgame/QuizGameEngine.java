@@ -3,6 +3,7 @@ package com.vou.sessions.engine.quizgame;
 import com.amazonaws.services.polly.model.OutputFormat;
 import com.vou.pkg.exception.NotFoundException;
 import com.vou.sessions.engine.GameEngine;
+import com.vou.sessions.repository.SessionsRepository;
 import com.vou.sessions.service.client.HQTriviaFeignClient;
 import com.vou.sessions.texttospeech.AmazonPollyService;
 import com.vou.sessions.utils.Utils;
@@ -12,6 +13,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.io.InputStream;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -20,9 +22,10 @@ import java.util.Optional;
 @Primary
 @Component
 public class QuizGameEngine extends GameEngine {
-    private static final String QUIZ_QUESTION_KEY = "QUIZ_QUESTION";
+    private static final String QUIZ_RESPONSE_KEY = "QUIZ_RESPONSE";
     private HQTriviaFeignClient hqTriviaFeignClient;
     private AmazonPollyService amazonPollyService;
+    private SessionsRepository sessionsRepository;
 
     @Autowired
     QuizGameEngine(RedisTemplate<String, Object> redisTemplate, HQTriviaFeignClient triviaFeignClient, AmazonPollyService amazonPollyService) {
@@ -34,6 +37,33 @@ public class QuizGameEngine extends GameEngine {
     @PostConstruct
     public void init() {
         hashOps = redisTemplate.opsForHash();
+    }
+
+
+    @Override
+    public void setUp(String sessionId) {
+        // Step 2: Fetch data from OpenTrivia
+        QuizResponse quizResponse = hqTriviaFeignClient.getQuestions(3);
+        shuffleCorrectAnswer(quizResponse);
+
+        // Step 3: Generate audio files from questions by Amazon Polly and save it to AWS S3
+        List<QuizQuestion> quizQuestions = quizResponse.getResults();
+        for (int i = 0; i < quizQuestions.size(); i++) {
+            String ssmlString = amazonPollyService.convertQuizQuestionToSSML(quizQuestions.get(i), i + 1);
+            try (InputStream inputStream = amazonPollyService.synthesize(ssmlString, OutputFormat.Mp3)) {
+                String key = String.format("questions/%s/%d", sessionId, i + 1);
+                log.info("S3key: {}", key);
+                String url = amazonPollyService.uploadToS3(inputStream, key);
+                log.info("S3url: {}", url);
+                quizQuestions.get(i).setAudioUrl(url);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException("Failed to set up quiz game");
+            }
+        }
+
+        // Step 4: Save quiz response to Redis and MongoDB
+        hashOps.put(sessionId, QUIZ_RESPONSE_KEY, quizResponse);
     }
 
     @Override
@@ -89,20 +119,7 @@ public class QuizGameEngine extends GameEngine {
 
     private Optional<QuizResponse> getQuizResponse(String sessionId, int amount) {
         try {
-            QuizResponse quizResponse = objectMapper.convertValue(hashOps.get(sessionId, QUIZ_QUESTION_KEY), QuizResponse.class);
-            if (quizResponse == null) {
-                quizResponse = hqTriviaFeignClient.getQuestions(amount);
-                quizResponse = shuffleCorrectAnswer(quizResponse);
-                hashOps.put(sessionId, QUIZ_QUESTION_KEY, quizResponse);
-                // Temporarily make audio
-                List<QuizQuestion> quizQuestions = quizResponse.getResults();
-//                for (int i = 0; i < quizQuestions.size(); i++) {
-//                }
-                log.info("{}", quizQuestions.get(0));
-                String ssmlString = amazonPollyService.convertQuizQuestionToSSML(quizQuestions.get(0), 1);
-                log.info("{}", ssmlString);
-                amazonPollyService.playAudio(amazonPollyService.synthesize(ssmlString, OutputFormat.Mp3));
-            }
+            QuizResponse quizResponse = objectMapper.convertValue(hashOps.get(sessionId, QUIZ_RESPONSE_KEY), QuizResponse.class);
             return Optional.of(quizResponse);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -110,12 +127,10 @@ public class QuizGameEngine extends GameEngine {
         }
     }
 
-    private QuizResponse shuffleCorrectAnswer(QuizResponse quizResponse) {
+    private void shuffleCorrectAnswer(QuizResponse quizResponse) {
         for (QuizQuestion quizQuestion : quizResponse.getResults()) {
             quizQuestion.setCorrectAnswerIndex((int) (Math.random() * 4));
         }
-
-        return quizResponse;
     }
 
     private Optional<QuizRecord> getQuizRecord(String sessionId, String playerId) {
@@ -139,7 +154,7 @@ public class QuizGameEngine extends GameEngine {
     private List<QuizRecord> getLeaderboard(String sessionId) {
         Map<String, Object> playerRecords = hashOps.entries(sessionId);
         playerRecords.remove(CONNECTION_KEY);
-        playerRecords.remove(QUIZ_QUESTION_KEY);
+        playerRecords.remove(QUIZ_RESPONSE_KEY);
         log.info("getLeaderboardBySessionId, len: {} {}", playerRecords.size(), playerRecords);
 
         List<QuizRecord> leaderboard = playerRecords.values().stream().map(value -> objectMapper.convertValue(value, QuizRecord.class))

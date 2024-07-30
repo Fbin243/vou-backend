@@ -14,7 +14,6 @@ import javazoom.jl.player.advanced.PlaybackEvent;
 import javazoom.jl.player.advanced.PlaybackListener;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -25,12 +24,7 @@ public class AmazonPollyService {
     private static final String SAMPLE = """
             <speak>
                 <p>
-                    <s>Question number 1<break time="500ms"/></s>
-                    <s>The human heart has how many chambers?<break time="1s"/></s>
-                    <s>A.<break time="200ms"/> 2<break time="500ms"/></s>
-                    <s>B.<break time="200ms"/> 6<break time="500ms"/></s>
-                    <s>C.<break time="200ms"/> 3<break time="500ms"/></s>
-                    <s>And D.<break time="200ms"/> 4<break time="500ms"/></s>
+                    <s>The correct answer is <break time="1s"/> <emphasis level="strong"><prosody pitch="+60%" rate="fast">D</prosody></emphasis> </s>
                 </p>
             </speak>
             """;
@@ -58,10 +52,9 @@ public class AmazonPollyService {
         InputStream speechStream = service.synthesize(SAMPLE, OutputFormat.Mp3);
 
         // Play audio
-        service.playAudio(speechStream);
-//
-//        // Upload to S3
-//        String s3Key = "questions/sample.mp3"; // Đường dẫn file trong bucket
+//        service.playAudio(speechStream);
+        // Upload to S3
+//        String s3Key = "answers/D.mp3"; // Đường dẫn file trong bucket
 //        service.uploadToS3(speechStream, s3Key);
 //
 //        // Generate S3 URL
@@ -69,7 +62,7 @@ public class AmazonPollyService {
 //        System.out.println("File URL: " + fileUrl);
     }
 
-    public InputStream synthesize(String text, OutputFormat format) throws IOException {
+    public InputStream synthesize(String text, OutputFormat format) {
         SynthesizeSpeechRequest synthReq = new SynthesizeSpeechRequest()
                 .withText(text).withVoiceId(voice.getId())
                 .withOutputFormat(format)
@@ -80,8 +73,9 @@ public class AmazonPollyService {
         return synthRes.getAudioStream();
     }
 
-    public void uploadToS3(InputStream inputStream, String key) {
+    public String uploadToS3(InputStream inputStream, String key) {
         s3Client.putObject(new PutObjectRequest(bucketName, key, inputStream, null));
+        return s3Client.getUrl(bucketName, key).toString();
     }
 
     public String getPresignedUrl(String key) {

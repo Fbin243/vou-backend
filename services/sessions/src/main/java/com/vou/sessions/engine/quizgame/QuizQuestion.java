@@ -20,6 +20,6 @@ public class QuizQuestion implements Serializable {
     private List<String> incorrectAnswers;
     @JsonProperty("correct_answer_index")
     private int correctAnswerIndex;
-    @JsonProperty("s3_key")
-    private String s3Key;
+    @JsonProperty("audio_url")
+    private String audioUrl;
 }
