@@ -35,6 +35,7 @@
     <modules>
         <module>pkg</module>
         <module>services/games</module>
+        <module>services/events</module>
         <module>services/sessions</module>
     </modules>
 
