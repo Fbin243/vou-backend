@@ -1,0 +1,46 @@
+services:
+  eurekaserver:
+    image: fbin243/eurekaserver:0.0.1
+    container_name: eurekaserver
+    ports:
+      - 8070:8070
+    healthcheck:
+      test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    extends:
+      file: common-config.yml
+      service: base-config
+    environment:
+      SPRING_APPLICATION_NAME: "eurekaserver"
+
+  gamesdb:
+    container_name: gamesdb
+    environment:
+      MYSQL_DATABASE: gamesdb
+    extends:
+      file: common-config.yml
+      service: db-config
+
+  games:
+    image: fbin243/games:0.0.1
+    container_name: games
+    ports:
+      - 8080:8080
+    environment:
+      SPRING_APPLICATION_NAME: "games"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://gamesdb:3306/gamesdb"
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    depends_on:
+      gamesdb:
+        condition: service_healthy
+    extends:
+      file: common-config.yml
+      service: eureka-config
+
+networks:
+  vou_network:
+    driver: bridge
