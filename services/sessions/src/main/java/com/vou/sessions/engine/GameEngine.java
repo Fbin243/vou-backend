@@ -44,6 +44,8 @@ public abstract class GameEngine {
         return value == null ? 1 : value;
     }
 
+    public abstract void setUp(String sessionId);
+
     public abstract Object start(String sessionId, String playerId);
 
     public abstract void update(String sessionId, String playerId, Object update);

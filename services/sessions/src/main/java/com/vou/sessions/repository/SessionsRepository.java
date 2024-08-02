@@ -10,4 +10,5 @@ import java.util.Optional;
 @Repository
 public interface SessionsRepository extends MongoRepository<SessionEntity, ObjectId> {
     Optional<SessionEntity> findSessionByEventIdAndGameId(String eventId, String gameId);
+
 }

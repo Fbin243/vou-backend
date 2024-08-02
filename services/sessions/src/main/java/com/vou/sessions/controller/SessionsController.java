@@ -1,12 +1,11 @@
 package com.vou.sessions.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vou.sessions.dto.MessageDto;
 import com.vou.sessions.engine.GameEngine;
+import com.vou.sessions.schedule.SchedulerService;
 import com.vou.sessions.service.ISessionsService;
-import com.vou.sessions.service.SchedulerService;
 import com.vou.sessions.utils.Utils;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -16,7 +15,6 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 @AllArgsConstructor
@@ -38,7 +36,7 @@ public class SessionsController {
             reqNode = objectMapper.readTree(message.getPayload());
             playerId = reqNode.get("playerId").asText();
             sessionId = reqNode.get("sessionId").asText();
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Cannot parse payload");
         }
@@ -68,12 +66,28 @@ public class SessionsController {
     }
 
     @PostMapping("/api/start")
-    public void startNewSession(@RequestBody String cronExpression) {
-        log.info(cronExpression);
-        Runnable runnable = () -> {
-            updateTimeAndLeaderboard("669fedc17ada690bd952c606", 123, 10);
+    public void setUpSession() {
+        // This is information received from Broker of Event services
+        String gameId = "1";
+        String eventId = "2";
+        String startDate = "2024-08-02";
+        String endDate = "2024-08-02";
+        String startTime = "9:01:00";
+        String endTime = "23:00:00";
+
+        Runnable setUpGame = () -> {
+            // Save data to MongoDB and get sessionId
+            String sessionId = "669fedc17ada690bd952c608";
+            gameEngine.setUp(sessionId);
+            log.info("set up session");
+
+            Runnable updateTime = () -> {
+                updateTimeAndLeaderboard(sessionId, 1, 2);
+            };
+            schedulerService.createCronJobs(updateTime, startDate, endDate, startTime, endTime, true);
         };
-        schedulerService.initializeNewTask(cronExpression, runnable);
+
+        schedulerService.createCronJobs(setUpGame, startDate, endDate, startTime, endTime, false);
     }
 
     private void updateTimeAndLeaderboard(String sessionId, long startTime, int duration) {
