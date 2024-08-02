@@ -115,8 +115,11 @@ public class AmazonPollyService {
         ssmlBuilder.append("<s>").append(quizQuestion.getQuestion()).append("<break time=\"1s\"/></s>");
 
         List<String> answers = new ArrayList<>();
-        answers.add(quizQuestion.getCorrectAnswer());
+        int correctAnswerIndex = quizQuestion.getCorrectAnswerIndex();
+        answers.add("");
         answers.addAll(quizQuestion.getIncorrectAnswers());
+        answers.set(0, answers.get(correctAnswerIndex));
+        answers.set(correctAnswerIndex, quizQuestion.getCorrectAnswer());
 
         for (int i = 0; i < answers.size(); i++) {
             if (i == 3) ssmlBuilder.append("And ");

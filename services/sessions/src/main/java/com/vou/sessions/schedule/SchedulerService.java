@@ -25,18 +25,18 @@ public class SchedulerService {
         scheduler = schedulerFactory.getScheduler();
     }
 
-    public void createCronJobs(Runnable runnable, String startDateStr, String endDateStr, String startTimeStr, String endTimeStr) {
+    public void createCronJobs(Runnable runnable, String startDateStr, String endDateStr, String startTimeStr, String endTimeStr, boolean loop) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate startDate = LocalDate.parse(startDateStr, formatter);
         LocalDate endDate = LocalDate.parse(endDateStr, formatter);
         while (!startDate.isAfter(endDate)) {
             log.info("startDate: {}, endDate: {}", startDate, endDate);
-            createOneCronJob(runnable, startDate.toString(), startTimeStr, endTimeStr);
+            createOneCronJob(runnable, startDate.toString(), startTimeStr, endTimeStr, loop);
             startDate = startDate.plusDays(1);
         }
     }
 
-    public void createOneCronJob(Runnable runnable, String dateStr, String startTimeStr, String endTimeStr) {
+    public void createOneCronJob(Runnable runnable, String dateStr, String startTimeStr, String endTimeStr, boolean loop) {
         try {
             JobDataMap jobDataMap = new JobDataMap();
             jobDataMap.put("runnable", runnable);
@@ -52,13 +52,25 @@ public class SchedulerService {
             Date endTime = sdf.parse(dateStr + " " + endTimeStr);
 
             // Define Trigger
-            Trigger trigger = TriggerBuilder.newTrigger()
-                    .startAt(startTime)
-                    .endAt(endTime)
-                    .withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                            .withIntervalInSeconds(1) // Specify the interval
-                            .repeatForever())
-                    .build();
+            Trigger trigger;
+            TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger()
+                    .startAt(startTime);
+
+
+            if (loop) {
+                trigger = triggerBuilder
+                        .endAt(endTime)
+                        .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                                .withIntervalInSeconds(1) // Specify the interval
+                                .repeatForever())
+                        .build();
+            } else {
+                trigger = triggerBuilder.
+                        withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                                .withRepeatCount(0))
+                        .build();
+            }
+
 
             // Schedule Job
             scheduler.scheduleJob(jobDetail, trigger);

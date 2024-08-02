@@ -42,16 +42,22 @@ public class QuizGameEngine extends GameEngine {
 
     @Override
     public void setUp(String sessionId) {
-        // Step 2: Fetch data from OpenTrivia
+        // Check if session is exists
+        if (hashOps.hasKey(sessionId, QUIZ_RESPONSE_KEY)) {
+            log.info("Session has been set up");
+            return;
+        }
+
+        // Step 1: Fetch data from OpenTrivia
         QuizResponse quizResponse = hqTriviaFeignClient.getQuestions(3);
         shuffleCorrectAnswer(quizResponse);
 
-        // Step 3: Generate audio files from questions by Amazon Polly and save it to AWS S3
+        // Step 2: Generate audio files from questions by Amazon Polly and save it to AWS S3
         List<QuizQuestion> quizQuestions = quizResponse.getResults();
         for (int i = 0; i < quizQuestions.size(); i++) {
             String ssmlString = amazonPollyService.convertQuizQuestionToSSML(quizQuestions.get(i), i + 1);
             try (InputStream inputStream = amazonPollyService.synthesize(ssmlString, OutputFormat.Mp3)) {
-                String key = String.format("questions/%s/%d", sessionId, i + 1);
+                String key = String.format("questions/%s/%d.mp3", sessionId, i + 1);
                 log.info("S3key: {}", key);
                 String url = amazonPollyService.uploadToS3(inputStream, key);
                 log.info("S3url: {}", url);
@@ -62,7 +68,7 @@ public class QuizGameEngine extends GameEngine {
             }
         }
 
-        // Step 4: Save quiz response to Redis and MongoDB
+        // Step 3: Save quiz response to Redis and MongoDB
         hashOps.put(sessionId, QUIZ_RESPONSE_KEY, quizResponse);
     }
 

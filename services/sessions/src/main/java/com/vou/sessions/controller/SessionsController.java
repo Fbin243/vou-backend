@@ -70,25 +70,30 @@ public class SessionsController {
         // This is information received from Broker of Event services
         String gameId = "1";
         String eventId = "2";
-        String startDate = "2024-07-30";
-        String endDate = "2024-07-30";
-        String startTime = "10:00:00";
-        String endTime = "21:00:00";
-        Runnable runnable = () -> {
+        String startDate = "2024-08-02";
+        String endDate = "2024-08-02";
+        String startTime = "9:01:00";
+        String endTime = "23:00:00";
+
+        Runnable setUpGame = () -> {
             // Save data to MongoDB and get sessionId
-            String sessionId = "669fedc17ada690bd952c606";
+            String sessionId = "669fedc17ada690bd952c608";
             gameEngine.setUp(sessionId);
-//            updateTimeAndLeaderboard("669fedc17ada690bd952c606", 123, 10);
             log.info("set up session");
+
+            Runnable updateTime = () -> {
+                updateTimeAndLeaderboard(sessionId, 1, 2);
+            };
+            schedulerService.createCronJobs(updateTime, startDate, endDate, startTime, endTime, true);
         };
 
-        schedulerService.createCronJobs(runnable, startDate, endDate, startTime, endTime);
+        schedulerService.createCronJobs(setUpGame, startDate, endDate, startTime, endTime, false);
     }
 
     private void updateTimeAndLeaderboard(String sessionId, long startTime, int duration) {
         long now = Utils.now();
         log.info("Time: {}", now);
-//        messagingTemplate.convertAndSend("/topic/time/" + sessionId, now);
+        messagingTemplate.convertAndSend("/topic/time/" + sessionId, now);
         // Update leaderboard when switch question
 //        if ((now - startTime) % duration == 0) {
 //            sessionsService.getLeaderboardBySessionId(sessionId);
