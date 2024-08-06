@@ -22,7 +22,7 @@ public class UserController {
         if (user.getRole() == null) {
             throw new BadRequestException("Role is required");
         }
-        user.setRole(UserRole.valueOf(user.getRole().name().toUpperCase()));
+        user.setRole(UserRole.valueOf(user.getRole().name()));
         User savedUser = userService.saveUser(user);
         return ResponseEntity.ok(savedUser);
     }
