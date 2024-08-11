@@ -1,8 +1,6 @@
 package com.vou.events.entity;
 
 import com.vou.events.common.EventIntermediateTableStatus;
-import com.vou.events.entity.Voucher;
-import com.vou.events.entity.Item;
 import com.vou.events.model.VoucherItemId;
 
 import lombok.Getter;
@@ -24,16 +22,19 @@ import java.io.Serializable;
 public class VoucherItem implements Serializable {
 
     @Id
-    @ManyToOne
-    @JoinColumn(name = "id", nullable = false)
+    @ManyToOne(cascade = CascadeType.MERGE)
+    @JoinColumn(name = "voucher_id", nullable = false)
     private Voucher voucher;
 
     @Id
-    @ManyToOne
-    @JoinColumn(name = "id", nullable = false)
+    @ManyToOne(cascade = CascadeType.MERGE)
+    @JoinColumn(name = "item_id", nullable = false)
     private Item item;
 
+    @Column(name = "number_of_item")
     private int numberOfItem;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "active_status")
     private EventIntermediateTableStatus activeStatus;
 }

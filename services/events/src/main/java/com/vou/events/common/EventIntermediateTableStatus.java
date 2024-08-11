@@ -5,6 +5,6 @@ package com.vou.events.common;
  */
 public enum EventIntermediateTableStatus {
     ACTIVE,
-    EXPIRED,
-    INACTIVE
+    INACTIVE,
+    EXPIRED
 }

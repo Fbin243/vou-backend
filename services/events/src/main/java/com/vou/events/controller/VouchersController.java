@@ -3,9 +3,10 @@ package com.vou.events.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 import com.vou.pkg.dto.ResponseDto;
-import com.vou.events.common.ItemQuantity;
+import com.vou.events.dto.ConversionVoucherItems;
 import com.vou.events.dto.VoucherDto;
 import com.vou.events.service.IVouchersService;
 
@@ -15,7 +16,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/vouchers")
+@RequestMapping(path = "/api/vouchers", produces = {MediaType.APPLICATION_JSON_VALUE})
 public class VouchersController {
     private final IVouchersService voucherService;
 
@@ -63,8 +64,8 @@ public class VouchersController {
     }
 
     @PostMapping("/conversion")
-    public ResponseEntity<ResponseDto> addVoucherItemConversion (@RequestParam String voucherId, @RequestParam List<ItemQuantity> itemIds_quantities) {
-        voucherService.addVoucherItemConversion(voucherId, itemIds_quantities);
+    public ResponseEntity<ResponseDto> addVoucherItemConversion (@RequestBody ConversionVoucherItems conversionVoucherItems) {
+        voucherService.addVoucherItemConversion(conversionVoucherItems.getVoucherId(), conversionVoucherItems.getItemIds_quantities());
         ResponseDto res = new ResponseDto(HttpStatus.CREATED, "Voucher item conversion added successfully.");
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }

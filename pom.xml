@@ -34,9 +34,12 @@
 
     <modules>
         <module>pkg</module>
-        <module>services/games</module>
+        <module>services/configserver</module>
         <module>services/events</module>
-        <module>services/sessions</module>
+       <module>services/games</module>
+        <module>services/notifications</module>
+        <module>services/eurekaserver</module>
+<!--        <module>services/sessions</module>-->
     </modules>
 
     <dependencies>
