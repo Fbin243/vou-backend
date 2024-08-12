@@ -15,6 +15,7 @@ public class BrandMapper {
         }
 
         BrandDto brandDto = new BrandDto();
+        brandDto.setId(brand.getId());
         brandDto.setBrandName(brand.getBrandName());
         brandDto.setField(brand.getField());
         brandDto.setAddress(brand.getAddress());
@@ -32,6 +33,7 @@ public class BrandMapper {
         }
 
         Brand brand = new Brand();
+        brand.setId(dto.getId());
         brand.setBrandName(dto.getBrandName());
         brand.setField(dto.getField());
         brand.setAddress(dto.getAddress());

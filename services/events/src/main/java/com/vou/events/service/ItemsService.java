@@ -5,7 +5,7 @@ import com.vou.events.entity.*;
 import com.vou.events.mapper.ItemMapper;
 import com.vou.events.repository.*;
 import com.vou.events.common.EventIntermediateTableStatus;
-import com.vou.events.common.ItemQuantity;
+import com.vou.events.common.ItemId_Quantity;
 import com.vou.pkg.exception.NotFoundException;
 
 import lombok.AllArgsConstructor;
@@ -29,7 +29,7 @@ public class ItemsService implements IItemsService {
 
     @Override
     public ItemDto fetchItemById(String id) {
-        Item item = itemRepository.findById(Long.parseLong(id)).orElseThrow(
+        Item item = itemRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("Item", "id", id)
         );
         return ItemMapper.toDto(item);
@@ -45,7 +45,7 @@ public class ItemsService implements IItemsService {
     @Override
     public boolean updateItem(ItemDto itemDto) {
         try {
-            Item item = itemRepository.findById(Long.parseLong(itemDto.getId())).orElseThrow(
+            Item item = itemRepository.findById(itemDto.getId()).orElseThrow(
                     () -> new NotFoundException("Item", "id", itemDto.getId())
             );
 
@@ -62,7 +62,7 @@ public class ItemsService implements IItemsService {
     @Override
     public boolean deleteItem(String id) {
         try {
-            Item item = itemRepository.findById(Long.parseLong(id)).orElseThrow(
+            Item item = itemRepository.findById(id).orElseThrow(
                     () -> new NotFoundException("Item", "id", id)
             );
 

@@ -5,12 +5,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vou.sessions.dto.MessageDto;
 import com.vou.sessions.dto.SetUpSessionDto;
 import com.vou.sessions.engine.GameEngine;
+import com.vou.sessions.model.EventSessionInfo;
 import com.vou.sessions.schedule.SchedulerService;
 import com.vou.sessions.service.ISessionsService;
+import com.vou.sessions.service.KafkaConsumerService;
 import com.vou.sessions.utils.Utils;
 import lombok.AllArgsConstructor;
+
+import org.apache.kafka.shaded.io.opentelemetry.proto.trace.v1.Span.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -21,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Controller
 @AllArgsConstructor
 public class SessionsController {
+    @Autowired
+    private KafkaConsumerService kafkaConsumerService;
     private static final Logger log = LoggerFactory.getLogger(SessionsController.class);
     private static ObjectMapper objectMapper = new ObjectMapper();
     private SimpMessagingTemplate messagingTemplate;
@@ -68,21 +75,21 @@ public class SessionsController {
     }
 
     @PostMapping("/api/start")
-    public void setUpSession(@RequestBody SetUpSessionDto setUpSessionDto) {
-//        // This is information received from Broker of Event services
-        String gameId = setUpSessionDto.getGameId();
-        String eventId = setUpSessionDto.getEventId();
-        String startDate = setUpSessionDto.getStartDate();
-        String endDate = setUpSessionDto.getEndDate();
-        String startTime = setUpSessionDto.getStartTime();
-        String endTime = setUpSessionDto.getEndTime();
+    public void setUpSession() {
+        EventSessionInfo eventSessionInfo = kafkaConsumerService.getNewestMessage();
 
-        log.info("set up {} ", setUpSessionDto);
+        // This is information received from Broker of Event services
+        String gameId = eventSessionInfo.getGameId();
+        String eventId = eventSessionInfo.getEventId();
+        String startDate = eventSessionInfo.getStartDate();
+        String endDate = eventSessionInfo.getEndDate();
+        String startTime = eventSessionInfo.getStartTime();
+        String endTime = "23:00:00";
 
         Runnable setUpGame = () -> {
             // Save data to MongoDB and get sessionId
             String sessionId = "669fedc17ada690bd952c608";
-//            gameEngine.setUp(sessionId);
+            // gameEngine.setUp(sessionId);
 
             Runnable updateTime = () -> {
                 updateTimeAndLeaderboard(sessionId, 1, 2);
@@ -98,9 +105,10 @@ public class SessionsController {
         log.info("Time: {}", now);
         messagingTemplate.convertAndSend("/topic/time/" + sessionId, now);
         // Update leaderboard when switch question
-//        if ((now - startTime) % duration == 0) {
-//            sessionsService.getLeaderboardBySessionId(sessionId);
-//            messagingTemplate.convertAndSend("/topic/leaderboard/" + sessionId, sessionsService.getLeaderboardBySessionId(sessionId));
-//        }
+        // if ((now - startTime) % duration == 0) {
+        // sessionsService.getLeaderboardBySessionId(sessionId);
+        // messagingTemplate.convertAndSend("/topic/leaderboard/" + sessionId,
+        // sessionsService.getLeaderboardBySessionId(sessionId));
+        // }
     }
 }

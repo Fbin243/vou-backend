@@ -1,6 +1,5 @@
 package com.vou.events.entity;
 
-import com.vou.events.entity.Brand;
 import com.vou.pkg.entity.Base;
 
 import lombok.Getter;

@@ -6,7 +6,7 @@
         <groupId>com.vou</groupId>
         <artifactId>backend</artifactId>
         <version>0.0.1</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath> ../pom.xml</relativePath>
     </parent>
     <artifactId>pkg</artifactId>
     <version>0.0.1-SNAPSHOT</version>

@@ -1,6 +1,6 @@
 package com.vou.events.service;
 
-import com.vou.events.common.ItemQuantity;
+import com.vou.events.common.ItemId_Quantity;
 import com.vou.events.dto.VoucherDto;
 
 import java.util.List;
@@ -44,7 +44,7 @@ public interface IVouchersService {
      * @param voucherDto the voucher to create
      * @return the created voucher
      */
-    default VoucherDto createVoucher(VoucherDto voucherDto) {
+    default String createVoucher(VoucherDto voucherDto) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -74,7 +74,7 @@ public interface IVouchersService {
      * @param itemIds the ids of the items to add
      * @return true if the items were added successfully, false otherwise
      */
-    default boolean addVoucherItemConversion(String voucherId, List<ItemQuantity> itemIds) {
+    default boolean addVoucherItemConversion(String voucherId, List<ItemId_Quantity> itemIds) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 }
