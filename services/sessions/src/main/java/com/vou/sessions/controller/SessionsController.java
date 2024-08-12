@@ -3,6 +3,7 @@ package com.vou.sessions.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vou.sessions.dto.MessageDto;
+import com.vou.sessions.dto.SetUpSessionDto;
 import com.vou.sessions.engine.GameEngine;
 import com.vou.sessions.schedule.SchedulerService;
 import com.vou.sessions.service.ISessionsService;
@@ -15,6 +16,7 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 @AllArgsConstructor
@@ -66,20 +68,21 @@ public class SessionsController {
     }
 
     @PostMapping("/api/start")
-    public void setUpSession() {
-        // This is information received from Broker of Event services
-        String gameId = "1";
-        String eventId = "2";
-        String startDate = "2024-08-02";
-        String endDate = "2024-08-02";
-        String startTime = "9:01:00";
-        String endTime = "23:00:00";
+    public void setUpSession(@RequestBody SetUpSessionDto setUpSessionDto) {
+//        // This is information received from Broker of Event services
+        String gameId = setUpSessionDto.getGameId();
+        String eventId = setUpSessionDto.getEventId();
+        String startDate = setUpSessionDto.getStartDate();
+        String endDate = setUpSessionDto.getEndDate();
+        String startTime = setUpSessionDto.getStartTime();
+        String endTime = setUpSessionDto.getEndTime();
+
+        log.info("set up {} ", setUpSessionDto);
 
         Runnable setUpGame = () -> {
             // Save data to MongoDB and get sessionId
             String sessionId = "669fedc17ada690bd952c608";
-            gameEngine.setUp(sessionId);
-            log.info("set up session");
+//            gameEngine.setUp(sessionId);
 
             Runnable updateTime = () -> {
                 updateTimeAndLeaderboard(sessionId, 1, 2);
