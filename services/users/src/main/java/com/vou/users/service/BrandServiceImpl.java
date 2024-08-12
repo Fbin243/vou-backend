@@ -52,4 +52,14 @@ public class BrandServiceImpl implements BrandService {
     public void deleteBrandById(String theId) {
         brandRepository.deleteById(theId);
     }
+
+    @Override
+    public Brand findBrandByEmail(String email) {
+        return brandRepository.findByEmail(email);
+    }
+
+    @Override
+    public List<Brand> findManyBrandsByManyEmails(List<String> emails) {
+        return brandRepository.findManyBrandsByManyEmails(emails);
+    }
 }

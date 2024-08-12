@@ -46,4 +46,32 @@ public class BrandController {
         brandService.deleteBrandById(brandId);
         return "Deleted brand id - " + brandId;
     }
+
+    @GetMapping("/email/{email}")
+    public Brand getBrandByEmail(@PathVariable String email) {
+        if (email == null || email.isEmpty()) {
+            throw new RuntimeException("Email is required");
+        }
+        // if no having any matched brand: return "No brand found with email: " + email;
+        Brand result = brandService.findBrandByEmail(email);
+        if (result == null) {
+            throw new RuntimeException("No brand found with email: " + email);
+        }
+        return result;
+    }
+
+    @GetMapping("/emails")
+    public List<Brand> getBrandsByEmails(@RequestBody List<String> emails) {
+
+        if (emails == null || emails.isEmpty()) {
+            throw new RuntimeException("Emails are required");
+        }
+        List<Brand> result = brandService.findManyBrandsByManyEmails(emails);
+        if (result == null || result.isEmpty()) {
+            throw new RuntimeException("No brand found with emails: " + emails);
+        }
+        return result;
+    }
+
+
 }

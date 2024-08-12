@@ -9,4 +9,7 @@ public interface BrandService {
     List<Brand> findAllBrands();
     void updateBrand(Brand theBrand);
     void deleteBrandById(String theId);
+    Brand findBrandByEmail(String email);
+    List<Brand> findManyBrandsByManyEmails(List<String> emails);
+
 }

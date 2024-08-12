@@ -61,6 +61,7 @@ public class UserController {
             throw new NotFoundException("User not found with id: " + id);
         }
         userService.deleteUserById(id);
-        return ResponseEntity.noContent().build();
+
+        return ResponseEntity.ok().build();
     }
 }
