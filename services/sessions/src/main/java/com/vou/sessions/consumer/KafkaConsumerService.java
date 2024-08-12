@@ -1,11 +1,11 @@
-package com.vou.notifications.consumer;
+package com.vou.sessions.consumer;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Service;
 
-import com.vou.notifications.model.EventSessionInfo;
+import com.vou.sessions.model.EventSessionInfo;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -21,6 +21,8 @@ import com.vou.pkg.exception.NotFoundException;
 
 import lombok.AllArgsConstructor;
 
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +32,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,8 +51,11 @@ public class EventsService implements IEventsService {
     private final IVouchersService          voucherService;
     private final IItemsService             itemService;
 
-    @Autowired
-    private KafkaTemplate<String, EventSessionInfo> kafkaTemplate;
+    Properties props = new Properties();
+
+    // KafkaProducer<String, EventSessionInfo> producer = new KafkaProducer<>(props);
+    // @Autowired
+    // private KafkaTemplate<String, EventSessionInfo> kafkaTemplate;
 
     @Override
     public List<EventDto> fetchAllEvents() {
@@ -441,10 +447,26 @@ public class EventsService implements IEventsService {
             }
             
             if (this.addGamesToEvent(eventId, eventRegistrationInfoDto.getListGameId_StartTime())) {
+
                 // Send list of games to Kafka - topic = event-session
-                for (GameId_StartTime gameId_StartTime : eventRegistrationInfoDto.getListGameId_StartTime()) {
-                    EventSessionInfo eventSessionInfo = new EventSessionInfo(eventId, gameId_StartTime.getGameId().toString(), eventRegistrationInfoDto.getEvent().getStartDate().toString(), eventRegistrationInfoDto.getEvent().getEndDate().toString(), gameId_StartTime.getStartTime().toString());
-                    kafkaTemplate.send("event-session", eventSessionInfo);
+                props.put("bootstrap.servers", "localhost:9092");
+                props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+                props.put("value.serializer", "com.vou.events.kafka.serializer.EventSessionInfoSerializer");
+
+                try (KafkaProducer<String, EventSessionInfo> producer = new KafkaProducer<>(props)) {
+                    for (GameId_StartTime gameId_StartTime : eventRegistrationInfoDto.getListGameId_StartTime()) {
+                        EventSessionInfo eventSessionInfo = new EventSessionInfo(
+                            eventId,
+                            gameId_StartTime.getGameId().toString(),
+                            eventRegistrationInfoDto.getEvent().getStartDate().toString(),
+                            eventRegistrationInfoDto.getEvent().getEndDate().toString(),
+                            gameId_StartTime.getStartTime().toString()
+                        );
+                
+                        producer.send(new ProducerRecord<>("event-session", eventSessionInfo));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             } else {
                 ResponseDto res = new ResponseDto(HttpStatus.BAD_REQUEST, "Game addition failed.");

@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.vou.notifications.consumer.KafkaConsumerService;
+import com.vou.notifications.model.EventSessionInfo;
 
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class KafkaMessageController {
     private KafkaConsumerService kafkaConsumerService;
 
     @GetMapping("/messages")
-    public List<String> getMessages() {
+    public List<EventSessionInfo> getMessages() {
         return kafkaConsumerService.getMessages();
     }
 

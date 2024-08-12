@@ -1,17 +1,11 @@
 package com.vou.events.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import com.vou.pkg.dto.ResponseDto;
-import com.vou.events.common.GameId_StartTime;
-import com.vou.events.common.ItemId_Quantity;
-import com.vou.events.common.VoucherId_Quantity_ItemIds_Quantities;
-import com.vou.events.common.VoucherId_Quantity;
 import com.vou.events.dto.AddBrandsRequestDto;
 import com.vou.events.dto.AddGamesRequestDto;
 import com.vou.events.dto.AddItemsRequestDto;
@@ -21,9 +15,6 @@ import com.vou.events.dto.EventId_GameIdsDto;
 import com.vou.events.dto.EventId_ItemIdsDto;
 import com.vou.events.dto.EventId_VoucherIdsDto;
 import com.vou.events.dto.EventRegistrationInfoDto;
-import com.vou.events.dto.VoucherDto;
-import com.vou.events.dto.ItemDto;
-import com.vou.events.model.EventSessionInfo;
 import com.vou.events.service.IEventsService;
 import com.vou.events.service.IVouchersService;
 import com.vou.events.service.IItemsService;
@@ -31,7 +22,6 @@ import com.vou.events.service.IItemsService;
 import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -43,8 +33,6 @@ public class EventsController {
     // @Autowired
     // private KafkaTemplate<String, EventSessionInfo> kafkaTemplate;
     private final IEventsService eventService;
-    private final IVouchersService voucherService;
-    private final IItemsService itemService;
 
     @GetMapping
     public ResponseEntity<List<EventDto>> getAllEvents() {

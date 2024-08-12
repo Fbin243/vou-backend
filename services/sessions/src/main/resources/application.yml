@@ -22,7 +22,7 @@ spring:
       group-id: group_id
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: com.vou.sessions.kafka.deserializer.EventSessionInfoDeserializer
       enable-auto-commit: false
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer

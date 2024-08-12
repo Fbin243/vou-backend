@@ -1,4 +1,4 @@
-package com.vou.events.model;
+package com.vou.notifications.model;
 
 import lombok.NoArgsConstructor;
 
