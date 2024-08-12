@@ -1,45 +1,71 @@
 services:
-  eurekaserver:
-    image: fbin243/eurekaserver:0.0.1
-    container_name: eurekaserver
-    ports:
-      - 8070:8070
-    healthcheck:
-      test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 10s
-    extends:
-      file: common-config.yml
-      service: base-config
-    environment:
-      SPRING_APPLICATION_NAME: "eurekaserver"
+  # eurekaserver:
+  #   image: fbin243/eurekaserver:0.0.1
+  #   container_name: eurekaserver
+  #   ports:
+  #     - 8070:8070
+  #   healthcheck:
+  #     test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 10
+  #     start_period: 10s
+  #   extends:
+  #     file: common-config.yml
+  #     service: base-config
+  #   environment:
+  #     SPRING_APPLICATION_NAME: "eurekaserver"
 
-  gamesdb:
-    container_name: gamesdb
-    environment:
-      MYSQL_DATABASE: gamesdb
-    extends:
-      file: common-config.yml
-      service: db-config
+  # gamesdb:
+  #   container_name: gamesdb
+  #   environment:
+  #     MYSQL_DATABASE: gamesdb
+  #   extends:
+  #     file: common-config.yml
+  #     service: db-config
 
-  games:
-    image: fbin243/games:0.0.1
-    container_name: games
-    ports:
-      - 8080:8080
+  # games:
+  #   image: fbin243/games:0.0.1
+  #   container_name: games
+  #   ports:
+  #     - 8080:8080
+  #   environment:
+  #     SPRING_APPLICATION_NAME: "games"
+  #     SPRING_DATASOURCE_URL: "jdbc:mysql://gamesdb:3306/gamesdb"
+  #     SPRING_DATASOURCE_USERNAME: root
+  #     SPRING_DATASOURCE_PASSWORD: root
+  #   depends_on:
+  #     gamesdb:
+  #       condition: service_healthy
+  #   extends:
+  #     file: common-config.yml
+  #     service: eureka-config
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
     environment:
-      SPRING_APPLICATION_NAME: "games"
-      SPRING_DATASOURCE_URL: "jdbc:mysql://gamesdb:3306/gamesdb"
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
     depends_on:
-      gamesdb:
-        condition: service_healthy
-    extends:
-      file: common-config.yml
-      service: eureka-config
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: INTERNAL://:9093,EXTERNAL://:9092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9093,EXTERNAL://localhost:9092
+      KAFKA_LISTENER_NAME: EXTERNAL # Default listener name for external connections
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL # Listener name used for broker-to-broker communication
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 # Replication factor for the offsets topic, common practice is 3 or <= number of brokers
 
 networks:
   vou_network:

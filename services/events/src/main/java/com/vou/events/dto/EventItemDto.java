@@ -1,9 +1,6 @@
 package com.vou.events.dto;
 
 import com.vou.events.common.EventIntermediateTableStatus;
-import com.vou.events.dto.EventDto;
-import com.vou.events.dto.ItemDto;
-
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

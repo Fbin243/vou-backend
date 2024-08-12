@@ -22,14 +22,16 @@ import java.io.Serializable;
 public class EventBrand implements Serializable {
 
     @Id
-    @ManyToOne
-    @JoinColumn(name = "id", nullable = false)
+    @ManyToOne(cascade = CascadeType.MERGE)
+    @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
     @Id
-    @ManyToOne
-    @JoinColumn(name = "id", nullable = false)
+    @ManyToOne(cascade = CascadeType.MERGE)
+    @JoinColumn(name = "brand_id", nullable = false)
     private Brand brand;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "active_status")
     private EventIntermediateTableStatus activeStatus;
 }

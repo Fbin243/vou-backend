@@ -33,11 +33,12 @@
 
     <modules>
         <module>pkg</module>
-<!--        <module>services/games</module>-->
+        <module>services/configserver</module>
+        <module>services/events</module>
+       <module>services/games</module>
+        <module>services/notifications</module>
+        <module>services/eurekaserver</module>
 <!--        <module>services/sessions</module>-->
-        <module>services/users</module>
-        <module>services/discovery-server</module>
-        <module>services/api-gateway</module>
     </modules>
 
     <dependencies>

@@ -1,0 +1,64 @@
+server:
+  port: 8087
+# spring:
+#   application:
+#     name: notifications
+#   kafka:
+#     bootstrap-servers: localhost:9092 # Kafka broker address
+#     consumer:
+#       group-id: notifications # Consumer group ID
+#       auto-offset-reset: earliest # Start reading from the earliest message
+#       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+#       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+#     producer:
+#       key-serializer: org.apache.kafka.common.serialization.StringSerializer
+#       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+#   datasource:
+#     url: jdbc:mysql://localhost:3306/events
+#     username: root
+#     password: 1234
+#     driver-class-name: com.mysql.cj.jdbc.Driver
+#   # jpa:
+#   #   show-sql: true
+#   #   hibernate:
+#   #     ddl-auto: update
+#   #   # properties:
+#   #   #   hibernate:
+#   #   #     dialect: org.hibernate.dialect.MySQL8Dialect
+#   # config:
+#   #   import:
+#   #     optional:configserver:http://localhost:8071/
+
+# spring:
+#   autoconfigure:
+#     exclude:
+#       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+#       - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+#   kafka:
+#     bootstrap-servers: host.docker.internal:9092
+#     consumer:
+#       group-id: group_id
+#       auto-offset-reset: earliest
+#       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+#       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+#     producer:
+#       key-serializer: org.apache.kafka.common.serialization.StringSerializer
+#       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+  kafka:
+    bootstrap-servers: host.docker.internal:9092
+    consumer:
+      group-id: group_id
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: com.vou.notifications.kafka.deserializer.EventSessionInfoDeserializer
+      enable-auto-commit: false
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
