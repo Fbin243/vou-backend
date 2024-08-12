@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: users
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/user_service?useSSL=false&serverTimezone=UTC
+    username: springstudent
+    password: springstudent
+
+  main:
+    banner-mode: off
+
+logging:
+  level:
+    root: warn
+    org:
+      hibernate:
+        SQL: TRACE
+        orm:
+          jdbc:
+            hind: TRACE
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+server:
+    port: 8081
