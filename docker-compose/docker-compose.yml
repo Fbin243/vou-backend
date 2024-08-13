@@ -1,20 +1,20 @@
 services:
-  # eurekaserver:
-  #   image: fbin243/eurekaserver:0.0.1
-  #   container_name: eurekaserver
-  #   ports:
-  #     - 8070:8070
-  #   healthcheck:
-  #     test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 10
-  #     start_period: 10s
-  #   extends:
-  #     file: common-config.yml
-  #     service: base-config
-  #   environment:
-  #     SPRING_APPLICATION_NAME: "eurekaserver"
+  eurekaserver:
+    image: fbin243/eurekaserver:0.0.1
+    container_name: eurekaserver
+    ports:
+      - 8070:8070
+    healthcheck:
+      test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    extends:
+      file: common-config.yml
+      service: base-config
+    environment:
+      SPRING_APPLICATION_NAME: "eurekaserver"
 
   # gamesdb:
   #   container_name: gamesdb
@@ -66,6 +66,22 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL # Listener name used for broker-to-broker communication
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 # Replication factor for the offsets topic, common practice is 3 or <= number of brokers
+
+  sessions:
+    image: fbin243/sessions:0.0.1
+    container_name: sessions
+    env_file:
+      - ../.env
+    ports:
+      - 8084:8084
+    environment:
+      SPRING_APPLICATION_NAME: "sessions"
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    extends:
+      file: common-config.yml
+      service: eureka-config
+    depends_on:
+      - kafka
 
 networks:
   vou_network:

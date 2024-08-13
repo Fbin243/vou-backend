@@ -73,16 +73,25 @@ public class SessionsController {
     }
 
     @PostMapping("/api/start")
-    public void setUpSession() {
+    public void setUpSession(@RequestBody SetUpSessionDto setUpSessionDto) {
         EventSessionInfo eventSessionInfo = kafkaConsumerService.getNewestMessage();
 
         // This is information received from Broker of Event services
-        String gameId = eventSessionInfo.getGameId();
-        String eventId = eventSessionInfo.getEventId();
-        String startDate = eventSessionInfo.getStartDate();
-        String endDate = eventSessionInfo.getEndDate();
-        String startTime = eventSessionInfo.getStartTime();
-        String endTime = "23:00:00";
+//        String gameId = eventSessionInfo.getGameId();
+//        String eventId = eventSessionInfo.getEventId();
+//        String startDate = eventSessionInfo.getStartDate();
+//        String endDate = eventSessionInfo.getEndDate();
+//        String startTime = eventSessionInfo.getStartTime();
+//        String endTime = "23:00:00";
+
+        String gameId = setUpSessionDto.getGameId();
+        String eventId = setUpSessionDto.getEventId();
+        String startDate = setUpSessionDto.getStartDate();
+        String endDate = setUpSessionDto.getEndDate();
+        String startTime = setUpSessionDto.getStartTime();
+        String endTime = setUpSessionDto.getEndTime();
+
+        log.info("set up {} ", setUpSessionDto);
 
         log.info("{} {} {} {} {} {}", gameId, eventId, startDate, endDate, startTime, endTime);
 
