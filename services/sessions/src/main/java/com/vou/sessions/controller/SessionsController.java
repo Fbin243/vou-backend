@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vou.sessions.consumer.KafkaConsumerService;
 import com.vou.sessions.dto.MessageDto;
+import com.vou.sessions.dto.SetUpSessionDto;
 import com.vou.sessions.engine.GameEngine;
 import com.vou.sessions.model.EventSessionInfo;
 import com.vou.sessions.schedule.SchedulerService;
@@ -19,6 +20,7 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 @AllArgsConstructor
@@ -104,9 +106,10 @@ public class SessionsController {
         log.info("Time: {}", now);
         messagingTemplate.convertAndSend("/topic/time/" + sessionId, now);
         // Update leaderboard when switch question
-//        if ((now - startTime) % duration == 0) {
-//            sessionsService.getLeaderboardBySessionId(sessionId);
-//            messagingTemplate.convertAndSend("/topic/leaderboard/" + sessionId, sessionsService.getLeaderboardBySessionId(sessionId));
-//        }
+        // if ((now - startTime) % duration == 0) {
+        // sessionsService.getLeaderboardBySessionId(sessionId);
+        // messagingTemplate.convertAndSend("/topic/leaderboard/" + sessionId,
+        // sessionsService.getLeaderboardBySessionId(sessionId));
+        // }
     }
 }
