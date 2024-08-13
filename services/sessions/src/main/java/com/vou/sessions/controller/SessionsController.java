@@ -2,16 +2,15 @@ package com.vou.sessions.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vou.sessions.consumer.KafkaConsumerService;
 import com.vou.sessions.dto.MessageDto;
 import com.vou.sessions.engine.GameEngine;
 import com.vou.sessions.model.EventSessionInfo;
 import com.vou.sessions.schedule.SchedulerService;
 import com.vou.sessions.service.ISessionsService;
-import com.vou.sessions.service.KafkaConsumerService;
 import com.vou.sessions.utils.Utils;
 import lombok.AllArgsConstructor;
 
-import org.apache.kafka.shaded.io.opentelemetry.proto.trace.v1.Span.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 @AllArgsConstructor
 public class SessionsController {
-    @Autowired
     private KafkaConsumerService kafkaConsumerService;
     private static final Logger log = LoggerFactory.getLogger(SessionsController.class);
     private static ObjectMapper objectMapper = new ObjectMapper();
@@ -84,10 +82,12 @@ public class SessionsController {
         String startTime = eventSessionInfo.getStartTime();
         String endTime = "23:00:00";
 
+        log.info("{} {} {} {} {} {}", gameId, eventId, startDate, endDate, startTime, endTime);
+
         Runnable setUpGame = () -> {
             // Save data to MongoDB and get sessionId
             String sessionId = "669fedc17ada690bd952c608";
-            gameEngine.setUp(sessionId);
+//            gameEngine.setUp(sessionId);
             log.info("set up session");
 
             Runnable updateTime = () -> {
