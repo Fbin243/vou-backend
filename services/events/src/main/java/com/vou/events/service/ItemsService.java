@@ -4,8 +4,6 @@ import com.vou.events.dto.ItemDto;
 import com.vou.events.entity.*;
 import com.vou.events.mapper.ItemMapper;
 import com.vou.events.repository.*;
-import com.vou.events.common.EventIntermediateTableStatus;
-import com.vou.events.common.ItemId_Quantity;
 import com.vou.pkg.exception.NotFoundException;
 
 import lombok.AllArgsConstructor;

@@ -19,8 +19,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class VouchersService implements IVouchersService {
     
-    private final VoucherRepository voucherRepository;
-    private final ItemRepository itemRepository;
+    private final VoucherRepository     voucherRepository;
+    private final ItemRepository        itemRepository;
     private final VoucherItemRepository voucherItemRepository;
 
     @Override

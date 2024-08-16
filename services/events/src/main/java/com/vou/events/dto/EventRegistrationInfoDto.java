@@ -18,11 +18,8 @@ import java.util.List;
 @Getter
 @Setter
 public class EventRegistrationInfoDto {
-    private EventDto event;
-
-    private List<GameId_StartTime> listGameId_StartTime;
-
-    private List<VoucherId_Quantity_ItemIds_Quantities> listVoucher_Items;
-
-    private List<String> brandIds;
+    private EventDto                                        event;
+    private List<GameId_StartTime>                          listGameId_StartTime;
+    private List<VoucherId_Quantity_ItemIds_Quantities>     listVoucher_Items;
+    private List<String>                                    emails;
 }

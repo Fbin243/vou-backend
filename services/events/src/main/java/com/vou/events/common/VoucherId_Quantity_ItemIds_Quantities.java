@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 public class VoucherId_Quantity_ItemIds_Quantities {
-    private String voucherId;
-    private int quantityOfVoucher;
-    private List<ItemId_Quantity> itemIds_quantities;
+    private String                  voucherId;
+    private int                     quantityOfVoucher;
+    private List<ItemId_Quantity>   itemIds_quantities;
 }

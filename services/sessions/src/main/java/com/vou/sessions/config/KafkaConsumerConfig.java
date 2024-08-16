@@ -15,6 +15,7 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.util.backoff.FixedBackOff;
 
 import com.vou.sessions.kafka.deserializer.EventSessionInfoDeserializer;
+import com.vou.sessions.model.EventSessionInfo;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +28,7 @@ public class KafkaConsumerConfig {
     private String bootstrapServers;
 
     @Bean
-    public ConsumerFactory<String, String> consumerFactory() {
+    public ConsumerFactory<String, EventSessionInfo> consumerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ConsumerConfig.GROUP_ID_CONFIG, "group_id");
@@ -39,10 +40,11 @@ public class KafkaConsumerConfig {
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, EventSessionInfo> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, EventSessionInfo> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
+        factory.setConcurrency(3);  // Increase the number of threads
 
         // Configure retry and backoff policy
         factory.setCommonErrorHandler(new DefaultErrorHandler(
