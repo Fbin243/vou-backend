@@ -91,10 +91,6 @@ public class SessionsController {
         String startTime = setUpSessionDto.getStartTime();
         String endTime = setUpSessionDto.getEndTime();
 
-        log.info("set up {} ", setUpSessionDto);
-
-        log.info("{} {} {} {} {} {}", gameId, eventId, startDate, endDate, startTime, endTime);
-
         Runnable setUpGame = () -> {
             // Save data to MongoDB and get sessionId
             String sessionId = "669fedc17ada690bd952c608";

@@ -49,6 +49,9 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "2181:2181"
+    extends:
+      file: common-config.yml
+      service: base-config
 
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -60,12 +63,15 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENERS: INTERNAL://:9093,EXTERNAL://:9092
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9093,EXTERNAL://localhost:9092
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9093,EXTERNAL://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9093,EXTERNAL://kafka:9092
       KAFKA_LISTENER_NAME: EXTERNAL # Default listener name for external connections
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL # Listener name used for broker-to-broker communication
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 # Replication factor for the offsets topic, common practice is 3 or <= number of brokers
+    extends:
+      file: common-config.yml
+      service: base-config
 
   sessions:
     image: fbin243/sessions:0.0.1
@@ -76,7 +82,7 @@ services:
       - 8084:8084
     environment:
       SPRING_APPLICATION_NAME: "sessions"
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     extends:
       file: common-config.yml
       service: eureka-config
