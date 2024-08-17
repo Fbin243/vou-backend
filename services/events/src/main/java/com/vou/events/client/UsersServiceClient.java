@@ -1,10 +1,16 @@
 package com.vou.events.client;
 
+import java.util.List;
+
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "users-service", url = "http://localhost:8081/api/users")
+import com.vou.events.dto.BrandDto;
+
+@FeignClient(name = "users-service", url = "http://localhost:8081/api")
 public interface UsersServiceClient {
-    // @GetMapping
-    // List<UserDto> getAllUsers();
+
+    @GetMapping("/brands/emails")
+    List<BrandDto> getBrandsByEmails(@RequestBody List<String> emails);
 }

@@ -127,6 +127,17 @@ public interface IEventsService {
     }
 
     /**
+     * Adds many brands to an event by emails.
+     *
+     * @param eventId the ID of the event
+     * @param emails the emails of the brands to add
+     * @return true if the brand was added successfully, false otherwise
+     */
+    default boolean addBrandsByEmailsToEvent(String eventId, List<String> emails) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
      * Removes many brands from an event.
      *
      * @param eventId the ID of the event

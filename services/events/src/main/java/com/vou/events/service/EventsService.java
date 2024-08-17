@@ -1,5 +1,6 @@
 package com.vou.events.service;
 
+import com.vou.events.dto.BrandDto;
 import com.vou.events.dto.EventDto;
 import com.vou.events.dto.EventRegistrationInfoDto;
 import com.vou.events.dto.GameDto;
@@ -8,6 +9,7 @@ import com.vou.events.dto.VoucherDto;
 import com.vou.events.mapper.GameMapper;
 import com.vou.events.model.EventSessionInfo;
 import com.vou.events.entity.*;
+import com.vou.events.mapper.BrandMapper;
 import com.vou.events.mapper.EventMapper;
 import com.vou.events.repository.*;
 import com.vou.events.common.EventIntermediateTableStatus;
@@ -16,6 +18,7 @@ import com.vou.events.common.ItemId_Quantity;
 import com.vou.events.common.VoucherId_Quantity;
 import com.vou.events.common.VoucherId_Quantity_ItemIds_Quantities;
 import com.vou.events.client.GamesServiceClient;
+import com.vou.events.client.UsersServiceClient;
 import com.vou.pkg.dto.ResponseDto;
 import com.vou.pkg.exception.NotFoundException;
 
@@ -48,14 +51,15 @@ public class EventsService implements IEventsService {
     private final EventItemRepository       eventItemRepository;
     private final EventGameRepository       eventGameRepository;
     private final GamesServiceClient        gamesServiceClient;
+    private final UsersServiceClient        usersServiceClient;
     private final IVouchersService          voucherService;
     private final IItemsService             itemService;
 
-    Properties props = new Properties();
+    // Properties props = new Properties();
 
     // KafkaProducer<String, EventSessionInfo> producer = new KafkaProducer<>(props);
-    // @Autowired
-    // private KafkaTemplate<String, EventSessionInfo> kafkaTemplate;
+    @Autowired
+    private KafkaTemplate<String, EventSessionInfo> kafkaTemplate;
 
     @Override
     public List<EventDto> fetchAllEvents() {
@@ -127,9 +131,13 @@ public class EventsService implements IEventsService {
                     () -> new NotFoundException("Event", "id", eventDto.getId())
             );
 
-            Event updatedEvent = EventMapper.toEntity(eventDto);
-            updatedEvent.setId(event.getId());
-            eventsRepository.save(updatedEvent);
+            event.setName(eventDto.getName());
+            event.setStartDate(eventDto.getStartDate());
+            event.setEndDate(eventDto.getEndDate());
+            event.setNumberOfVoucher(eventDto.getNumberOfVoucher());
+            event.setImage(eventDto.getImage());
+
+            eventsRepository.save(event);
         } catch (Exception e) {
             return false;
         }
@@ -175,6 +183,41 @@ public class EventsService implements IEventsService {
                     eventBrand.setBrand(brand);
                     eventBrand.setActiveStatus(EventIntermediateTableStatus.ACTIVE);
                     eventBrandRepository.save(eventBrand);
+                }
+            }
+        } catch (Exception e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean addBrandsByEmailsToEvent(String eventId, List<String> emails) {
+        try {
+            Event event = eventsRepository.findById(eventId).orElseThrow(
+                    () -> new NotFoundException("Event", "id", eventId)
+            );
+
+            List<BrandDto> brands = usersServiceClient.getBrandsByEmails(emails);
+
+            if (brands == null || brands.isEmpty()) {
+                return false;
+            } else {
+                for (BrandDto _brandDto : brands) {
+                    Brand _brandEntity = BrandMapper.toEntity(_brandDto);
+                    EventBrand eventBrand = eventBrandRepository.findByEventAndBrand(eventId, _brandEntity.getId());
+                    if (eventBrand != null) {
+                        eventBrand.setActiveStatus(EventIntermediateTableStatus.ACTIVE);
+                        eventBrandRepository.save(eventBrand);
+                    }
+                    else {
+                        eventBrand = new EventBrand();
+                        eventBrand.setEvent(event);
+                        eventBrand.setBrand(_brandEntity);
+                        eventBrand.setActiveStatus(EventIntermediateTableStatus.ACTIVE);
+                        eventBrandRepository.save(eventBrand);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -397,30 +440,38 @@ public class EventsService implements IEventsService {
         ItemDto                     existItem;
         String                      voucherId;
         String                      itemId;
-        String                      eventId                 = this.createEvent(eventRegistrationInfoDto.getEvent());
-        List<VoucherId_Quantity>    listVoucherIdQuantity   = new ArrayList<>();
-        List<ItemId_Quantity>       listItemIdQuantity      = new ArrayList<>();
+        EventDto                    existEvent                      = eventRegistrationInfoDto.getEvent();
+        List<VoucherId_Quantity>    listVoucherIdQuantity           = new ArrayList<>();
+        List<ItemId_Quantity>       listItemIdQuantity              = new ArrayList<>();
+        String                      regexSplitStringLocalDateTime   = "T";
+        Integer                     sumNumberOfVoucher              = 0;
+        String                      eventId                         = null;
+        if (existEvent != null)     eventId                         = this.createEvent(existEvent);
 
         if (eventId == null) {
-            
+            ResponseDto res = new ResponseDto(HttpStatus.BAD_REQUEST, "Event creation failed.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
         } else {
-            if (!this.addBrandsToEvent(eventId, eventRegistrationInfoDto.getBrandIds())) {
+            if (!this.addBrandsByEmailsToEvent(eventId, eventRegistrationInfoDto.getEmails())) {
                 ResponseDto res = new ResponseDto(HttpStatus.BAD_REQUEST, "Brand addition failed.");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
             }
 
             for (VoucherId_Quantity_ItemIds_Quantities listVoucher_Items : eventRegistrationInfoDto.getListVoucher_Items()) {
-                voucherId = listVoucher_Items.getVoucherId();
-                existVoucher = voucherService.fetchVoucherById(voucherId);
+                voucherId       = listVoucher_Items.getVoucherId();
+                existVoucher    = voucherService.fetchVoucherById(voucherId);
+
                 if (existVoucher == null) {
                     ResponseDto res = new ResponseDto(HttpStatus.BAD_REQUEST, "Voucher creation failed.");
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
                 } else {
                     listVoucherIdQuantity.add(new VoucherId_Quantity(voucherId, listVoucher_Items.getQuantityOfVoucher()));
                     listItemIdQuantity.clear();
+
                     for (ItemId_Quantity itemId_Quantity : listVoucher_Items.getItemIds_quantities()) {
-                        itemId = itemId_Quantity.getItemId();
-                        existItem = itemService.fetchItemById(itemId);
+                        itemId      = itemId_Quantity.getItemId();
+                        existItem   = itemService.fetchItemById(itemId);
+
                         if (existItem == null) {
                             ResponseDto res = new ResponseDto(HttpStatus.BAD_REQUEST, "Item creation failed.");
                             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
@@ -437,6 +488,8 @@ public class EventsService implements IEventsService {
                             ResponseDto res = new ResponseDto(HttpStatus.BAD_REQUEST, "Voucher addition failed.");
                             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
                         }
+
+                        sumNumberOfVoucher += listVoucher_Items.getQuantityOfVoucher();
                     }
                 }
             }
@@ -448,22 +501,27 @@ public class EventsService implements IEventsService {
             
             if (this.addGamesToEvent(eventId, eventRegistrationInfoDto.getListGameId_StartTime())) {
 
-                // Send list of games to Kafka - topic = event-session
-                props.put("bootstrap.servers", "localhost:9092");
-                props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-                props.put("value.serializer", "com.vou.events.kafka.serializer.EventSessionInfoSerializer");
+                // Update sum(number of voucher)
+                existEvent.setId(eventId);
+                existEvent.setNumberOfVoucher(sumNumberOfVoucher);
+                if (!this.updateEvent(existEvent)) {
+                    ResponseDto res = new ResponseDto(HttpStatus.BAD_REQUEST, "Sum of number of voucher for this event updating failed.");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+                }
 
-                try (KafkaProducer<String, EventSessionInfo> producer = new KafkaProducer<>(props)) {
+                // Send list of games to Kafka - topic = event-session
+                try {
                     for (GameId_StartTime gameId_StartTime : eventRegistrationInfoDto.getListGameId_StartTime()) {
                         EventSessionInfo eventSessionInfo = new EventSessionInfo(
                             eventId,
                             gameId_StartTime.getGameId().toString(),
-                            eventRegistrationInfoDto.getEvent().getStartDate().toString(),
-                            eventRegistrationInfoDto.getEvent().getEndDate().toString(),
-                            gameId_StartTime.getStartTime().toString()
+                            eventRegistrationInfoDto.getEvent().getStartDate().toString().split(regexSplitStringLocalDateTime)[0],
+                            eventRegistrationInfoDto.getEvent().getEndDate().toString().split(regexSplitStringLocalDateTime)[0],
+                            gameId_StartTime.getStartTime().toString(),
+                            gameId_StartTime.getStartTime().plusMinutes(30).toString()
                         );
                 
-                        producer.send(new ProducerRecord<>("event-session", eventSessionInfo));
+                        kafkaTemplate.send("event-session", eventSessionInfo);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

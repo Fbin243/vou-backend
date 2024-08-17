@@ -23,4 +23,6 @@ public class EventSessionInfo {
     private String endDate;
 
     private String startTime;
+
+    private String endTime;
 }

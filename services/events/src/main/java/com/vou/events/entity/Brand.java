@@ -1,8 +1,7 @@
 // Temporary file to store the Brand entity
-
 package com.vou.events.entity;
 
-import com.vou.events.common.BrandStatus;
+import com.vou.events.common.UserRole;
 import com.vou.pkg.entity.Base;
 
 import lombok.Getter;
@@ -24,6 +23,25 @@ public class Brand extends Base {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @Column(name = "fullname")
+    private String fullName;
+
+    @Column(name = "username")
+    private String username;
+
+    @Column(name = "password")
+    private String password;
+    
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "phone")
+    private String phone;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", insertable = false, updatable = false)
+    private UserRole role;
+
     @Column(name = "brand_name")
     private String brandName;
 
@@ -40,5 +58,5 @@ public class Brand extends Base {
     private double longitude;
 
     @Column(name = "status")
-    private BrandStatus status;
+    private boolean status;
 }

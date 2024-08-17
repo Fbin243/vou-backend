@@ -60,7 +60,7 @@ public class BrandController {
         return result;
     }
 
-    @GetMapping("/emails")
+    @PostMapping("/emails")
     public List<Brand> getBrandsByEmails(@RequestBody List<String> emails) {
 
         if (emails == null || emails.isEmpty()) {

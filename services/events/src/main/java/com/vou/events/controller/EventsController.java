@@ -16,8 +16,6 @@ import com.vou.events.dto.EventId_ItemIdsDto;
 import com.vou.events.dto.EventId_VoucherIdsDto;
 import com.vou.events.dto.EventRegistrationInfoDto;
 import com.vou.events.service.IEventsService;
-import com.vou.events.service.IVouchersService;
-import com.vou.events.service.IItemsService;
 
 import lombok.AllArgsConstructor;
 
@@ -68,8 +66,6 @@ public class EventsController {
     @PostMapping("/create")
     public ResponseEntity<ResponseDto> createEventWithSessionInfo(@RequestBody EventRegistrationInfoDto eventRegistrationInfoDto) {
         return eventService.createEventWithSessionInfo(eventRegistrationInfoDto);
-        // ResponseDto res = new ResponseDto(HttpStatus.CREATED, "Event created successfully.");
-        // return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
 
     @PutMapping
