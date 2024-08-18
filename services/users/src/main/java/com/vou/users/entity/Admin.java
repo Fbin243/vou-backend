@@ -12,8 +12,8 @@ public class Admin extends User {
     public Admin() {
     }
 
-    public Admin(String fullName, String username, String password, String email, String phone, UserRole role, boolean status) {
-        super(fullName, username, password, email, phone, role, status);
+    public Admin(String fullName, String username, String accountId, String email, String phone, UserRole role, boolean status) {
+        super(fullName, username, accountId, email, phone, role, status);
     }
 
     @Override
@@ -22,7 +22,7 @@ public class Admin extends User {
                 "id='" + getId() + '\'' +
                 ", fullName='" + getFullName() + '\'' +
                 ", username='" + getUsername() + '\'' +
-                ", password='" + getPassword() + '\'' +
+                ", accountId='" + getAccountId() + '\'' +
                 ", email='" + getEmail() + '\'' +
                 ", phone='" + getPhone() + '\'' +
                 ", role='" + getRole() + '\'' +

@@ -19,8 +19,8 @@ public abstract class User {
     @Column(name = "username")
     private String username;
 
-    @Column(name = "password")
-    private String password;
+    @Column(name = "accountId")
+    private String accountId;
     @Column(name = "email")
     private String email;
 
@@ -36,10 +36,10 @@ public abstract class User {
 
     public User() {}
 
-    public User(String fullName, String username, String password, String email, String phone, UserRole role, boolean status) {
+    public User(String fullName, String username, String accountId, String email, String phone, UserRole role, boolean status) {
         this.fullName = fullName;
         this.username = username;
-        this.password = password;
+        this.accountId = accountId;
         this.email = email;
         this.phone = phone;
         this.role = role;
@@ -70,12 +70,12 @@ public abstract class User {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
+    public String getAccountId() {
+        return accountId;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setAccountId(String accountId) {
+        this.accountId = accountId;
     }
 
     public String getEmail() {
@@ -117,7 +117,7 @@ public abstract class User {
                 "id='" + id + '\'' +
                 ", fullName='" + fullName + '\'' +
                 ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
+                ", accountId='" + accountId + '\'' +
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
                 ", role='" + role + '\'' +

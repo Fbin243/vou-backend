@@ -35,9 +35,10 @@
         <module>pkg</module>
 <!--        <module>services/games</module>-->
 <!--        <module>services/sessions</module>-->
-        <module>services/users</module>
         <module>services/discovery-server</module>
         <module>services/api-gateway</module>
+        <module>services/identity</module>
+        <module>services/users</module>
     </modules>
 
     <dependencies>

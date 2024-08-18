@@ -36,8 +36,8 @@ public class Player extends User {
         this.turns = turns;
     }
 
-    public Player(String fullName, String username, String password, String email, String phone, UserRole role, boolean status, String gender, String facebookAccount, String dateOfBirth, String avatar, int turns) {
-        super(fullName, username, password, email, phone, role, status);
+    public Player(String fullName, String username, String accountId, String email, String phone, UserRole role, boolean status, String gender, String facebookAccount, String dateOfBirth, String avatar, int turns) {
+        super(fullName, username, accountId, email, phone, role, status);
         this.gender = gender;
         this.facebookAccount = facebookAccount;
         this.dateOfBirth = dateOfBirth;
