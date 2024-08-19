@@ -37,12 +37,11 @@
         <module>pkg</module>
         <module>services/users</module>
         <module>services/api-gateway</module>
-        <module>services/gatewayserver</module>
-        <module>services/discovery-server</module>
         <module>services/events</module>
         <module>services/games</module>
         <module>services/notifications</module>
         <module>services/sessions</module>
+        <module>services/identity</module>
     </modules>
 
     <dependencies>
