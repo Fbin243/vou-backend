@@ -18,6 +18,7 @@ management:
     health:
       probes:
         enabled: true
+
 server:
   port: 8761
 eureka:

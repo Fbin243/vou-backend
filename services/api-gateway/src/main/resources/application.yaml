@@ -11,7 +11,7 @@ spring:
     gateway:
       routes:
         - id: discovery-server
-          uri: http://localhost:8761
+          uri: ${DISCOVERY_SERVER_URI:http://localhost:8761}
           predicates:
             - Path=${app.api-prefix}/eureka/web
           filters:
@@ -28,16 +28,39 @@ spring:
             - Path=${app.api-prefix}/users/**
           filters:
             - StripPrefix=2
-  eureka:
-    client:
-      service-url:
-        defaultZone: http://localhost:8761/eureka
-
+        - id: games
+          uri: lb://games
+          predicates:
+            - Path=${app.api-prefix}/games/**
+          filters:
+            - StripPrefix=2
+        - id: sessions
+          uri: lb://sessions
+          predicates:
+            - Path=${app.api-prefix}/sessions/**
+          filters:
+            - StripPrefix=2
   # Disable data source auto-configuration
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
       - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
-
   main:
     web-application-type: reactive
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    gateway:
+      enabled: true
+  info:
+    env:
+      enabled: true

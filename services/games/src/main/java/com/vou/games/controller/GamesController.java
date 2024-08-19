@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping(path = "/api", produces = {MediaType.APPLICATION_JSON_VALUE})
+@RequestMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE})
 public class GamesController {
     private final IGamesService gamesService;
 

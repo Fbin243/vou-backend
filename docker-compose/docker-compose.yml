@@ -1,46 +1,58 @@
 services:
-  eurekaserver:
-    image: fbin243/eurekaserver:0.0.1
-    container_name: eurekaserver
+  ############### MY SQL #####################
+  mysqldb:
     ports:
-      - 8070:8070
-    healthcheck:
-      test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 10s
+      - 3300:3306
+    container_name: mysqldb
+    environment:
+      MYSQL_DATABASE: mysqldb
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     extends:
       file: common-config.yml
-      service: base-config
-    environment:
-      SPRING_APPLICATION_NAME: "eurekaserver"
+      service: db-config
 
-  # gamesdb:
-  #   container_name: gamesdb
-  #   environment:
-  #     MYSQL_DATABASE: gamesdb
-  #   extends:
-  #     file: common-config.yml
-  #     service: db-config
+#  identitydb:
+#    ports:
+#      - 3300:3306
+#    container_name: identitydb
+#    environment:
+#      MYSQL_DATABASE: identitydb
+#    extends:
+#      file: common-config.yml
+#      service: db-config
 
-  # games:
-  #   image: fbin243/games:0.0.1
-  #   container_name: games
-  #   ports:
-  #     - 8080:8080
-  #   environment:
-  #     SPRING_APPLICATION_NAME: "games"
-  #     SPRING_DATASOURCE_URL: "jdbc:mysql://gamesdb:3306/gamesdb"
-  #     SPRING_DATASOURCE_USERNAME: root
-  #     SPRING_DATASOURCE_PASSWORD: root
-  #   depends_on:
-  #     gamesdb:
-  #       condition: service_healthy
-  #   extends:
-  #     file: common-config.yml
-  #     service: eureka-config
+#  usersdb:
+#    ports:
+#      - 3301:3306
+#    container_name: usersdb
+#    environment:
+#      MYSQL_DATABASE: usersdb
+#    extends:
+#      file: common-config.yml
+#      service: db-config
+#
+#  gamesdb:
+#    ports:
+#      - 3302:3306
+#    container_name: gamesdb
+#    environment:
+#      MYSQL_DATABASE: gamesdb
+#    extends:
+#      file: common-config.yml
+#      service: db-config
 
+#  eventsdb:
+#    ports:
+#      - 3303:3306
+#    container_name: eventsdb
+#    environment:
+#      MYSQL_DATABASE: eventsdb
+#    extends:
+#      file: common-config.yml
+#      service: db-config
+
+  ############## MESSAGE BROKER #####################
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     container_name: zookeeper
@@ -73,6 +85,82 @@ services:
       file: common-config.yml
       service: base-config
 
+  ###################### SERVICES ##########################
+  discovery-server:
+    image: fbin243/discovery-server:0.0.1
+    container_name: discovery-server
+    ports:
+      - 8761:8761
+    healthcheck:
+      test: "curl --fail --silent localhost:8761/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    extends:
+      file: common-config.yml
+      service: base-config
+    environment:
+      SPRING_APPLICATION_NAME: "discovery-server"
+
+  users:
+    image: fbin243/users:0.0.1
+    container_name: users
+    ports:
+      - 8081:8081
+    environment:
+      SPRING_APPLICATION_NAME: "users"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysqldb:3306/usersdb"
+#      SPRING_DATASOURCE_URL: "jdbc:mysql://usersdb:3306/usersdb"
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    depends_on:
+      mysqldb:
+#      usersdb:
+        condition: service_healthy
+    extends:
+      file: common-config.yml
+      service: discovery-config
+
+  identity:
+    image: fbin243/identity:0.0.1
+    container_name: identity
+    ports:
+      - 8071:8071
+    environment:
+      SPRING_APPLICATION_NAME: "identity"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysqldb:3306/identitydb"
+#      SPRING_DATASOURCE_URL: "jdbc:mysql://identitydb:3306/identitydb"
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      APP_SERVICES_USERS: "http://users:8081/users"
+    depends_on:
+      mysqldb:
+#      identitydb:
+        condition: service_healthy
+    extends:
+      file: common-config.yml
+      service: discovery-config
+
+  games:
+    image: fbin243/games:0.0.1
+    container_name: games
+    ports:
+      - 8082:8082
+    environment:
+      SPRING_APPLICATION_NAME: "games"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysqldb:3306/gamesdb"
+#      SPRING_DATASOURCE_URL: "jdbc:mysql://gamesdb:3306/gamesdb"
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    depends_on:
+      mysqldb:
+#      gamesdb:
+        condition: service_healthy
+    extends:
+      file: common-config.yml
+      service: discovery-config
+
   sessions:
     image: fbin243/sessions:0.0.1
     container_name: sessions
@@ -83,12 +171,29 @@ services:
     environment:
       SPRING_APPLICATION_NAME: "sessions"
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    extends:
-      file: common-config.yml
-      service: eureka-config
     depends_on:
       - kafka
+    extends:
+      file: common-config.yml
+      service: discovery-config
 
+  api-gateway:
+    image: fbin243/api-gateway:0.0.1
+    container_name: api-gateway
+    ports:
+      - 8888:8888
+    depends_on:
+      - identity
+      - users
+      - games
+      - sessions
+    environment:
+      DISCOVERY_SERVER_URI: "http://discovery-server:8761"
+    extends:
+      file: common-config.yml
+      service: discovery-config
+
+################ NETWORK ###############
 networks:
   vou_network:
     driver: bridge
