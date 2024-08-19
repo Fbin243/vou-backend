@@ -1,0 +1,43 @@
+server:
+  port: 8888
+
+app:
+  api-prefix: /api/v1
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: discovery-server
+          uri: http://localhost:8761
+          predicates:
+            - Path=${app.api-prefix}/eureka/web
+          filters:
+            - StripPrefix=2
+        - id: identity
+          uri: lb://identity
+          predicates:
+            - Path=${app.api-prefix}/identity/**
+          filters:
+            - StripPrefix=2
+        - id: users
+          uri: lb://users
+          predicates:
+            - Path=${app.api-prefix}/users/**
+          filters:
+            - StripPrefix=2
+  eureka:
+    client:
+      service-url:
+        defaultZone: http://localhost:8761/eureka
+
+  # Disable data source auto-configuration
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+
+  main:
+    web-application-type: reactive

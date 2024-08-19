@@ -33,7 +33,7 @@ public class UserDeserializer extends JsonDeserializer<User> {
         // Manually set fields to avoid recursive deserialization
         user.setFullName(node.get("fullName").asText());
         user.setUsername(node.get("username").asText());
-        user.setPassword(node.get("password").asText());
+        user.setAccountId(node.get("accountId").asText());
         user.setEmail(node.get("email").asText());
         user.setPhone(node.get("phone").asText());
         user.setStatus(node.get("status").asBoolean());

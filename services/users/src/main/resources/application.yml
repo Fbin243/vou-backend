@@ -3,10 +3,13 @@ spring:
     name: users
 
   datasource:
-    url: jdbc:mysql://localhost:3306/user_service
-    username: root
-    password: 1234
-
+    url: jdbc:mysql://localhost:3306/user_service?useSSL=false&serverTimezone=UTC
+    username: springstudent
+    password: springstudent
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
   main:
     banner-mode: off
 
@@ -27,3 +30,5 @@ eureka:
 
 server:
     port: 8081
+    servlet:
+      context-path: /users
