@@ -15,6 +15,7 @@ public class EventMapper {
         }
 
         EventDto eventDto = new EventDto();
+        eventDto.setId(event.getId());
         eventDto.setName(event.getName());
         eventDto.setImage(event.getImage());
         eventDto.setNumberOfVoucher(event.getNumberOfVoucher());
@@ -31,6 +32,7 @@ public class EventMapper {
         }
 
         Event event = new Event();
+        event.setId(dto.getId());
         event.setName(dto.getName());
         event.setImage(dto.getImage());
         event.setNumberOfVoucher(dto.getNumberOfVoucher());

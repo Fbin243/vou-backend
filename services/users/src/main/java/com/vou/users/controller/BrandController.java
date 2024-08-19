@@ -66,7 +66,8 @@ public class BrandController {
         if (emails == null || emails.isEmpty()) {
             throw new RuntimeException("Emails are required");
         }
-        // if no having any matched brand: return "No brand found with emails: " + emails;
+        // if no having any matched brand: return "No brand found with emails: " +
+        // emails;
         List<Brand> result = brandService.findManyBrandsByManyEmails(emails);
         if (result == null || result.isEmpty()) {
             throw new RuntimeException("No brand found with emails: " + emails);

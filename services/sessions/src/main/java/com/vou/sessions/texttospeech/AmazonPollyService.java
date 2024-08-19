@@ -45,11 +45,11 @@ public class AmazonPollyService {
         voice = describeVoicesResult.getVoices().stream().filter(p -> p.getName().equals("Brian")).findFirst().get();
     }
 
-    public static void main(String args[]) throws Exception {
+//    public static void main(String args[]) throws Exception {
         //create the test class
-        AmazonPollyService service = new AmazonPollyService();
+//        AmazonPollyService service = new AmazonPollyService();
         //get the audio stream
-        InputStream speechStream = service.synthesize(SAMPLE, OutputFormat.Mp3);
+//        InputStream speechStream = service.synthesize(SAMPLE, OutputFormat.Mp3);
 
         // Play audio
 //        service.playAudio(speechStream);
@@ -60,7 +60,7 @@ public class AmazonPollyService {
 //        // Generate S3 URL
 //        String fileUrl = service.getPresignedUrl(s3Key);
 //        System.out.println("File URL: " + fileUrl);
-    }
+//    }
 
     public InputStream synthesize(String text, OutputFormat format) {
         SynthesizeSpeechRequest synthReq = new SynthesizeSpeechRequest()

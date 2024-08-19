@@ -3,6 +3,7 @@ package com.vou.events.repository;
 import com.vou.events.entity.EventVoucher;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 
@@ -20,6 +21,11 @@ public class EventVoucherRepositoryImpl implements EventVoucherRepositoryCustom 
         );
         query.setParameter("eventId", eventId);
         query.setParameter("voucherId", voucherId);
-        return query.getSingleResult();
+        query.setMaxResults(1); // Limit results to 1
+        try {
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 }

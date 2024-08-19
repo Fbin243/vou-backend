@@ -15,6 +15,7 @@ public class VoucherMapper {
         }
 
         VoucherDto voucherDto = new VoucherDto();
+        voucherDto.setId(voucher.getId());
         voucherDto.setBrand(BrandMapper.toDto(voucher.getBrand()));
         voucherDto.setVoucherCode(voucher.getVoucherCode());
         voucherDto.setQrCode(voucher.getQrCode());
@@ -34,6 +35,7 @@ public class VoucherMapper {
         }
 
         Voucher voucher = new Voucher();
+        voucher.setId(dto.getId());
         voucher.setBrand(BrandMapper.toEntity(dto.getBrand()));
         voucher.setVoucherCode(dto.getVoucherCode());
         voucher.setQrCode(dto.getQrCode());

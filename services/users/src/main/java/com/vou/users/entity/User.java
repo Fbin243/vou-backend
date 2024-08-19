@@ -34,9 +34,11 @@ public abstract class User {
     @Column(name = "status", columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean status;
 
-    public User() {}
+    public User() {
+    }
 
-    public User(String fullName, String username, String accountId, String email, String phone, UserRole role, boolean status) {
+    public User(String fullName, String username, String accountId, String email, String phone, UserRole role,
+            boolean status) {
         this.fullName = fullName;
         this.username = username;
         this.accountId = accountId;
@@ -94,7 +96,6 @@ public abstract class User {
         this.phone = phone;
     }
 
-
     public boolean isStatus() {
         return status;
     }
@@ -125,4 +126,3 @@ public abstract class User {
                 '}';
     }
 }
-

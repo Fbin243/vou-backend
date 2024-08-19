@@ -3,6 +3,7 @@ package com.vou.events.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 import com.vou.pkg.dto.ResponseDto;
 import com.vou.events.dto.ItemDto;
@@ -14,7 +15,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/items")
+@RequestMapping(path = "/api/items", produces = {MediaType.APPLICATION_JSON_VALUE})
 public class ItemsController {
     private final IItemsService itemService;
 

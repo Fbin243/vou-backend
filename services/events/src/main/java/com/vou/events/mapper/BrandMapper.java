@@ -15,12 +15,19 @@ public class BrandMapper {
         }
 
         BrandDto brandDto = new BrandDto();
+        brandDto.setId(brand.getId());
+        brandDto.setFullName(brand.getFullName());
+        brandDto.setUsername(brand.getUsername());
+        brandDto.setPassword(brand.getPassword());
+        brandDto.setEmail(brand.getEmail());
+        brandDto.setPhone(brand.getPhone());
+        brandDto.setRole(brand.getRole());
         brandDto.setBrandName(brand.getBrandName());
         brandDto.setField(brand.getField());
         brandDto.setAddress(brand.getAddress());
         brandDto.setLatitude(brand.getLatitude());
         brandDto.setLongitude(brand.getLongitude());
-        brandDto.setStatus(brand.getStatus());
+        brandDto.setStatus(brand.isStatus());
 
         return brandDto;
     }
@@ -32,12 +39,19 @@ public class BrandMapper {
         }
 
         Brand brand = new Brand();
+        brand.setId(dto.getId());
+        brand.setFullName(dto.getFullName());
+        brand.setUsername(dto.getUsername());
+        brand.setPassword(dto.getPassword());
+        brand.setEmail(dto.getEmail());
+        brand.setPhone(dto.getPhone());
+        brand.setRole(dto.getRole());
         brand.setBrandName(dto.getBrandName());
         brand.setField(dto.getField());
         brand.setAddress(dto.getAddress());
         brand.setLatitude(dto.getLatitude());
         brand.setLongitude(dto.getLongitude());
-        brand.setStatus(dto.getStatus());
+        brand.setStatus(dto.isStatus());
 
         return brand;
     }

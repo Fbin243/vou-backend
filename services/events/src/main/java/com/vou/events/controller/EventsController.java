@@ -1,17 +1,20 @@
 package com.vou.events.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.http.MediaType;
 
 import com.vou.pkg.dto.ResponseDto;
-import com.vou.events.common.ItemQuantity;
-import com.vou.events.common.VoucherQuantity;
+import com.vou.events.dto.AddBrandsRequestDto;
+import com.vou.events.dto.AddGamesRequestDto;
+import com.vou.events.dto.AddItemsRequestDto;
+import com.vou.events.dto.AddVouchersRequestDto;
 import com.vou.events.dto.EventDto;
+import com.vou.events.dto.EventId_GameIdsDto;
+import com.vou.events.dto.EventId_ItemIdsDto;
+import com.vou.events.dto.EventId_VoucherIdsDto;
+import com.vou.events.dto.EventRegistrationInfoDto;
 import com.vou.events.service.IEventsService;
 
 import lombok.AllArgsConstructor;
@@ -22,8 +25,11 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/events")
+@RequestMapping(path = "/api/events", produces = {MediaType.APPLICATION_JSON_VALUE})
 public class EventsController {
+
+    // @Autowired
+    // private KafkaTemplate<String, EventSessionInfo> kafkaTemplate;
     private final IEventsService eventService;
 
     @GetMapping
@@ -57,6 +63,11 @@ public class EventsController {
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
 
+    @PostMapping("/create")
+    public ResponseEntity<ResponseDto> createEventWithSessionInfo(@RequestBody EventRegistrationInfoDto eventRegistrationInfoDto) {
+        return eventService.createEventWithSessionInfo(eventRegistrationInfoDto);
+    }
+
     @PutMapping
     public ResponseEntity<ResponseDto> updateEvent(@RequestBody EventDto eventDto) {
         eventService.updateEvent(eventDto);
@@ -72,44 +83,58 @@ public class EventsController {
     }
 
     @PostMapping("/brands")
-    public ResponseEntity<ResponseDto> addBrandsToEvent(@RequestParam String eventId, @RequestParam List<String> brandIds) {
-        eventService.addBrandsToEvent(eventId, brandIds);
+    public ResponseEntity<ResponseDto> addBrandsToEvent(@RequestBody AddBrandsRequestDto addBrandsRequestDto) {
+        eventService.addBrandsToEvent(addBrandsRequestDto.getEventId(), addBrandsRequestDto.getBrandIds());
         ResponseDto res = new ResponseDto(HttpStatus.CREATED, "Brands added to event successfully.");
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
 
     @PutMapping("/brands")
-    public ResponseEntity<ResponseDto> removeBrandsFromEvent(@RequestParam String eventId, @RequestParam List<String> brandIds) {
-        eventService.removeBrandsFromEvent(eventId, brandIds);
+    public ResponseEntity<ResponseDto> removeBrandsFromEvent(@RequestBody AddBrandsRequestDto addBrandsRequestDto) {
+        eventService.removeBrandsFromEvent(addBrandsRequestDto.getEventId(), addBrandsRequestDto.getBrandIds());
         ResponseDto res = new ResponseDto(HttpStatus.OK, "Brands removed from event successfully.");
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
     @PostMapping("/vouchers")
-    public ResponseEntity<ResponseDto> addVouchersToEvent(@RequestParam String eventId, @RequestParam List<VoucherQuantity> voucherIds_quantities) {
-        eventService.addVouchersToEvent(eventId, voucherIds_quantities);
+    public ResponseEntity<ResponseDto> addVouchersToEvent(@RequestBody AddVouchersRequestDto addVouchersRequestDto) {
+        eventService.addVouchersToEvent(addVouchersRequestDto.getEventId(), addVouchersRequestDto.getVoucherId_Quantities());
         ResponseDto res = new ResponseDto(HttpStatus.CREATED, "Vouchers added to event successfully.");
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
 
     @PutMapping("/vouchers")
-    public ResponseEntity<ResponseDto> removeVouchersFromEvent(@RequestParam String eventId, @RequestParam List<String> voucherIds) {
-        eventService.removeVouchersFromEvent(eventId, voucherIds);
+    public ResponseEntity<ResponseDto> removeVouchersFromEvent(@RequestBody EventId_VoucherIdsDto eventId_VoucherId) {
+        eventService.removeVouchersFromEvent(eventId_VoucherId.getEventId(), eventId_VoucherId.getVoucherIds());
         ResponseDto res = new ResponseDto(HttpStatus.OK, "Vouchers removed from event successfully.");
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
     @PostMapping("/items")
-    public ResponseEntity<ResponseDto> addItemsToEvent(@RequestParam String eventId, @RequestParam List<ItemQuantity> itemIds_quantities) {
-        eventService.addItemsToEvent(eventId, itemIds_quantities);
+    public ResponseEntity<ResponseDto> addItemsToEvent(@RequestBody AddItemsRequestDto addItemsRequestDto) {
+        eventService.addItemsToEvent(addItemsRequestDto.getEventId(), addItemsRequestDto.getItemId_Quantities());
         ResponseDto res = new ResponseDto(HttpStatus.CREATED, "Items added to event successfully.");
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
 
     @PutMapping("/items")
-    public ResponseEntity<ResponseDto> removeItemsFromEvent(@RequestParam String eventId, @RequestParam List<String> itemIds) {
-        eventService.removeItemsFromEvent(eventId, itemIds);
+    public ResponseEntity<ResponseDto> removeItemsFromEvent(@RequestBody EventId_ItemIdsDto eventId_ItemIds) {
+        eventService.removeItemsFromEvent(eventId_ItemIds.getEventId(), eventId_ItemIds.getItemIds());
         ResponseDto res = new ResponseDto(HttpStatus.OK, "Items removed from event successfully.");
+        return ResponseEntity.status(HttpStatus.OK).body(res);
+    }
+
+    @PostMapping("/games")
+    public ResponseEntity<ResponseDto> addGamesToEvent(@RequestBody AddGamesRequestDto addGamesRequestDto) {
+        eventService.addGamesToEvent(addGamesRequestDto.getEventId(), addGamesRequestDto.getGameId_StartTimes());
+        ResponseDto res = new ResponseDto(HttpStatus.CREATED, "Games added to event successfully.");
+        return ResponseEntity.status(HttpStatus.CREATED).body(res);
+    }
+
+    @PutMapping("/games")
+    public ResponseEntity<ResponseDto> removeGamesFromEvent(@RequestBody EventId_GameIdsDto eventId_GameIds) {
+        eventService.removeGamesFromEvent(eventId_GameIds.getEventId(), eventId_GameIds.getGameIds());
+        ResponseDto res = new ResponseDto(HttpStatus.OK, "Games removed from event successfully.");
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 }

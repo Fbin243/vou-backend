@@ -1,17 +1,32 @@
 server:
-  port: 8081
+  port: 8084
 
 spring:
   application:
     name: sessions
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      username: ${REDIS_USERNAME}
+      password: ${REDIS_PASSWORD}
     mongodb:
-      host: localhost
-      port: 27017
-      database: test
+      uri: mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@vou.hvasc.mongodb.net/${MONGO_DBNAME}
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: group_id
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: com.vou.sessions.kafka.deserializer.EventSessionInfoDeserializer
+      enable-auto-commit: false
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
 management:
   endpoints:

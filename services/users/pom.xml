@@ -6,7 +6,7 @@
 		<groupId>com.vou</groupId>
 		<artifactId>backend</artifactId>
 		<version>0.0.1</version>
-		<relativePath>../../pom.xml</relativePath>
+<!--		<relativePath>../../pom.xml</relativePath>-->
 	</parent>
 	<name>users</name>
 	<description>Users Microservice</description>
@@ -33,7 +33,6 @@
 	</properties>
 
 	<dependencies>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-aop</artifactId>

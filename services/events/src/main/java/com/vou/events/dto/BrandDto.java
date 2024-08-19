@@ -1,6 +1,7 @@
 package com.vou.events.dto;
 
 import com.vou.events.common.BrandStatus;
+import com.vou.events.common.UserRole;
 
 import lombok.Data;
 import lombok.Getter;
@@ -16,6 +17,18 @@ import lombok.Setter;
 public class BrandDto {
     private String id;
 
+    private String fullName;
+
+    private String username;
+
+    private String password;
+    
+    private String email;
+
+    private String phone;
+
+    private UserRole role;
+
     private String brandName;
 
     private String field;
@@ -26,5 +39,5 @@ public class BrandDto {
 
     private double longitude;
 
-    private BrandStatus status;
+    private boolean status;
 }

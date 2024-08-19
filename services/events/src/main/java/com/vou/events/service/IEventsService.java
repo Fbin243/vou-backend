@@ -1,11 +1,17 @@
 package com.vou.events.service;
 
-import com.vou.events.common.ItemQuantity;
+import com.vou.events.common.GameId_StartTime;
+import com.vou.events.common.ItemId_Quantity;
+import com.vou.events.common.VoucherId_Quantity;
 import com.vou.events.common.VoucherQuantity;
 import com.vou.events.dto.EventDto;
+import com.vou.events.dto.EventRegistrationInfoDto;
+import com.vou.pkg.dto.ResponseDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import org.springframework.http.ResponseEntity;
 
 /**
  * Service interface for managing events.
@@ -89,9 +95,9 @@ public interface IEventsService {
      * Creates a new event.
      *
      * @param eventDto the DTO of the event to create
-     * @return the created event
+     * @return the created event id
      */
-    EventDto createEvent(EventDto eventDto);
+    String createEvent(EventDto eventDto);
 
     /**
      * Updates an existing event.
@@ -121,6 +127,17 @@ public interface IEventsService {
     }
 
     /**
+     * Adds many brands to an event by emails.
+     *
+     * @param eventId the ID of the event
+     * @param emails the emails of the brands to add
+     * @return true if the brand was added successfully, false otherwise
+     */
+    default boolean addBrandsByEmailsToEvent(String eventId, List<String> emails) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
      * Removes many brands from an event.
      *
      * @param eventId the ID of the event
@@ -138,7 +155,7 @@ public interface IEventsService {
      * @param voucherIds the IDs of the vouchers to add
      * @return true if the voucher was added successfully, false otherwise
      */
-    default boolean addVouchersToEvent(String eventId, List<VoucherQuantity> voucherIds_quantities) {
+    default boolean addVouchersToEvent(String eventId, List<VoucherId_Quantity> voucherIds_quantities) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -160,7 +177,7 @@ public interface IEventsService {
      * @param itemIds the IDs of the items to add
      * @return true if the item was added successfully, false otherwise
      */
-    default boolean addItemsToEvent(String eventId, List<ItemQuantity> itemIds_quantities) {
+    default boolean addItemsToEvent(String eventId, List<ItemId_Quantity> itemIds_quantities) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -182,7 +199,7 @@ public interface IEventsService {
      * @param gameIds the IDs of the games to add
      * @return true if the game was added successfully, false otherwise
      */
-    default boolean addGamesToEvent(String eventId, List<String> gameIds) {
+    default boolean addGamesToEvent(String eventId, List<GameId_StartTime> listGameId_StartTime) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -193,7 +210,17 @@ public interface IEventsService {
      * @param gameIds the IDs of the games to remove
      * @return true if the game was removed successfully, false otherwise
      */
-    default boolean removeGamesFromEvent(String eventId, List<String> gameIds) {
+    default boolean removeGamesFromEvent(String eventId, List<Long> gameIds) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Creates an event with session info.
+     *
+     * @param eventRegistrationInfoDto the DTO of the event registration info
+     * @return true if the event was created successfully, false otherwise
+     */
+    default ResponseEntity<ResponseDto> createEventWithSessionInfo(EventRegistrationInfoDto eventRegistrationInfoDto) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 }
