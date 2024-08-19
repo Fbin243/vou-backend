@@ -5,7 +5,7 @@ spring:
   application:
     name: games
   datasource:
-    url: jdbc:mysql://localhost:3306/events_service
+    url: jdbc:mysql://localhost:3306/gamesdb
     username: root
     password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
