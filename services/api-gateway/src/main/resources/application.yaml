@@ -9,6 +9,9 @@ spring:
     name: api-gateway
   cloud:
     gateway:
+      httpclient:
+        connect-timeout: 1000
+        response-timeout: 2s
       routes:
         - id: discovery-server
           uri: ${DISCOVERY_SERVER_URI:http://localhost:8761}
@@ -20,30 +23,24 @@ spring:
           uri: lb://identity
           predicates:
             - Path=${app.api-prefix}/identity/**
-          filters:
-            - StripPrefix=2
-            - name: CircuitBreaker
-              args:
-                name: identityCircuitBreaker
-                fallbackUri: forward:/inCaseOfFailureUseThis/{segments}
         - id: users
           uri: lb://users
           predicates:
             - Path=${app.api-prefix}/users/**
-          filters:
-            - StripPrefix=2
         - id: games
           uri: lb://games
           predicates:
             - Path=${app.api-prefix}/games/**
-          filters:
-            - StripPrefix=2
         - id: sessions
           uri: lb://sessions
           predicates:
             - Path=${app.api-prefix}/sessions/**
-          filters:
-            - StripPrefix=2
+      default-filters:
+        - StripPrefix=2
+        - name: CircuitBreaker
+          args:
+            name: gatewayCircuitBreaker
+            fallbackUri: forward:/contactSupport
   # Disable data source auto-configuration
   autoconfigure:
     exclude:
