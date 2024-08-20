@@ -9,13 +9,13 @@ spring:
     username: root
     password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
-  #  sql:
-  #    init:
-  #      mode: always
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: update
+#  sql:
+#    init:
+#      mode: always
   config:
     import:
       optional:configserver:http://localhost:8071/

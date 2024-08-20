@@ -7,10 +7,10 @@ spring:
   application:
     name: identity
   datasource:
-    url: "jdbc:mysql://localhost:3306/identity_service?useSSL=false&serverTimezone=UTC"
+    url: "jdbc:mysql://localhost:3306/identitydb?useSSL=false&serverTimezone=UTC"
     driverClassName: "com.mysql.cj.jdbc.Driver"
-    username: springstudent
-    password: springstudent
+    username: root
+    password: 1234
   jpa:
     hibernate:
       ddl-auto: update
