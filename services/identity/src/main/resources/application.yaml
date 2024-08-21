@@ -7,10 +7,10 @@ spring:
   application:
     name: identity
   datasource:
-    url: "jdbc:mysql://localhost:3306/identity_service?useSSL=false&serverTimezone=UTC"
+    url: "jdbc:mysql://localhost:3306/identitydb?useSSL=false&serverTimezone=UTC"
     driverClassName: "com.mysql.cj.jdbc.Driver"
-    username: springstudent
-    password: springstudent
+    username: root
+    password: 1234
   jpa:
     hibernate:
       ddl-auto: update
@@ -29,3 +29,27 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    shutdown:
+      enabled: true
+  info:
+    env:
+      enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+  observations:
+    key-values:
+      application: identity-service
+  tracing:
+    sampling:
+      probability: 1.0

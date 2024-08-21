@@ -76,7 +76,6 @@ public class UserService {
         return userMapper.toUserResponse(user);
     }
 
-
     public UserResponse updateUser(String userId, UserUpdateRequest request) {
         User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 

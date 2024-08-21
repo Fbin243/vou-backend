@@ -4,3 +4,4 @@ dump.rdb
 
 .env
 .log
+/docker-compose/tempo/tempo-data

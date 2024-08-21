@@ -3,9 +3,9 @@ spring:
     name: users
 
   datasource:
-    url: jdbc:mysql://localhost:3306/user_service?useSSL=false&serverTimezone=UTC
-    username: springstudent
-    password: springstudent
+    url: jdbc:mysql://localhost:3306/usersdb?useSSL=false&serverTimezone=UTC
+    username: root
+    password: 1234
   jpa:
     hibernate:
       ddl-auto: update
@@ -32,3 +32,27 @@ server:
     port: 8081
     servlet:
       context-path: /users
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    shutdown:
+      enabled: true
+  info:
+    env:
+      enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+  observations:
+    key-values:
+      application: users-service
+  tracing:
+    sampling:
+      probability: 1.0

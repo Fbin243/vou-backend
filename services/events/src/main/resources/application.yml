@@ -15,8 +15,6 @@ spring:
     # properties:
     #   hibernate:
     #     dialect: org.hibernate.dialect.MySQL8Dialect
-  config:
-    import: optional:configserver:http://localhost:8071/
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
