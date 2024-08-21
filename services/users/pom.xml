@@ -6,7 +6,7 @@
 		<groupId>com.vou</groupId>
 		<artifactId>backend</artifactId>
 		<version>0.0.1</version>
-<!--		<relativePath>../../pom.xml</relativePath>-->
+		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<name>users</name>
 	<description>Users Microservice</description>

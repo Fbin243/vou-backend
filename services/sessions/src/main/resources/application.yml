@@ -39,10 +39,18 @@ management:
   info:
     env:
       enabled: true
-
-endpoints:
-  shutdown:
-    enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+  observations:
+    key-values:
+      application: games-service
+  tracing:
+    sampling:
+      probability: 1.0
 
 eureka:
   instance:

@@ -32,3 +32,27 @@ server:
     port: 8081
     servlet:
       context-path: /users
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    shutdown:
+      enabled: true
+  info:
+    env:
+      enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+  observations:
+    key-values:
+      application: games-service
+  tracing:
+    sampling:
+      probability: 1.0
