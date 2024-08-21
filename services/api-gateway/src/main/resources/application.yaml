@@ -54,6 +54,15 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka
 
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-size: 10
+        permitted-number-of-calls-in-half-open-state: 2
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10000
+
 management:
   endpoints:
     web:
@@ -65,12 +74,15 @@ management:
   info:
     env:
       enabled: true
-
-resilience4j:
-  circuitbreaker:
-    configs:
-      default:
-        sliding-window-size: 10
-        permitted-number-of-calls-in-half-open-state: 2
-        failure-rate-threshold: 50
-        wait-duration-in-open-state: 10000
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+  observations:
+    key-values:
+      application: api-gateway
+  tracing:
+    sampling:
+      probability: 1.0
