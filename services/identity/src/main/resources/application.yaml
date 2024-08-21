@@ -49,7 +49,7 @@ management:
             requests: true
   observations:
     key-values:
-      application: games-service
+      application: identity-service
   tracing:
     sampling:
       probability: 1.0

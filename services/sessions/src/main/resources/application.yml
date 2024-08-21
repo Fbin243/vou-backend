@@ -47,7 +47,7 @@ management:
             requests: true
   observations:
     key-values:
-      application: games-service
+      application: sessions-service
   tracing:
     sampling:
       probability: 1.0
