@@ -82,7 +82,7 @@
 				<version>3.4.1</version>
 				<configuration>
 					<to>
-						<image>fbin243/${project.artifactId}:0.0.1</image>
+						<image>namthang030602/${project.artifactId}:0.0.1</image>
 					</to>
 				</configuration>
 			</plugin>
