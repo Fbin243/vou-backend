@@ -37,10 +37,10 @@ spring:
             - Path=${app.api-prefix}/sessions/**
       default-filters:
         - StripPrefix=2
-        - name: CircuitBreaker
-          args:
-            name: gatewayCircuitBreaker
-            fallbackUri: forward:/contactSupport
+#        - name: CircuitBreaker
+#          args:
+#            name: gatewayCircuitBreaker
+#            fallbackUri: forward:/contactSupport
   # Disable data source auto-configuration
   autoconfigure:
     exclude:
