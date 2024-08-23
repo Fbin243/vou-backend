@@ -222,10 +222,10 @@ services:
       MYSQL_DATABASE: mysqldb
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql-data:/var/lib/mysql
     extends:
       file: common-config.yml
       service: db-config
-
 #  identitydb:
 #    ports:
 #      - 3300:3306
@@ -411,3 +411,7 @@ services:
 networks:
   vou_network:
     driver: bridge
+
+################ VOLUME ###############
+volumes:
+  mysql-data:
