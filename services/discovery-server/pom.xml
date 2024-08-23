@@ -6,7 +6,6 @@
         <groupId>com.vou</groupId>
         <artifactId>backend</artifactId>
         <version>0.0.1</version>
-<!--        <relativePath>../../pom.xml</relativePath>-->
     </parent>
     <groupId>com.vou</groupId>
     <artifactId>discovery-server</artifactId>
@@ -31,6 +30,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
     </dependencies>
     <dependencyManagement>

@@ -37,10 +37,10 @@ spring:
             - Path=${app.api-prefix}/sessions/**
       default-filters:
         - StripPrefix=2
-#        - name: CircuitBreaker
-#          args:
-#            name: gatewayCircuitBreaker
-#            fallbackUri: forward:/contactSupport
+        - name: CircuitBreaker
+          args:
+            name: gatewayCircuitBreaker
+            fallbackUri: forward:/contactSupport
   # Disable data source auto-configuration
   autoconfigure:
     exclude:
@@ -54,6 +54,26 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka
 
+#    configs:
+#      default:
+#        sliding-window-size: 10
+#        permitted-number-of-calls-in-half-open-state: 2
+#        failure-rate-threshold: 50
+#        wait-duration-in-open-state: 10000
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      gatewayCircuitBreaker:
+        sliding-window-size: 10
+        permitted-number-of-calls-in-half-open-state: 2
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10000
+  timelimiter:
+    instances:
+      gatewayCircuitBreaker:
+        timeout-duration: 5s
+
 management:
   endpoints:
     web:
@@ -65,12 +85,6 @@ management:
   info:
     env:
       enabled: true
-
-resilience4j:
-  circuitbreaker:
-    configs:
-      default:
-        sliding-window-size: 10
-        permitted-number-of-calls-in-half-open-state: 2
-        failure-rate-threshold: 50
-        wait-duration-in-open-state: 10000
+  metrics:
+    tags:
+      application: ${spring.application.name}

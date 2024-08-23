@@ -10,18 +10,16 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-  main:
-    banner-mode: off
 
-logging:
-  level:
-    root: warn
-    org:
-      hibernate:
-        SQL: TRACE
-        orm:
-          jdbc:
-            hind: TRACE
+#logging:
+#  level:
+#    root: warn
+#    org:
+#      hibernate:
+#        SQL: TRACE
+#        orm:
+#          jdbc:
+#            hind: TRACE
 
 eureka:
   client:
@@ -29,6 +27,21 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
 
 server:
-    port: 8081
-    servlet:
-      context-path: /users
+  port: 8081
+  servlet:
+    context-path: /users
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    shutdown:
+      enabled: true
+  info:
+    env:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}

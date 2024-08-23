@@ -39,10 +39,9 @@ management:
   info:
     env:
       enabled: true
-
-endpoints:
-  shutdown:
-    enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
 
 eureka:
   instance:

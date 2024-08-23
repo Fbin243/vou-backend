@@ -12,9 +12,6 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
-    # properties:
-    #   hibernate:
-    #     dialect: org.hibernate.dialect.MySQL8Dialect
   config:
     import: optional:configserver:http://localhost:8071/
   kafka:
@@ -27,3 +24,18 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: com.vou.events.kafka.serializer.EventSessionInfoSerializer
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    gateway:
+      enabled: true
+  info:
+    env:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}

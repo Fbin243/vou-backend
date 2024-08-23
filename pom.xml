@@ -35,8 +35,9 @@
 
     <modules>
         <module>pkg</module>
-        <module>services/users</module>
         <module>services/api-gateway</module>
+        <module>services/discovery-server</module>
+        <module>services/users</module>
         <module>services/events</module>
         <module>services/games</module>
         <module>services/notifications</module>
@@ -69,6 +70,11 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
+        </dependency>
+<!--        Observability & Monitoring -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

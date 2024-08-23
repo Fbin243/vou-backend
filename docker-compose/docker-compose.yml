@@ -80,17 +80,17 @@ services:
       file: common-config.yml
       service: network-config
 
-#  prometheus:
-#    image: prom/prometheus:v2.50.1
-#    container_name: prometheus
-#    ports:
-#      - "9090:9090"
-#    volumes:
-#      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-#    extends:
-#      file: common-config.yml
-#      service: network-config
-#
+  prometheus:
+    image: prom/prometheus:v2.50.1
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    extends:
+      file: common-config.yml
+      service: network-config
+
 #  tempo:
 #    image: grafana/tempo:2.4.2
 #    container_name: tempo
