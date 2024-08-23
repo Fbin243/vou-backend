@@ -9,6 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/brands")
+@RequestMapping("/brands")
 public class BrandController {
 
     private BrandService brandService;
@@ -48,6 +49,7 @@ public class BrandController {
     }
 
     @GetMapping("public/email/{email}")
+    @GetMapping("public/email/{email}")
     public Brand getBrandByEmail(@PathVariable String email) {
         if (email == null || email.isEmpty()) {
             throw new RuntimeException("Email is required");
@@ -66,6 +68,8 @@ public class BrandController {
         if (emails == null || emails.isEmpty()) {
             throw new RuntimeException("Emails are required");
         }
+        // if no having any matched brand: return "No brand found with emails: " +
+        // emails;
         // if no having any matched brand: return "No brand found with emails: " +
         // emails;
         List<Brand> result = brandService.findManyBrandsByManyEmails(emails);
