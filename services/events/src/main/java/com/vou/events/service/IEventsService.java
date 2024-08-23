@@ -3,7 +3,6 @@ package com.vou.events.service;
 import com.vou.events.common.GameId_StartTime;
 import com.vou.events.common.ItemId_Quantity;
 import com.vou.events.common.VoucherId_Quantity;
-import com.vou.events.common.VoucherQuantity;
 import com.vou.events.dto.EventDto;
 import com.vou.events.dto.EventRegistrationInfoDto;
 import com.vou.pkg.dto.ResponseDto;

@@ -1,0 +1,90 @@
+server:
+  port: 8888
+
+app:
+  api-prefix: /api/v1
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      httpclient:
+        connect-timeout: 1000
+        response-timeout: 10s
+      routes:
+        - id: discovery-server
+          uri: ${DISCOVERY_SERVER_URI:http://localhost:8761}
+          predicates:
+            - Path=${app.api-prefix}/eureka/web
+          filters:
+            - StripPrefix=2
+        - id: identity
+          uri: lb://identity
+          predicates:
+            - Path=${app.api-prefix}/identity/**
+        - id: users
+          uri: lb://users
+          predicates:
+            - Path=${app.api-prefix}/users/**
+        - id: games
+          uri: lb://games
+          predicates:
+            - Path=${app.api-prefix}/games/**
+        - id: sessions
+          uri: lb://sessions
+          predicates:
+            - Path=${app.api-prefix}/sessions/**
+      default-filters:
+        - StripPrefix=2
+        - name: CircuitBreaker
+          args:
+            name: gatewayCircuitBreaker
+            fallbackUri: forward:/contactSupport
+  # Disable data source auto-configuration
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+  main:
+    web-application-type: reactive
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+#    configs:
+#      default:
+#        sliding-window-size: 10
+#        permitted-number-of-calls-in-half-open-state: 2
+#        failure-rate-threshold: 50
+#        wait-duration-in-open-state: 10000
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      gatewayCircuitBreaker:
+        sliding-window-size: 10
+        permitted-number-of-calls-in-half-open-state: 2
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10000
+  timelimiter:
+    instances:
+      gatewayCircuitBreaker:
+        timeout-duration: 5s
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    gateway:
+      enabled: true
+  info:
+    env:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}

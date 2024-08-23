@@ -13,8 +13,6 @@ services:
 
   db-config:
     image: mysql
-    ports:
-      - 3306:3306
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       timeout: 10s
@@ -26,11 +24,11 @@ services:
     extends:
       service: base-config
 
-  eureka-config:
+  discovery-config:
     depends_on:
-      eurekaserver:
+      discovery-server:
         condition: service_healthy
     environment:
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:8070/eureka/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
     extends:
       service: base-config

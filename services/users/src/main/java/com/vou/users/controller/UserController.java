@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/all-users")
 public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<User> createUser(@RequestBody User user) {
         if (user.getRole() == null) {
             throw new BadRequestException("Role is required");
@@ -44,6 +44,15 @@ public class UserController {
     @GetMapping("/role/{role}")
     public ResponseEntity<List<User>> getUsersByRole(@PathVariable UserRole role) {
         return ResponseEntity.ok(userService.findUsersByRole(role));
+    }
+
+    @GetMapping("/account/{accountId}")
+    public ResponseEntity<User> getUserByAccountId(@PathVariable String accountId) {
+        User user = userService.findUserByAccountId(accountId);
+        if (user == null) {
+            throw new NotFoundException("User not found with account id: " + accountId);
+        }
+        return ResponseEntity.ok(user);
     }
 
     @PatchMapping("/{id}")

@@ -8,6 +8,7 @@ import com.vou.events.dto.ItemDto;
 import com.vou.events.dto.VoucherDto;
 import com.vou.events.mapper.GameMapper;
 import com.vou.events.model.EventSessionInfo;
+import com.vou.events.model.NotificationInfo;
 import com.vou.events.entity.*;
 import com.vou.events.mapper.BrandMapper;
 import com.vou.events.mapper.EventMapper;
@@ -15,6 +16,7 @@ import com.vou.events.repository.*;
 import com.vou.events.common.EventIntermediateTableStatus;
 import com.vou.events.common.GameId_StartTime;
 import com.vou.events.common.ItemId_Quantity;
+import com.vou.events.common.UserRole;
 import com.vou.events.common.VoucherId_Quantity;
 import com.vou.events.common.VoucherId_Quantity_ItemIds_Quantities;
 import com.vou.events.client.GamesServiceClient;
@@ -24,8 +26,6 @@ import com.vou.pkg.exception.NotFoundException;
 
 import lombok.AllArgsConstructor;
 
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +35,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.stream.Collectors;
 
 @Service
@@ -59,7 +58,10 @@ public class EventsService implements IEventsService {
 
     // KafkaProducer<String, EventSessionInfo> producer = new KafkaProducer<>(props);
     @Autowired
-    private KafkaTemplate<String, EventSessionInfo> kafkaTemplate;
+    private KafkaTemplate<String, EventSessionInfo> kafkaTemplateEventSessionInfo;
+
+    // @Autowired
+    // private KafkaTemplate<String, NotificationInfo> kafkaTemplateNotificationInfo;
 
     @Override
     public List<EventDto> fetchAllEvents() {
@@ -200,6 +202,12 @@ public class EventsService implements IEventsService {
             );
 
             List<BrandDto> brands = usersServiceClient.getBrandsByEmails(emails);
+
+            // // don't need Thang to test
+            // brands = new ArrayList<>();
+            // brands.add(new BrandDto());
+            // brands.get(0).setId("81ba2eb1-0311-4c44-bc11-3b94f1cadd62");
+            // brands.get(0).setAccountId("d1ae9e33-9c2e-4f53-8f91-9d23d6d933b1");
 
             if (brands == null || brands.isEmpty()) {
                 return false;
@@ -521,11 +529,20 @@ public class EventsService implements IEventsService {
                             gameId_StartTime.getStartTime().plusMinutes(30).toString()
                         );
                 
-                        kafkaTemplate.send("event-session", eventSessionInfo);
+                        kafkaTemplateEventSessionInfo.send("event-session", eventSessionInfo);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
+                // // wair for session response
+                // // Send notification to related brands
+                // try {
+                //     kafkaTemplateNotificationInfo.send("event-notification", new NotificationInfo("NotificationId", "NotificationTitle", "NotificationDescription", "NotificationImageUrl"));
+                // } catch (Exception e) {
+                //     e.printStackTrace();
+                // }
+
             } else {
                 ResponseDto res = new ResponseDto(HttpStatus.BAD_REQUEST, "Game addition failed.");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);

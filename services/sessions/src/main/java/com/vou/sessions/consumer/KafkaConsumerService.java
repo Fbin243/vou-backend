@@ -20,7 +20,7 @@ public class KafkaConsumerService {
     Properties props = new Properties();
     private final List<EventSessionInfo> messages = new ArrayList<>();
 
-    @KafkaListener(topics = "event-session", groupId = "group_id", containerFactory = "kafkaListenerContainerFactory", concurrency = "1")
+    @KafkaListener(topics = "event-session", groupId = "group_id", containerFactory = "kafkaListenerContainerFactory")
     public void listen(ConsumerRecord<String, EventSessionInfo> record, Acknowledgment acknowledgment) {
         EventSessionInfo eventSessionInfo = record.value();
         messages.add(eventSessionInfo);

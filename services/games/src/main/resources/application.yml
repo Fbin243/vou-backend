@@ -5,17 +5,17 @@ spring:
   application:
     name: games
   datasource:
-    url: jdbc:mysql://localhost:3306/events_service
+    url: jdbc:mysql://localhost:3306/gamesdb
     username: root
     password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
-  #  sql:
-  #    init:
-  #      mode: always
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: update
+#  sql:
+#    init:
+#      mode: always
   config:
     import:
       optional:configserver:http://localhost:8071/
@@ -31,6 +31,9 @@ management:
   info:
     env:
       enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
 
 endpoints:
   shutdown:
@@ -43,7 +46,7 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
     service-url:
-      defaultZone: http://localhost:8070/eureka/
+      defaultZone: http://localhost:8761/eureka/
 
 info:
   app:

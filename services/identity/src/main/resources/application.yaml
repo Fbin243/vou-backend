@@ -1,0 +1,46 @@
+server:
+  port: 8071
+  servlet:
+    context-path: /identity
+
+spring:
+  application:
+    name: identity
+  datasource:
+    url: "jdbc:mysql://localhost:3306/identitydb?useSSL=false&serverTimezone=UTC"
+    driverClassName: "com.mysql.cj.jdbc.Driver"
+    username: root
+    password: 1234
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+jwt:
+  signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
+  valid-duration: 3600 # in second
+  refreshable-duration: 36000 # in seconds
+
+app:
+  services:
+    users: http://localhost:8081/users
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      ex
+  metrics:posure:
+    include: "*"
+  endpoint:
+    shutdown:
+      enabled: true
+  info:
+    env:
+      enabled: true
+    tags:
+      application: ${spring.application.name}

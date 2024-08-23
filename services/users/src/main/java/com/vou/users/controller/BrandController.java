@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/brands")
+@RequestMapping("/brands")
 public class BrandController {
 
     private BrandService brandService;
@@ -47,7 +47,7 @@ public class BrandController {
         return "Deleted brand id - " + brandId;
     }
 
-    @GetMapping("/email/{email}")
+    @GetMapping("public/email/{email}")
     public Brand getBrandByEmail(@PathVariable String email) {
         if (email == null || email.isEmpty()) {
             throw new RuntimeException("Email is required");
@@ -60,18 +60,18 @@ public class BrandController {
         return result;
     }
 
-    @PostMapping("/emails")
+    @PostMapping("/public/emails")
     public List<Brand> getBrandsByEmails(@RequestBody List<String> emails) {
 
         if (emails == null || emails.isEmpty()) {
             throw new RuntimeException("Emails are required");
         }
+        // if no having any matched brand: return "No brand found with emails: " +
+        // emails;
         List<Brand> result = brandService.findManyBrandsByManyEmails(emails);
         if (result == null || result.isEmpty()) {
             throw new RuntimeException("No brand found with emails: " + emails);
         }
         return result;
     }
-
-
 }

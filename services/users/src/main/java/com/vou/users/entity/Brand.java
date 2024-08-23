@@ -12,8 +12,6 @@ public class Brand extends User {
 
     // annotate the fields with db column names
 
-    // set up mapping to InstructorDetail entity
-
     // create constructors
 
     // generate getter/setter methods
@@ -55,8 +53,8 @@ public class Brand extends User {
         this.longitude = longitude;
     }
 
-    public Brand(String fullName, String username, String password, String email, String phone, UserRole role, boolean status, String brandName, String field, String address, double latitude, double longitude) {
-        super(fullName, username, password, email, phone, role, status);
+    public Brand(String fullName, String username, String accountId, String email, String phone, UserRole role, boolean status, String brandName, String field, String address, double latitude, double longitude) {
+        super(fullName, username, accountId, email, phone, role, status);
         this.brandName = brandName;
         this.field = field;
         this.address = address;

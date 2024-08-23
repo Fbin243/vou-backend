@@ -6,7 +6,6 @@
         <groupId>com.vou</groupId>
         <artifactId>backend</artifactId>
         <version>0.0.1</version>
-<!--        <relativePath>../../pom.xml</relativePath>-->
     </parent>
     <groupId>com.vou</groupId>
     <artifactId>discovery-server</artifactId>
@@ -32,6 +31,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
@@ -55,6 +58,17 @@
                 <artifactId>jib-maven-plugin</artifactId>
                 <version>3.4.1</version>
                 <configuration>
+                    <from>
+                        <image>
+                            eclipse-temurin:17.0.3_7-jre-focal
+                        </image>
+                        <platforms>
+                            <platform>
+                                <architecture>arm64</architecture>
+                                <os>linux</os>
+                            </platform>
+                        </platforms>
+                    </from>
                     <to>
                         <image>fbin243/${project.artifactId}:0.0.1</image>
                     </to>
