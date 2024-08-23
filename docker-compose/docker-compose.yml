@@ -301,7 +301,7 @@ services:
 
   ###################### SERVICES ##########################
   discovery-server:
-    image: fbin243/discovery-server:0.0.1
+    image: fbin243/discovery-server
     container_name: discovery-server
     ports:
       - 8761:8761
@@ -318,7 +318,7 @@ services:
       SPRING_APPLICATION_NAME: "discovery-server"
 
   users:
-    image: fbin243/users:0.0.1
+    image: fbin243/users
     container_name: users
     ports:
       - 8081:8081
@@ -337,7 +337,7 @@ services:
       service: discovery-config
 
   identity:
-    image: fbin243/identity:0.0.1
+    image: fbin243/identity
     container_name: identity
     ports:
       - 8071:8071
@@ -357,7 +357,7 @@ services:
       service: discovery-config
 
   games:
-    image: fbin243/games:0.0.1
+    image: fbin243/games
     container_name: games
     ports:
       - 8082:8082
@@ -376,7 +376,7 @@ services:
       service: discovery-config
 
   sessions:
-    image: fbin243/sessions:0.0.1
+    image: fbin243/sessions
     container_name: sessions
     env_file:
       - ../.env
@@ -392,7 +392,7 @@ services:
       service: discovery-config
 
   api-gateway:
-    image: fbin243/api-gateway:0.0.1
+    image: fbin243/api-gateway
     container_name: api-gateway
     ports:
       - 8888:8888
