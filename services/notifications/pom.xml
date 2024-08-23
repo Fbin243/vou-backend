@@ -87,6 +87,11 @@
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-registry-prometheus</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.google.cloud</groupId>
+			<artifactId>spring-cloud-gcp-starter-firestore</artifactId>
+			<version>5.5.1</version>
+		</dependency>
     </dependencies>
 	<dependencyManagement>
         <dependencies>

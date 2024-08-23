@@ -1,6 +1,5 @@
 package com.vou.events.dto;
 
-import com.vou.events.common.BrandStatus;
 import com.vou.events.common.UserRole;
 
 import lombok.Data;
@@ -21,7 +20,7 @@ public class BrandDto {
 
     private String username;
 
-    private String password;
+    private String accountId;
     
     private String email;
 

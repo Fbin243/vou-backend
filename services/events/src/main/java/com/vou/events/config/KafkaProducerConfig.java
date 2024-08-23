@@ -10,6 +10,7 @@ import org.springframework.kafka.core.ProducerFactory;
 
 import com.vou.events.kafka.serializer.EventSessionInfoSerializer;
 import com.vou.events.model.EventSessionInfo;
+import com.vou.events.model.NotificationInfo;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +19,7 @@ import java.util.Map;
 public class KafkaProducerConfig {
 
     @Bean
-    public ProducerFactory<String, EventSessionInfo> producerFactory() {
+    public ProducerFactory<String, EventSessionInfo> eventSessionProducerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -26,8 +27,22 @@ public class KafkaProducerConfig {
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
+    // // @Bean
+    // public ProducerFactory<String, NotificationInfo> notificationProducerFactory() {
+    //     Map<String, Object> configProps = new HashMap<>();
+    //     configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+    //     configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+    //     configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, EventSessionInfoSerializer.class);
+    //     return new DefaultKafkaProducerFactory<>(configProps);
+    // }
+
     @Bean
-    public KafkaTemplate<String, EventSessionInfo> kafkaTemplate() {
-        return new KafkaTemplate<>(producerFactory());
+    public KafkaTemplate<String, EventSessionInfo> kafkaTemplateEventSessionInfo() {
+        return new KafkaTemplate<>(eventSessionProducerFactory());
     }
+
+    // @Bean
+    // public KafkaTemplate<String, NotificationInfo> kafkaTemplateNotificationInfo() {
+    //     return new KafkaTemplate<>(notificationProducerFactory());
+    // }
 }

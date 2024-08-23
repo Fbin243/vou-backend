@@ -18,7 +18,7 @@ public class BrandMapper {
         brandDto.setId(brand.getId());
         brandDto.setFullName(brand.getFullName());
         brandDto.setUsername(brand.getUsername());
-        brandDto.setPassword(brand.getPassword());
+        brandDto.setAccountId(brand.getAccountId());
         brandDto.setEmail(brand.getEmail());
         brandDto.setPhone(brand.getPhone());
         brandDto.setRole(brand.getRole());
@@ -42,7 +42,7 @@ public class BrandMapper {
         brand.setId(dto.getId());
         brand.setFullName(dto.getFullName());
         brand.setUsername(dto.getUsername());
-        brand.setPassword(dto.getPassword());
+        brand.setAccountId(dto.getAccountId());
         brand.setEmail(dto.getEmail());
         brand.setPhone(dto.getPhone());
         brand.setRole(dto.getRole());
