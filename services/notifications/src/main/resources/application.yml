@@ -1,5 +1,5 @@
 server:
-  port: 8087
+  port: 8086
 
 spring:
   application:
@@ -16,6 +16,15 @@ spring:
   firebase:
     firebase-configuration-file: google/serviceAccountKey.json
 
+  main:
+    allow-bean-definition-overriding: true
+
+  cloud:
+    gcp:
+      security:
+        firebase:
+          enabled: false
+
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
@@ -28,10 +37,10 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+  # autoconfigure:
+  #   exclude:
+  #     - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  #     - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
 
 management:
   endpoints:

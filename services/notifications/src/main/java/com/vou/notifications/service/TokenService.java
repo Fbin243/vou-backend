@@ -21,7 +21,7 @@ import com.vou.notifications.entity.UserToken;
 @AllArgsConstructor
 public class TokenService {
 
-    private UserTokenRepository userTokenRepository;
+    // private UserTokenRepository userTokenRepository;
     private final Firestore firestore;
 
     public void saveOrUpdateToken(String userId, String fcmToken) {

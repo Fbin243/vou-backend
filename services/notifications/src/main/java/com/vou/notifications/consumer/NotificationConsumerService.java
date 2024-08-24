@@ -18,9 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Service;
@@ -29,9 +26,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class NotificationConsumerService {
 
-    // @Autowired
     private final FCMService fcmService;
-    private static final Logger log = LoggerFactory.getLogger(NotificationConsumerService.class);
     private final NotificationUserRepository notificationUserRepository;
     private final UserTokenRepository userTokenRepository;
     private final NotificationRelatedPairRepository notificationRelatedPairRepository;
@@ -61,7 +56,7 @@ public class NotificationConsumerService {
             acknowledgment.acknowledge();
         }
         catch (Exception e) {
-            log.error("Error processing message: {}", record, e);
+            e.getStackTrace();
         }
     }
 }
