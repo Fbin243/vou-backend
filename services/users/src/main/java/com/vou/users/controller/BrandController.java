@@ -9,7 +9,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/brands")
-@RequestMapping("/brands")
 public class BrandController {
 
     private BrandService brandService;
@@ -48,7 +47,6 @@ public class BrandController {
         return "Deleted brand id - " + brandId;
     }
 
-    @GetMapping("public/email/{email}")
     @GetMapping("public/email/{email}")
     public Brand getBrandByEmail(@PathVariable String email) {
         if (email == null || email.isEmpty()) {

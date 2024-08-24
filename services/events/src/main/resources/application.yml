@@ -4,9 +4,9 @@ spring:
   application:
     name: events
   datasource:
-    url: jdbc:mysql://localhost:3306/events_service
+    url: jdbc:mysql://localhost:3300/eventsdb
     username: root
-    password: 1234
+    password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     show-sql: true
@@ -32,6 +32,14 @@ management:
         include: "*"
   endpoint:
     gateway:
+      enabled: true
+    health:
+      probes:
+        enabled: true
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
       enabled: true
   info:
     env:

@@ -59,15 +59,15 @@
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
         <dependency>
-			<groupId>org.springframework.kafka</groupId>
-			<artifactId>spring-kafka</artifactId>
-			<version>3.2.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.kafka</groupId>
-			<artifactId>spring-kafka-test</artifactId>
-			<scope>test</scope>
-		</dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+            <version>3.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka-test</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
@@ -97,19 +97,19 @@
                 <artifactId>jib-maven-plugin</artifactId>
                 <version>3.4.1</version>
                 <configuration>
-                    <from>
-                        <image>
-                            eclipse-temurin:17.0.3_7-jre-focal
-                        </image>
-                        <platforms>
-                            <platform>
-                                <architecture>arm64</architecture>
-                                <os>linux</os>
-                            </platform>
-                        </platforms>
-                    </from>
+<!--					<from>-->
+<!--						<image>-->
+<!--							eclipse-temurin:17.0.3_7-jre-focal-->
+<!--						</image>-->
+<!--						<platforms>-->
+<!--							<platform>-->
+<!--								<architecture>arm64</architecture>-->
+<!--								<os>linux</os>-->
+<!--							</platform>-->
+<!--						</platforms>-->
+<!--					</from>-->
                     <to>
-                        <image>fbin243/${project.artifactId}:0.0.1</image>
+                        <image>fbin243/${project.artifactId}</image>
                     </to>
                 </configuration>
             </plugin>

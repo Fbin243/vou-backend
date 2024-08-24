@@ -26,6 +26,8 @@ import com.vou.pkg.exception.NotFoundException;
 
 import lombok.AllArgsConstructor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +42,8 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class EventsService implements IEventsService {
-    
+
+    private static final Logger log = LoggerFactory.getLogger(EventsService.class);
     private final EventRepository           eventsRepository;
     private final BrandRepository           brandRepository;
     private final VoucherRepository         voucherRepository;
@@ -202,7 +205,7 @@ public class EventsService implements IEventsService {
             );
 
             List<BrandDto> brands = usersServiceClient.getBrandsByEmails(emails);
-
+            log.info("BRAND: {}", brands);
             // // don't need Thang to test
             // brands = new ArrayList<>();
             // brands.add(new BrandDto());
@@ -210,6 +213,7 @@ public class EventsService implements IEventsService {
             // brands.get(0).setAccountId("d1ae9e33-9c2e-4f53-8f91-9d23d6d933b1");
 
             if (brands == null || brands.isEmpty()) {
+                log.info("BRAND IS NULL");
                 return false;
             } else {
                 for (BrandDto _brandDto : brands) {
@@ -229,6 +233,7 @@ public class EventsService implements IEventsService {
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
 

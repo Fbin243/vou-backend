@@ -33,11 +33,18 @@ eureka:
 management:
   endpoints:
     web:
-      ex
-  metrics:posure:
-    include: "*"
+      exposure:
+        include: "*"
   endpoint:
     shutdown:
+      enabled: true
+    health:
+      probes:
+        enabled: true
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
       enabled: true
   info:
     env:
