@@ -30,22 +30,22 @@ public class KafkaProducerConfig {
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
-    // // @Bean
-    // public ProducerFactory<String, NotificationInfo> notificationProducerFactory() {
-    //     Map<String, Object> configProps = new HashMap<>();
-    //     configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-    //     configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-    //     configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, EventSessionInfoSerializer.class);
-    //     return new DefaultKafkaProducerFactory<>(configProps);
-    // }
+    @Bean
+    public ProducerFactory<String, NotificationInfo> notificationProducerFactory() {
+        Map<String, Object> configProps = new HashMap<>();
+        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, EventSessionInfoSerializer.class);
+        return new DefaultKafkaProducerFactory<>(configProps);
+    }
 
     @Bean
     public KafkaTemplate<String, EventSessionInfo> kafkaTemplateEventSessionInfo() {
         return new KafkaTemplate<>(eventSessionProducerFactory());
     }
 
-    // @Bean
-    // public KafkaTemplate<String, NotificationInfo> kafkaTemplateNotificationInfo() {
-    //     return new KafkaTemplate<>(notificationProducerFactory());
-    // }
+    @Bean
+    public KafkaTemplate<String, NotificationInfo> kafkaTemplateNotificationInfo() {
+        return new KafkaTemplate<>(notificationProducerFactory());
+    }
 }
