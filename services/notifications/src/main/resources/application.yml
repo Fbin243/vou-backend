@@ -17,7 +17,7 @@ spring:
     firebase-configuration-file: google/serviceAccountKey.json
 
   kafka:
-    bootstrap-servers: host.docker.internal:9092
+    bootstrap-servers: localhost:9092
     consumer:
       group-id: group_id
       auto-offset-reset: earliest
@@ -38,9 +38,17 @@ management:
     web:
       exposure:
         include: "*"
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
   endpoint:
     shutdown:
       enabled: true
+    health:
+      probes:
+        enabled: true
   info:
     env:
       enabled: true

@@ -28,6 +28,8 @@ import com.vou.pkg.exception.NotFoundException;
 
 import lombok.AllArgsConstructor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +44,8 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class EventsService implements IEventsService {
-    
+
+    private static final Logger log = LoggerFactory.getLogger(EventsService.class);
     private final EventRepository           eventsRepository;
     private final BrandRepository           brandRepository;
     private final VoucherRepository         voucherRepository;
@@ -205,6 +208,7 @@ public class EventsService implements IEventsService {
             );
 
             if (brands == null || brands.isEmpty()) {
+                log.info("BRAND IS NULL");
                 return false;
             } else {
                 for (BrandDto _brandDto : brands) {
@@ -224,6 +228,7 @@ public class EventsService implements IEventsService {
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
 
