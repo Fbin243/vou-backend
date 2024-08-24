@@ -5,4 +5,4 @@ dump.rdb
 .env
 .log
 /docker-compose/.data
-services/notifications/src/main/resources/serviceAccountKey.json
+services/notifications/src/main/resources/*.json

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.vou.events.dto.AddUsersRequestDto;
 
-@FeignClient(name = "notifications-service", url = "http://localhost:8087/api/notifications")
+@FeignClient(name = "notifications-service", url = "http://localhost:8086/api/notifications")
 public interface NotificationsServiceClient {
 
     @PostMapping("/users")

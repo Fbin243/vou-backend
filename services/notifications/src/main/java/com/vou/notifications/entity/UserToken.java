@@ -33,16 +33,27 @@ import lombok.Setter;
 import java.sql.Date;
 
 import com.google.cloud.firestore.annotation.DocumentId;
+import com.google.cloud.firestore.annotation.ServerTimestamp;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "users_tokens")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 public class UserToken {
     
+    @Id
     @DocumentId
-    private String userId;  // Firestore document ID
+    private String documentId;  // Firestore document ID
 
+    private String user_id;
     private String token;
+
+    @ServerTimestamp
     private Date updatedAt;
 }
