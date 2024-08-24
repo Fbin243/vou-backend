@@ -1,5 +1,6 @@
 package com.vou.events.service;
 
+import com.vou.events.dto.AddUsersRequestDto;
 import com.vou.events.dto.BrandDto;
 import com.vou.events.dto.EventDto;
 import com.vou.events.dto.EventRegistrationInfoDto;
@@ -20,6 +21,7 @@ import com.vou.events.common.UserRole;
 import com.vou.events.common.VoucherId_Quantity;
 import com.vou.events.common.VoucherId_Quantity_ItemIds_Quantities;
 import com.vou.events.client.GamesServiceClient;
+import com.vou.events.client.NotificationsServiceClient;
 import com.vou.events.client.UsersServiceClient;
 import com.vou.pkg.dto.ResponseDto;
 import com.vou.pkg.exception.NotFoundException;
@@ -53,6 +55,7 @@ public class EventsService implements IEventsService {
     private final UsersServiceClient        usersServiceClient;
     private final IVouchersService          voucherService;
     private final IItemsService             itemService;
+    private final NotificationsServiceClient notificationsServiceClient;
 
     // Properties props = new Properties();
 
@@ -60,8 +63,8 @@ public class EventsService implements IEventsService {
     @Autowired
     private KafkaTemplate<String, EventSessionInfo> kafkaTemplateEventSessionInfo;
 
-    // @Autowired
-    // private KafkaTemplate<String, NotificationInfo> kafkaTemplateNotificationInfo;
+    @Autowired
+    private KafkaTemplate<String, NotificationInfo> kafkaTemplateNotificationInfo;
 
     @Override
     public List<EventDto> fetchAllEvents() {
@@ -195,19 +198,11 @@ public class EventsService implements IEventsService {
     }
 
     @Override
-    public boolean addBrandsByEmailsToEvent(String eventId, List<String> emails) {
+    public boolean addBrandsByEmailsToEvent(String eventId, List<BrandDto> brands) {
         try {
             Event event = eventsRepository.findById(eventId).orElseThrow(
                     () -> new NotFoundException("Event", "id", eventId)
             );
-
-            List<BrandDto> brands = usersServiceClient.getBrandsByEmails(emails);
-
-            // // don't need Thang to test
-            // brands = new ArrayList<>();
-            // brands.add(new BrandDto());
-            // brands.get(0).setId("81ba2eb1-0311-4c44-bc11-3b94f1cadd62");
-            // brands.get(0).setAccountId("d1ae9e33-9c2e-4f53-8f91-9d23d6d933b1");
 
             if (brands == null || brands.isEmpty()) {
                 return false;
@@ -455,12 +450,19 @@ public class EventsService implements IEventsService {
         Integer                     sumNumberOfVoucher              = 0;
         String                      eventId                         = null;
         if (existEvent != null)     eventId                         = this.createEvent(existEvent);
+        List<BrandDto>              brands;
 
         if (eventId == null) {
             ResponseDto res = new ResponseDto(HttpStatus.BAD_REQUEST, "Event creation failed.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
         } else {
-            if (!this.addBrandsByEmailsToEvent(eventId, eventRegistrationInfoDto.getEmails())) {
+            brands = usersServiceClient.getBrandsByEmails(eventRegistrationInfoDto.getEmails());
+            if (brands == null || brands.isEmpty()) {
+                ResponseDto res = new ResponseDto(HttpStatus.BAD_REQUEST, "There is no related brands at all.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+            }
+
+            if (!this.addBrandsByEmailsToEvent(eventId, brands)) {
                 ResponseDto res = new ResponseDto(HttpStatus.BAD_REQUEST, "Brand addition failed.");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
             }
@@ -535,13 +537,21 @@ public class EventsService implements IEventsService {
                     e.printStackTrace();
                 }
 
-                // // wair for session response
-                // // Send notification to related brands
-                // try {
-                //     kafkaTemplateNotificationInfo.send("event-notification", new NotificationInfo("NotificationId", "NotificationTitle", "NotificationDescription", "NotificationImageUrl"));
-                // } catch (Exception e) {
-                //     e.printStackTrace();
-                // }
+                // wair for session response
+                // Send notification to related brands
+                try {
+                    // get list of brandIds from brands
+                    List<String> brandIds = new ArrayList<>();
+                    for (BrandDto brand : brands) {
+                        brandIds.add(brand.getId());
+                    }
+
+                    String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(new NotificationInfo("NotificationId", "NotificationTitle", "NotificationDescription", "NotificationImageUrl"), brandIds));
+                    
+                    kafkaTemplateNotificationInfo.send("event-notification", new NotificationInfo(notificationId, "NotificationTitle", "NotificationDescription", "NotificationImageUrl"));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
             } else {
                 ResponseDto res = new ResponseDto(HttpStatus.BAD_REQUEST, "Game addition failed.");

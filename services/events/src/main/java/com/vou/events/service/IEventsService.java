@@ -3,6 +3,7 @@ package com.vou.events.service;
 import com.vou.events.common.GameId_StartTime;
 import com.vou.events.common.ItemId_Quantity;
 import com.vou.events.common.VoucherId_Quantity;
+import com.vou.events.dto.BrandDto;
 import com.vou.events.dto.EventDto;
 import com.vou.events.dto.EventRegistrationInfoDto;
 import com.vou.pkg.dto.ResponseDto;
@@ -132,7 +133,7 @@ public interface IEventsService {
      * @param emails the emails of the brands to add
      * @return true if the brand was added successfully, false otherwise
      */
-    default boolean addBrandsByEmailsToEvent(String eventId, List<String> emails) {
+    default boolean addBrandsByEmailsToEvent(String eventId, List<BrandDto> emails) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 

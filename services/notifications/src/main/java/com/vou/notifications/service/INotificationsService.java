@@ -23,7 +23,7 @@ public interface INotificationsService {
      * @param userIds
      * @return true if the users was added successfully, false otherwise
      */
-    default boolean addUsersToNotification(NotificationDto notificationInfo, List<String> userIds) {
+    default String addUsersToNotification(NotificationDto notificationInfo, List<String> userIds) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 }

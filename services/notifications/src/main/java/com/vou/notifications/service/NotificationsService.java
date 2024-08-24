@@ -11,6 +11,7 @@ import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.Firestore;
 import com.vou.notifications.common.ActiveStatus;
 import com.vou.notifications.dto.NotificationDto;
+import com.vou.notifications.dto.NotificationUserDto;
 import com.vou.notifications.entity.NotificationEntity;
 import com.vou.notifications.entity.NotificationUser;
 import com.vou.notifications.mapper.NotificationMapper;
@@ -39,21 +40,28 @@ public class NotificationsService implements INotificationsService {
 
         // return createdNotification.getId().toString();
 
-        // Create a reference to the notifications collection
-        CollectionReference notifications = firestore.collection("notifications");
+        try {
+            // Create a reference to the notifications collection
+            CollectionReference notifications = firestore.collection("notifications");
 
-        // Generate a new document ID
-        DocumentReference newNotificationRef = notifications.document();
-        String notificationId = newNotificationRef.getId();
+            // Generate a new document ID
+            DocumentReference newNotificationRef = notifications.document();
+            String notificationId = newNotificationRef.getId();
 
-        // Set the fields in Firestore
-        newNotificationRef.set(notificationInfo); //  not yet check fail or success
+            // Set the fields in Firestore
+            newNotificationRef.set(notificationInfo); //  not yet check fail or success
 
-        return notificationId;
+            return notificationId;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     @Override
-    public boolean addUsersToNotification(NotificationDto notificationInfo, List<String> userIds) {
+    public String addUsersToNotification(NotificationDto notificationInfo, List<String> userIds) {
         // try {
         //     String notificationId = this.createNotification(notificationInfo);
 
@@ -71,29 +79,37 @@ public class NotificationsService implements INotificationsService {
 
         // return true;
 
+        String notificationId = null;
+
         try {
-            String notificationId = this.createNotification(notificationInfo);
+            notificationId = this.createNotification(notificationInfo);
 
             for (String userId : userIds) {
                 saveUserNotificationToFirestore(notificationId, userId);
             }
         }
         catch (Exception e) {
-            return false;
+            e.printStackTrace();
         }
 
-        return true;
+        return notificationId;
     }
 
     private void saveUserNotificationToFirestore(String notificationId, String userId) {
-        // Define the Firestore collection for notification users
-        CollectionReference notificationUsers = firestore.collection("notifications_users");
 
-        // Create a unique document ID for the user-notification pair
-        String userNotificationId = notificationId + "_" + userId;
-        DocumentReference userNotificationRef = notificationUsers.document(userNotificationId);
+        try {
+            // Define the Firestore collection for notification users
+            CollectionReference notificationUsers = firestore.collection("notifications_users");
 
-        // Set the document fields in Firestore
-        userNotificationRef.set(new NotificationUserId(notificationId, userId)); // not yet check fail or success
+            // Create a unique document ID for the user-notification pair
+            // String userNotificationId = notificationId + "_" + userId;
+            DocumentReference userNotificationRef = notificationUsers.document();
+
+            // Set the document fields in Firestore
+            userNotificationRef.set(new NotificationUserDto(notificationId, userId, false, ActiveStatus.ACTIVE)); // not yet check fail or success
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

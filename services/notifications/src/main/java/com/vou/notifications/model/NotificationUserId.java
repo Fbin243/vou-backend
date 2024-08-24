@@ -21,4 +21,6 @@ public class NotificationUserId implements Serializable {
 
     @Column(name = "user_id", nullable = false)
     private String userId;
+
+    
 }

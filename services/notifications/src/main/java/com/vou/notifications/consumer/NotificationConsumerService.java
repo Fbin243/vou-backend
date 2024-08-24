@@ -29,7 +29,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class NotificationConsumerService {
 
-    @Autowired
+    // @Autowired
     private final FCMService fcmService;
     private static final Logger log = LoggerFactory.getLogger(NotificationConsumerService.class);
     private final NotificationUserRepository notificationUserRepository;

@@ -31,9 +31,19 @@ public class NotificationController {
     }
 
     @PostMapping("/users")
-    public ResponseEntity<ResponseDto> addUsersToNotification(@RequestBody AddUsersRequestDto addUsersRequestDto) {
-        notificationsService.addUsersToNotification(addUsersRequestDto.getNotification(), addUsersRequestDto.getUserIds());
-        ResponseDto res = new ResponseDto(HttpStatus.CREATED, "Users added to event successfully.");
-        return ResponseEntity.status(HttpStatus.CREATED).body(res);
+    public String addUsersToNotification(@RequestBody AddUsersRequestDto addUsersRequestDto) {
+        // notificationsService.addUsersToNotification(addUsersRequestDto.getNotification(), addUsersRequestDto.getUserIds());
+        // ResponseDto res = new ResponseDto(HttpStatus.CREATED, "Users added to event successfully.");
+        // return ResponseEntity.status(HttpStatus.CREATED).body(res);
+        String notificationId = null;
+
+        try {
+            notificationId = notificationsService.addUsersToNotification(addUsersRequestDto.getNotification(), addUsersRequestDto.getUserIds());
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return notificationId;
     }
 }

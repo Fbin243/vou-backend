@@ -4,15 +4,18 @@ server:
 spring:
   application:
     name: notifications
-  datasource:
-    url: jdbc:mysql://localhost:3306/notificationsdb
-    username: root
-    password: 1234
-    driver-class-name: com.mysql.cj.jdbc.Driver
+  # datasource:
+  #   url: jdbc:mysql://localhost:3306/notificationsdb
+  #   username: root
+  #   password: 1234
+  #   driver-class-name: com.mysql.cj.jdbc.Driver
   # autoconfigure:
   #   exclude:
   #     - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
   #     - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+  firebase:
+    firebase-configuration-file: google/serviceAccountKey.json
+
   kafka:
     bootstrap-servers: host.docker.internal:9092
     consumer:
@@ -24,6 +27,11 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
 
 management:
   endpoints:
