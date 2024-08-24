@@ -319,7 +319,7 @@ services:
     ports:
       - 8082:8082
     healthcheck:
-      test: "curl --fail --silent localhost:8082/actuator/health/readiness | grep UP || exit 1"
+      test: "curl --fail --silent localhost:8082/games/actuator/health/readiness | grep UP || exit 1"
       interval: 20s
       timeout: 5s
       retries: 10
@@ -342,7 +342,7 @@ services:
     ports:
       - 8083:8083
     healthcheck:
-      test: "curl --fail --silent localhost:8083/actuator/health/readiness | grep UP || exit 1"
+      test: "curl --fail --silent localhost:8083/events/actuator/health/readiness | grep UP || exit 1"
       interval: 20s
       timeout: 5s
       retries: 10
@@ -368,7 +368,7 @@ services:
     ports:
       - 8084:8084
     healthcheck:
-      test: "curl --fail --silent localhost:8084/actuator/health/readiness | grep UP || exit 1"
+      test: "curl --fail --silent localhost:8084/sessions/actuator/health/readiness | grep UP || exit 1"
       interval: 20s
       timeout: 5s
       retries: 10

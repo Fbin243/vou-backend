@@ -1,6 +1,7 @@
 server:
   port: 8082
-
+  servlet:
+    context-path: /games
 spring:
   application:
     name: games

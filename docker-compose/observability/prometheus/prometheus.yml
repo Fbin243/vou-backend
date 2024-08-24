@@ -12,19 +12,19 @@ scrape_configs:
     static_configs:
       - targets: [ 'discovery-server:8761' ]
   - job_name: 'identity'
-    metrics_path: '/actuator/prometheus'
+    metrics_path: '/identity/actuator/prometheus'
     static_configs:
       - targets: [ 'identity:8071' ]
   - job_name: 'users'
-    metrics_path: '/actuator/prometheus'
+    metrics_path: '/users/actuator/prometheus'
     static_configs:
       - targets: [ 'users:8081' ]
   - job_name: 'games'
-    metrics_path: '/actuator/prometheus'
+    metrics_path: '/games/actuator/prometheus'
     static_configs:
       - targets: [ 'games:8082' ]
   - job_name: 'sessions'
-    metrics_path: '/actuator/prometheus'
+    metrics_path: '/sessions/actuator/prometheus'
     static_configs:
       - targets: [ 'sessions:8084' ]
 
