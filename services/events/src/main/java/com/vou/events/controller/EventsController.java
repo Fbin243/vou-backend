@@ -10,11 +10,13 @@ import com.vou.events.dto.AddBrandsRequestDto;
 import com.vou.events.dto.AddGamesRequestDto;
 import com.vou.events.dto.AddItemsRequestDto;
 import com.vou.events.dto.AddVouchersRequestDto;
+import com.vou.events.dto.BrandWithEventActiveStatusDto;
 import com.vou.events.dto.EventDto;
 import com.vou.events.dto.EventId_GameIdsDto;
 import com.vou.events.dto.EventId_ItemIdsDto;
 import com.vou.events.dto.EventId_VoucherIdsDto;
 import com.vou.events.dto.EventRegistrationInfoDto;
+import com.vou.events.dto.EventWithBrandActiveStatusDto;
 import com.vou.events.service.IEventsService;
 
 import lombok.AllArgsConstructor;
@@ -80,6 +82,24 @@ public class EventsController {
         eventService.deleteEvent(id);
         ResponseDto res = new ResponseDto(HttpStatus.OK, "Event deleted successfully.");
         return ResponseEntity.status(HttpStatus.OK).body(res);
+    }
+
+    @GetMapping("/brands/{brandId}")
+    public ResponseEntity<List<EventWithBrandActiveStatusDto>> getEventsByBrand(@PathVariable String brandId) {
+        List<EventWithBrandActiveStatusDto> eventDtos = eventService.fetchEventsByBrand(brandId);
+        return ResponseEntity.ok(eventDtos);
+    }
+
+    // @GetMapping("/brands")
+    // public ResponseEntity<List<BrandWithEventActiveStatusDto>> getBrandsByEvent(@RequestParam("eventId") String eventId) {
+    //     List<BrandWithEventActiveStatusDto> eventDtos = eventService.fetchBrandsByEvent(eventId);
+    //     return ResponseEntity.ok(eventDtos);
+    // }
+
+    @GetMapping("/brands")
+    public ResponseEntity<List<EventWithBrandActiveStatusDto>> getEventsByBrands(@RequestBody List<String> brandIds) {
+        List<EventWithBrandActiveStatusDto> eventDtos = eventService.fetchEventsByBrands(brandIds);
+        return ResponseEntity.ok(eventDtos);
     }
 
     @PostMapping("/brands")

@@ -29,6 +29,26 @@ public interface IItemsService {
     }
 
     /**
+     * Fetches all items by brand.
+     *  
+     * @param brandId the id of the brand to fetch items for
+     * @return a list of items for the specified brand
+     */
+    default List<ItemDto> fetchItemsByBrand(String brandId) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Fetches all items by brands.
+     *  
+     * @param brandIds the ids of the brands to fetch items for
+     * @return a list of items for the specified brands
+     */
+    default List<ItemDto> fetchItemsByBrands(List<String> brandIds) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
      * Creates a new item.
      *  
      * @param itemDto the item to create

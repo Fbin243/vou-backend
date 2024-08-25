@@ -2,7 +2,9 @@ package com.vou.events.service;
 
 import com.vou.events.dto.AddUsersRequestDto;
 import com.vou.events.dto.BrandDto;
+import com.vou.events.dto.BrandWithEventActiveStatusDto;
 import com.vou.events.dto.EventDto;
+import com.vou.events.dto.EventWithBrandActiveStatusDto;
 import com.vou.events.dto.EventRegistrationInfoDto;
 import com.vou.events.dto.GameDto;
 import com.vou.events.dto.ItemDto;
@@ -17,7 +19,6 @@ import com.vou.events.repository.*;
 import com.vou.events.common.EventIntermediateTableStatus;
 import com.vou.events.common.GameId_StartTime;
 import com.vou.events.common.ItemId_Quantity;
-import com.vou.events.common.UserRole;
 import com.vou.events.common.VoucherId_Quantity;
 import com.vou.events.common.VoucherId_Quantity_ItemIds_Quantities;
 import com.vou.events.client.GamesServiceClient;
@@ -45,21 +46,25 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class EventsService implements IEventsService {
 
-    private static final Logger log = LoggerFactory.getLogger(EventsService.class);
-    private final EventRepository           eventsRepository;
-    private final BrandRepository           brandRepository;
-    private final VoucherRepository         voucherRepository;
-    private final ItemRepository            itemRepository;
-    private final EventBrandRepository      eventBrandRepository;
-    private final EventVoucherRepository    eventVoucherRepository;
-    private final EventItemRepository       eventItemRepository;
-    private final EventGameRepository       eventGameRepository;
-    private final GamesServiceClient        gamesServiceClient;
-    private final UsersServiceClient        usersServiceClient;
-    private final IVouchersService          voucherService;
-    private final IItemsService             itemService;
-    private final NotificationsServiceClient notificationsServiceClient;
+    private static final Logger                 log = LoggerFactory.getLogger(EventsService.class);
+    
+    private final EventRepository               eventsRepository;
+    private final BrandRepository               brandRepository;
+    private final VoucherRepository             voucherRepository;
+    private final ItemRepository                itemRepository;
+    private final EventBrandRepository          eventBrandRepository;
+    private final EventVoucherRepository        eventVoucherRepository;
+    private final EventItemRepository           eventItemRepository;
+    private final EventGameRepository           eventGameRepository;
 
+    private final IVouchersService              voucherService;
+    private final IItemsService                 itemService;
+
+    private final GamesServiceClient            gamesServiceClient;
+    private final UsersServiceClient            usersServiceClient;
+    private final NotificationsServiceClient    notificationsServiceClient;
+
+    
     // Properties props = new Properties();
 
     // KafkaProducer<String, EventSessionInfo> producer = new KafkaProducer<>(props);
@@ -108,13 +113,51 @@ public class EventsService implements IEventsService {
     //             .collect(Collectors.toList());
     // }
 
+    @Override
+    public List<EventWithBrandActiveStatusDto> fetchEventsByBrand(String brandId) {
+        List<EventBrand> eventBrands = eventBrandRepository.findByBrand(brandId);
+
+        return eventBrands.stream()
+                .map(eventBrand -> {
+                    Event event = eventBrand.getEvent();
+                    return new EventWithBrandActiveStatusDto(
+                            event.getId().toString(),
+                            event.getName(),
+                            event.getImage(),
+                            event.getNumberOfVoucher(),
+                            event.getStartDate(),
+                            event.getEndDate(),
+                            eventBrand.getActiveStatus()
+                    );
+                })
+                .collect(Collectors.toList());
+    }
+
     // @Override
-    // public List<EventDto> fetchEventsByBrand() {
-    //     return eventsRepository.findAll().stream()
-    //             .sorted(Comparator.comparing(Event::getBrand))
-    //             .map(EventMapper::toDto)
-    //             .collect(Collectors.toList());
+    // public List<BrandWithEventActiveStatusDto> fetchBrandsByEvent(String eventId) {
+    //     List<EventBrand> eventBrands = eventBrandRepository.findByEvent(eventId);
     // }
+
+    @Override
+    public List<EventWithBrandActiveStatusDto> fetchEventsByBrands(List<String> brandIds) {
+        List<EventBrand> eventBrands = eventBrandRepository.findByBrands(brandIds);
+
+        return eventBrands.stream()
+                .filter(eventBrand -> brandIds.contains(eventBrand.getBrand().getId()))
+                .map(eventBrand -> {
+                    Event event = eventBrand.getEvent();
+                    return new EventWithBrandActiveStatusDto(
+                            event.getId().toString(),
+                            event.getName(),
+                            event.getImage(),
+                            event.getNumberOfVoucher(),
+                            event.getStartDate(),
+                            event.getEndDate(),
+                            eventBrand.getActiveStatus()
+                    );
+                })
+                .collect(Collectors.toList());
+    }
 
     @Override
     public EventDto fetchEventById(String id) {

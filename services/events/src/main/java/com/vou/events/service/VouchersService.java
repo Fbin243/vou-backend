@@ -40,6 +40,18 @@ public class VouchersService implements IVouchersService {
     }
 
     @Override
+    public List<VoucherDto> fetchVouchersByBrand(String brandId) {
+        List<Voucher> vouchers = voucherRepository.findByBrand(brandId);
+        return vouchers.stream().map(VoucherMapper::toDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<VoucherDto> fetchVouchersByBrands(List<String> brandIds) {
+        List<Voucher> vouchers = voucherRepository.findByBrands(brandIds);
+        return vouchers.stream().map(VoucherMapper::toDto).collect(Collectors.toList());
+    }
+
+    @Override
     public String createVoucher(VoucherDto voucherDto) {
         if (brandRepository.findById(voucherDto.getBrand().getId()) == null) {
             brandRepository.save(BrandMapper.toEntity(voucherDto.getBrand()));

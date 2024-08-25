@@ -36,6 +36,18 @@ public class ItemsService implements IItemsService {
     }
 
     @Override
+    public List<ItemDto> fetchItemsByBrand(String brandId) {
+        List<Item> items = itemRepository.findByBrand(brandId);
+        return items.stream().map(ItemMapper::toDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ItemDto> fetchItemsByBrands(List<String> brandIds) {
+        List<Item> items = itemRepository.findByBrands(brandIds);
+        return items.stream().map(ItemMapper::toDto).collect(Collectors.toList());
+    }
+
+    @Override
     public ItemDto createItem(ItemDto itemDto) {
         if (brandRepository.findById(itemDto.getBrand().getId()) == null) {
             brandRepository.save(BrandMapper.toEntity(itemDto.getBrand()));
