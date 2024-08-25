@@ -382,27 +382,27 @@ services:
       file: common-config.yml
       service: discovery-config
 
-  notifications:
-    image: fbin243/notifications
-    container_name: notifications
-    env_file:
-      - ../serviceAccountKey.json
-    ports:
-      - 8086:8086
-    healthcheck:
-      test: "curl --fail --silent localhost:8086/notifications/actuator/health/readiness | grep UP || exit 1"
-      interval: 20s
-      timeout: 5s
-      retries: 10
-      start_period: 10s
-    environment:
-      SPRING_APPLICATION_NAME: "notifications"
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    depends_on:
-      - kafka
-    extends:
-      file: common-config.yml
-      service: discovery-config
+#  notifications:
+#    image: fbin243/notifications
+#    container_name: notifications
+#    env_file:
+#      - ../serviceAccountKey.json
+#    ports:
+#      - 8086:8086
+#    healthcheck:
+#      test: "curl --fail --silent localhost:8086/notifications/actuator/health/readiness | grep UP || exit 1"
+#      interval: 20s
+#      timeout: 5s
+#      retries: 10
+#      start_period: 10s
+#    environment:
+#      SPRING_APPLICATION_NAME: "notifications"
+#      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+#    depends_on:
+#      - kafka
+#    extends:
+#      file: common-config.yml
+#      service: discovery-config
 
   api-gateway:
     image: fbin243/api-gateway
