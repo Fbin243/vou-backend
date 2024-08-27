@@ -60,12 +60,13 @@ public class BrandController {
         return result;
     }
 
-    @PostMapping("public/emails")
+    @PostMapping("/public/emails")
     public List<Brand> getBrandsByEmails(@RequestBody List<String> emails) {
 
         if (emails == null || emails.isEmpty()) {
             throw new RuntimeException("Emails are required");
         }
+
         List<Brand> result = brandService.findManyBrandsByManyEmails(emails);
         if (result == null || result.isEmpty()) {
             throw new RuntimeException("No brand found with emails: " + emails);

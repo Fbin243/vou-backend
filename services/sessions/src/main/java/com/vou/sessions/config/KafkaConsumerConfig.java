@@ -48,7 +48,7 @@ public class KafkaConsumerConfig {
         ConcurrentKafkaListenerContainerFactory<String, EventSessionInfo> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
-        factory.setConcurrency(3);  // Increase the number of threads
+        factory.setConcurrency(1);  // Increase the number of threads
 
         // Configure retry and backoff policy
         factory.setCommonErrorHandler(new DefaultErrorHandler(

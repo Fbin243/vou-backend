@@ -91,19 +91,6 @@ services:
       file: common-config.yml
       service: network-config
 
-#  tempo:
-#    image: grafana/tempo:2.4.2
-#    container_name: tempo
-#    command: -config.file /etc/tempo-config.yml
-#    ports:
-#      - "3110:3100"
-#      - "4317:4317"
-#    volumes:
-#      - ./observability/tempo/tempo.yml:/etc/tempo-config.yml
-#    extends:
-#      file: common-config.yml
-#      service: network-config
-
   grafana:
     image: grafana/grafana:11.0.0
     environment:
@@ -213,6 +200,7 @@ services:
     extends:
       file: common-config.yml
       service: network-config
+
   ############### MY SQL #####################
   mysqldb:
     ports:
@@ -222,49 +210,10 @@ services:
       MYSQL_DATABASE: mysqldb
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql-data:/var/lib/mysql
     extends:
       file: common-config.yml
       service: db-config
-
-#  identitydb:
-#    ports:
-#      - 3300:3306
-#    container_name: identitydb
-#    environment:
-#      MYSQL_DATABASE: identitydb
-#    extends:
-#      file: common-config.yml
-#      service: db-config
-
-#  usersdb:
-#    ports:
-#      - 3301:3306
-#    container_name: usersdb
-#    environment:
-#      MYSQL_DATABASE: usersdb
-#    extends:
-#      file: common-config.yml
-#      service: db-config
-#
-#  gamesdb:
-#    ports:
-#      - 3302:3306
-#    container_name: gamesdb
-#    environment:
-#      MYSQL_DATABASE: gamesdb
-#    extends:
-#      file: common-config.yml
-#      service: db-config
-
-#  eventsdb:
-#    ports:
-#      - 3303:3306
-#    container_name: eventsdb
-#    environment:
-#      MYSQL_DATABASE: eventsdb
-#    extends:
-#      file: common-config.yml
-#      service: db-config
 
   ############## MESSAGE BROKER #####################
   zookeeper:
@@ -307,7 +256,7 @@ services:
       - 8761:8761
     healthcheck:
       test: "curl --fail --silent localhost:8761/actuator/health/readiness | grep UP || exit 1"
-      interval: 10s
+      interval: 20s
       timeout: 5s
       retries: 10
       start_period: 10s
@@ -322,15 +271,19 @@ services:
     container_name: users
     ports:
       - 8081:8081
+    healthcheck:
+      test: "curl --fail --silent localhost:8081/users/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
     environment:
       SPRING_APPLICATION_NAME: "users"
       SPRING_DATASOURCE_URL: "jdbc:mysql://mysqldb:3306/usersdb"
-#      SPRING_DATASOURCE_URL: "jdbc:mysql://usersdb:3306/usersdb"
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
     depends_on:
       mysqldb:
-#      usersdb:
         condition: service_healthy
     extends:
       file: common-config.yml
@@ -341,16 +294,20 @@ services:
     container_name: identity
     ports:
       - 8071:8071
+    healthcheck:
+      test: "curl --fail --silent localhost:8071/identity/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
     environment:
       SPRING_APPLICATION_NAME: "identity"
       SPRING_DATASOURCE_URL: "jdbc:mysql://mysqldb:3306/identitydb"
-#      SPRING_DATASOURCE_URL: "jdbc:mysql://identitydb:3306/identitydb"
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
       APP_SERVICES_USERS: "http://users:8081/users"
     depends_on:
       mysqldb:
-#      identitydb:
         condition: service_healthy
     extends:
       file: common-config.yml
@@ -361,15 +318,43 @@ services:
     container_name: games
     ports:
       - 8082:8082
+    healthcheck:
+      test: "curl --fail --silent localhost:8082/games/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
     environment:
       SPRING_APPLICATION_NAME: "games"
       SPRING_DATASOURCE_URL: "jdbc:mysql://mysqldb:3306/gamesdb"
-#      SPRING_DATASOURCE_URL: "jdbc:mysql://gamesdb:3306/gamesdb"
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
     depends_on:
       mysqldb:
-#      gamesdb:
+        condition: service_healthy
+    extends:
+      file: common-config.yml
+      service: discovery-config
+
+  events:
+    image: fbin243/events
+    container_name: events
+    ports:
+      - 8083:8083
+    healthcheck:
+      test: "curl --fail --silent localhost:8083/events/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    environment:
+      SPRING_APPLICATION_NAME: "events"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysqldb:3306/eventsdb"
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      mysqldb:
         condition: service_healthy
     extends:
       file: common-config.yml
@@ -382,6 +367,12 @@ services:
       - ../.env
     ports:
       - 8084:8084
+    healthcheck:
+      test: "curl --fail --silent localhost:8084/sessions/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
     environment:
       SPRING_APPLICATION_NAME: "sessions"
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
@@ -391,16 +382,50 @@ services:
       file: common-config.yml
       service: discovery-config
 
+#  notifications:
+#    image: fbin243/notifications
+#    container_name: notifications
+#    env_file:
+#      - ../serviceAccountKey.json
+#    ports:
+#      - 8086:8086
+#    healthcheck:
+#      test: "curl --fail --silent localhost:8086/notifications/actuator/health/readiness | grep UP || exit 1"
+#      interval: 20s
+#      timeout: 5s
+#      retries: 10
+#      start_period: 10s
+#    environment:
+#      SPRING_APPLICATION_NAME: "notifications"
+#      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+#    depends_on:
+#      - kafka
+#    extends:
+#      file: common-config.yml
+#      service: discovery-config
+
   api-gateway:
     image: fbin243/api-gateway
     container_name: api-gateway
     ports:
       - 8888:8888
+    healthcheck:
+      test: "curl --fail --silent localhost:8888/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
     depends_on:
-      - identity
-      - users
-      - games
-      - sessions
+      identity:
+        condition: service_healthy
+      users:
+        condition: service_healthy
+      games:
+        condition: service_healthy
+      sessions:
+        condition: service_healthy
+      events:
+        condition: service_healthy
     environment:
       DISCOVERY_SERVER_URI: "http://discovery-server:8761"
     extends:
@@ -411,3 +436,7 @@ services:
 networks:
   vou_network:
     driver: bridge
+
+################ VOLUME ###############
+volumes:
+  mysql-data:

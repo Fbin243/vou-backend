@@ -1,5 +1,6 @@
 package com.vou.events.service;
 
+import com.vou.events.dto.AddUsersRequestDto;
 import com.vou.events.dto.BrandDto;
 import com.vou.events.dto.EventDto;
 import com.vou.events.dto.EventRegistrationInfoDto;
@@ -8,6 +9,7 @@ import com.vou.events.dto.ItemDto;
 import com.vou.events.dto.VoucherDto;
 import com.vou.events.mapper.GameMapper;
 import com.vou.events.model.EventSessionInfo;
+import com.vou.events.model.NotificationInfo;
 import com.vou.events.entity.*;
 import com.vou.events.mapper.BrandMapper;
 import com.vou.events.mapper.EventMapper;
@@ -15,17 +17,19 @@ import com.vou.events.repository.*;
 import com.vou.events.common.EventIntermediateTableStatus;
 import com.vou.events.common.GameId_StartTime;
 import com.vou.events.common.ItemId_Quantity;
+import com.vou.events.common.UserRole;
 import com.vou.events.common.VoucherId_Quantity;
 import com.vou.events.common.VoucherId_Quantity_ItemIds_Quantities;
 import com.vou.events.client.GamesServiceClient;
+import com.vou.events.client.NotificationsServiceClient;
 import com.vou.events.client.UsersServiceClient;
 import com.vou.pkg.dto.ResponseDto;
 import com.vou.pkg.exception.NotFoundException;
 
 import lombok.AllArgsConstructor;
 
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,13 +39,13 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class EventsService implements IEventsService {
-    
+
+    private static final Logger log = LoggerFactory.getLogger(EventsService.class);
     private final EventRepository           eventsRepository;
     private final BrandRepository           brandRepository;
     private final VoucherRepository         voucherRepository;
@@ -54,12 +58,16 @@ public class EventsService implements IEventsService {
     private final UsersServiceClient        usersServiceClient;
     private final IVouchersService          voucherService;
     private final IItemsService             itemService;
+    private final NotificationsServiceClient notificationsServiceClient;
 
     // Properties props = new Properties();
 
     // KafkaProducer<String, EventSessionInfo> producer = new KafkaProducer<>(props);
     @Autowired
-    private KafkaTemplate<String, EventSessionInfo> kafkaTemplate;
+    private KafkaTemplate<String, EventSessionInfo> kafkaTemplateEventSessionInfo;
+
+    @Autowired
+    private KafkaTemplate<String, NotificationInfo> kafkaTemplateNotificationInfo;
 
     @Override
     public List<EventDto> fetchAllEvents() {
@@ -193,15 +201,14 @@ public class EventsService implements IEventsService {
     }
 
     @Override
-    public boolean addBrandsByEmailsToEvent(String eventId, List<String> emails) {
+    public boolean addBrandsByEmailsToEvent(String eventId, List<BrandDto> brands) {
         try {
             Event event = eventsRepository.findById(eventId).orElseThrow(
                     () -> new NotFoundException("Event", "id", eventId)
             );
 
-            List<BrandDto> brands = usersServiceClient.getBrandsByEmails(emails);
-
             if (brands == null || brands.isEmpty()) {
+                log.info("BRAND IS NULL");
                 return false;
             } else {
                 for (BrandDto _brandDto : brands) {
@@ -221,6 +228,7 @@ public class EventsService implements IEventsService {
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
 
@@ -447,12 +455,19 @@ public class EventsService implements IEventsService {
         Integer                     sumNumberOfVoucher              = 0;
         String                      eventId                         = null;
         if (existEvent != null)     eventId                         = this.createEvent(existEvent);
+        List<BrandDto>              brands;
 
         if (eventId == null) {
             ResponseDto res = new ResponseDto(HttpStatus.BAD_REQUEST, "Event creation failed.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
         } else {
-            if (!this.addBrandsByEmailsToEvent(eventId, eventRegistrationInfoDto.getEmails())) {
+            brands = usersServiceClient.getBrandsByEmails(eventRegistrationInfoDto.getEmails());
+            if (brands == null || brands.isEmpty()) {
+                ResponseDto res = new ResponseDto(HttpStatus.BAD_REQUEST, "There is no related brands at all.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+            }
+
+            if (!this.addBrandsByEmailsToEvent(eventId, brands)) {
                 ResponseDto res = new ResponseDto(HttpStatus.BAD_REQUEST, "Brand addition failed.");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
             }
@@ -521,11 +536,28 @@ public class EventsService implements IEventsService {
                             gameId_StartTime.getStartTime().plusMinutes(30).toString()
                         );
                 
-                        kafkaTemplate.send("event-session", eventSessionInfo);
+                        kafkaTemplateEventSessionInfo.send("event-session", eventSessionInfo);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
+                // wair for session response
+                // Send notification to related brands
+                try {
+                    // get list of brandIds from brands
+                    List<String> brandIds = new ArrayList<>();
+                    for (BrandDto brand : brands) {
+                        brandIds.add(brand.getId());
+                    }
+
+                    String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(new NotificationInfo("NotificationId", "NotificationTitle", "NotificationDescription", "NotificationImageUrl"), brandIds));
+                    
+                    kafkaTemplateNotificationInfo.send("event-notification", new NotificationInfo(notificationId, "NotificationTitle", "NotificationDescription", "NotificationImageUrl"));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             } else {
                 ResponseDto res = new ResponseDto(HttpStatus.BAD_REQUEST, "Game addition failed.");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);

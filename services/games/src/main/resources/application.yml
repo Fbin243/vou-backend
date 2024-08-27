@@ -1,6 +1,7 @@
 server:
   port: 8082
-
+  servlet:
+    context-path: /games
 spring:
   application:
     name: games
@@ -25,9 +26,17 @@ management:
     web:
       exposure:
         include: "*"
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
   endpoint:
     shutdown:
       enabled: true
+    health:
+      probes:
+        enabled: true
   info:
     env:
       enabled: true

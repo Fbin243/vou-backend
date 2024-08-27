@@ -36,14 +36,6 @@
 		</dependency>
 		<dependency>
 			<groupId>io.micrometer</groupId>
-			<artifactId>micrometer-tracing-bridge-brave</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.zipkin.reporter2</groupId>
-			<artifactId>zipkin-reporter-brave</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-registry-prometheus</artifactId>
 		</dependency>
 		<dependency>
@@ -86,20 +78,20 @@
 				<version>3.4.1</version>
 				<configuration>
 <!--					For Fbin's M1 Mac -->
-					<from>
-						<image>
-							eclipse-temurin:17.0.3_7-jre-focal
-						</image>
-						<platforms>
-							<platform>
-								<architecture>arm64</architecture>
-								<os>linux</os>
-							</platform>
-						</platforms>
-					</from>
+<!--					<from>-->
+<!--						<image>-->
+<!--							eclipse-temurin:17.0.3_7-jre-focal-->
+<!--						</image>-->
+<!--						<platforms>-->
+<!--							<platform>-->
+<!--								<architecture>arm64</architecture>-->
+<!--								<os>linux</os>-->
+<!--							</platform>-->
+<!--						</platforms>-->
+<!--					</from>-->
 <!--					/// -->
 					<to>
-						<image>fbin243/${project.artifactId}:0.0.1</image>
+						<image>fbin243/${project.artifactId}</image>
 					</to>
 				</configuration>
 			</plugin>

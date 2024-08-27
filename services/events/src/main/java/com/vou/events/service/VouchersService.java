@@ -2,6 +2,7 @@ package com.vou.events.service;
 
 import com.vou.events.dto.VoucherDto;
 import com.vou.events.entity.*;
+import com.vou.events.mapper.BrandMapper;
 import com.vou.events.mapper.VoucherMapper;
 import com.vou.events.repository.*;
 import com.vou.events.common.EventIntermediateTableStatus;
@@ -22,6 +23,7 @@ public class VouchersService implements IVouchersService {
     private final VoucherRepository     voucherRepository;
     private final ItemRepository        itemRepository;
     private final VoucherItemRepository voucherItemRepository;
+    private final BrandRepository       brandRepository;
 
     @Override
     public List<VoucherDto> fetchAllVouchers() {
@@ -39,7 +41,15 @@ public class VouchersService implements IVouchersService {
 
     @Override
     public String createVoucher(VoucherDto voucherDto) {
+        if (brandRepository.findById(voucherDto.getBrand().getId()) == null) {
+            brandRepository.save(BrandMapper.toEntity(voucherDto.getBrand()));
+        }
+
+        Brand brand = brandRepository.findById(voucherDto.getBrand().getId())
+                     .orElseGet(() -> brandRepository.save(BrandMapper.toEntity(voucherDto.getBrand())));
+
         Voucher voucher = VoucherMapper.toEntity(voucherDto);
+        voucher.setBrand(brand);
         voucher.setId(null);
         Voucher createdVoucher = voucherRepository.save(voucher);
         return createdVoucher.getId().toString();

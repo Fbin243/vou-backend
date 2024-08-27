@@ -2,6 +2,7 @@ package com.vou.events.service;
 
 import com.vou.events.dto.ItemDto;
 import com.vou.events.entity.*;
+import com.vou.events.mapper.BrandMapper;
 import com.vou.events.mapper.ItemMapper;
 import com.vou.events.repository.*;
 import com.vou.pkg.exception.NotFoundException;
@@ -17,7 +18,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ItemsService implements IItemsService {
     
-    private final ItemRepository itemRepository;
+    private final ItemRepository        itemRepository;
+    private final BrandRepository       brandRepository;
 
     @Override
     public List<ItemDto> fetchAllItems() {
@@ -35,7 +37,16 @@ public class ItemsService implements IItemsService {
 
     @Override
     public ItemDto createItem(ItemDto itemDto) {
+        if (brandRepository.findById(itemDto.getBrand().getId()) == null) {
+            brandRepository.save(BrandMapper.toEntity(itemDto.getBrand()));
+        }
+
+        Brand brand = brandRepository.findById(itemDto.getBrand().getId())
+                     .orElseGet(() -> brandRepository.save(BrandMapper.toEntity(itemDto.getBrand())));
+                     
+
         Item item = ItemMapper.toEntity(itemDto);
+        item.setBrand(brand);
         Item createdItem = itemRepository.save(item);
         return ItemMapper.toDto(createdItem);
     }
