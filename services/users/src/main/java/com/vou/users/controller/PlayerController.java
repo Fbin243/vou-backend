@@ -56,4 +56,16 @@ public class PlayerController {
     public Player getPlayerByEmail(@PathVariable String email) {
         return playerService.findByEmail(email);
     }
+
+    @PostMapping("public/ids")
+    public List<Player> getManyPlayersByManyIds(@RequestBody List<String> ids) {
+        if (ids == null || ids.isEmpty()) {
+            throw new RuntimeException("Ids are required");
+        }
+        List<Player> result = playerService.findManyPlayersByManyIds(ids);
+        if (result == null || result.isEmpty()) {
+            throw new RuntimeException("No player found with ids: " + ids);
+        }
+        return result;
+    }
 }

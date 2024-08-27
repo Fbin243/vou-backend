@@ -1,6 +1,7 @@
 package com.vou.users.service;
 
 import com.vou.users.dao.PlayerRepository;
+import com.vou.users.entity.Brand;
 import com.vou.users.entity.Player;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -67,5 +68,10 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public Player findByEmail(String email) {
         return playerRepository.findByEmail(email);
+    }
+
+    @Override
+    public List<Player> findManyPlayersByManyIds(List<String> theIds) {
+        return playerRepository.findManyPlayersByManyIds(theIds);
     }
 }
