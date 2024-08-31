@@ -1,5 +1,6 @@
 package com.vou.events.dto;
 
+import java.time.LocalTime;
 import lombok.Data;
 import lombok.Getter;
 import lombok.AllArgsConstructor;
@@ -11,7 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class GameDto {
+public class ReturnGameDto {
     private Long id;
 
     private String name;
@@ -20,7 +21,9 @@ public class GameDto {
 
     private String type;
 
-    private Boolean itemSwappable;
+    private boolean itemSwappable;
 
     private String instruction;
+
+    private LocalTime startTime;
 }

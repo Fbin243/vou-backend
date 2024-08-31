@@ -2,12 +2,13 @@ package com.vou.events.service;
 
 import com.vou.events.dto.AddUsersRequestDto;
 import com.vou.events.dto.BrandDto;
-import com.vou.events.dto.BrandWithEventActiveStatusDto;
 import com.vou.events.dto.EventDto;
 import com.vou.events.dto.EventWithBrandActiveStatusDto;
 import com.vou.events.dto.EventRegistrationInfoDto;
 import com.vou.events.dto.GameDto;
 import com.vou.events.dto.ItemDto;
+import com.vou.events.dto.ReturnGameDto;
+import com.vou.events.dto.ReturnVoucherDto;
 import com.vou.events.dto.VoucherDto;
 import com.vou.events.mapper.GameMapper;
 import com.vou.events.model.EventSessionInfo;
@@ -165,6 +166,48 @@ public class EventsService implements IEventsService {
                 () -> new NotFoundException("Event", "id", id)
         );
         return EventMapper.toDto(event);
+    }
+
+    @Override
+    public List<ReturnGameDto> fetchGamesByEvent(String eventId) {
+        List<EventGame> eventGames = eventGameRepository.findByEvent(eventId);
+        List<ReturnGameDto> returnGameDtos = new ArrayList<>();
+
+        for (EventGame eventGame : eventGames) {
+            GameDto gameDto = gamesServiceClient.getGameById(eventGame.getGame().getId());
+            returnGameDtos.add(new ReturnGameDto(gameDto.getId(),
+                                    gameDto.getName(),
+                                    gameDto.getImage(),
+                                    gameDto.getType(),
+                                    gameDto.getItemSwappable(),
+                                    gameDto.getInstruction(),
+                                    eventGame.getStartTime()));
+        }
+
+        return returnGameDtos;
+    }
+
+    @Override
+    public List<ReturnVoucherDto> fetchVouchersByEvent(String eventId) {
+        List<EventVoucher> eventVouchers = eventVoucherRepository.findByEvent(eventId);
+        List<ReturnVoucherDto> returnVoucherDtos = new ArrayList<>();
+
+        for (EventVoucher eventVoucher : eventVouchers) {
+            VoucherDto voucherDto = voucherService.fetchVoucherById(eventVoucher.getVoucher().getId());
+            returnVoucherDtos.add(new ReturnVoucherDto(voucherDto.getId(),
+                                    voucherDto.getBrand(),
+                                    voucherDto.getVoucherCode(),
+                                    voucherDto.getQrCode(),
+                                    voucherDto.getImage(),
+                                    voucherDto.getValue(),
+                                    voucherDto.getDescription(),
+                                    voucherDto.getExpiredDate(),
+                                    voucherDto.getStatus(),
+                                    voucherDto.getUnitValue(),
+                                    eventVoucher.getNumberOfVoucher()));
+        }
+
+        return returnVoucherDtos;
     }
 
     @Override

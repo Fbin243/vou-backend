@@ -17,6 +17,9 @@ import com.vou.events.dto.EventId_ItemIdsDto;
 import com.vou.events.dto.EventId_VoucherIdsDto;
 import com.vou.events.dto.EventRegistrationInfoDto;
 import com.vou.events.dto.EventWithBrandActiveStatusDto;
+import com.vou.events.dto.GameDto;
+import com.vou.events.dto.ReturnGameDto;
+import com.vou.events.dto.ReturnVoucherDto;
 import com.vou.events.service.IEventsService;
 
 import lombok.AllArgsConstructor;
@@ -56,6 +59,18 @@ public class EventsController {
     public ResponseEntity<EventDto> getEventById(@PathVariable String id) {
         EventDto eventDto = eventService.fetchEventById(id);
         return ResponseEntity.ok(eventDto);
+    }
+
+    @GetMapping("/games/event/{eventId}")
+    public ResponseEntity<List<ReturnGameDto>> getGamesByEvent(@PathVariable String eventId) {
+        List<ReturnGameDto> gameDtos = eventService.fetchGamesByEvent(eventId);
+        return ResponseEntity.ok(gameDtos);
+    }
+
+    @GetMapping("/vouchers/event/{eventId}")
+    public ResponseEntity<List<ReturnVoucherDto>> getVouchersByEvent(@PathVariable String eventId) {
+        List<ReturnVoucherDto> voucherDtos = eventService.fetchVouchersByEvent(eventId);
+        return ResponseEntity.ok(voucherDtos);
     }
 
     @PostMapping

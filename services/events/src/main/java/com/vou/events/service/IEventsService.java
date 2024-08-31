@@ -8,7 +8,10 @@ import com.vou.events.dto.BrandWithEventActiveStatusDto;
 import com.vou.events.dto.EventDto;
 import com.vou.events.dto.EventRegistrationInfoDto;
 import com.vou.events.dto.EventWithBrandActiveStatusDto;
+import com.vou.events.dto.GameDto;
+import com.vou.events.dto.ReturnGameDto;
 import com.vou.pkg.dto.ResponseDto;
+import com.vou.events.dto.ReturnVoucherDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -62,6 +65,19 @@ public interface IEventsService {
      * @return a list of events filtered by item
      */
     default List<EventDto> fetchEventsByItem() {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Fetches all events filtered by game.
+     *
+     * @return a list of events filtered by game
+     */
+    default List<ReturnGameDto> fetchGamesByEvent(String eventId) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    default List<ReturnVoucherDto> fetchVouchersByEvent(String eventId) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
