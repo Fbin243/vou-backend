@@ -39,6 +39,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -191,9 +192,11 @@ public class EventsService implements IEventsService {
     public List<ReturnVoucherDto> fetchVouchersByEvent(String eventId) {
         List<EventVoucher> eventVouchers = eventVoucherRepository.findByEvent(eventId);
         List<ReturnVoucherDto> returnVoucherDtos = new ArrayList<>();
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 
         for (EventVoucher eventVoucher : eventVouchers) {
             VoucherDto voucherDto = voucherService.fetchVoucherById(eventVoucher.getVoucher().getId());
+            String formatExpiredDateTime = voucherDto.getExpiredDate().format(format); 
             returnVoucherDtos.add(new ReturnVoucherDto(voucherDto.getId(),
                                     voucherDto.getBrand(),
                                     voucherDto.getVoucherCode(),
@@ -201,7 +204,7 @@ public class EventsService implements IEventsService {
                                     voucherDto.getImage(),
                                     voucherDto.getValue(),
                                     voucherDto.getDescription(),
-                                    voucherDto.getExpiredDate(),
+                                    formatExpiredDateTime,
                                     voucherDto.getStatus(),
                                     voucherDto.getUnitValue(),
                                     eventVoucher.getNumberOfVoucher()));

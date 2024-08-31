@@ -1,6 +1,7 @@
 package com.vou.events.service;
 
 import com.vou.events.dto.ItemDto;
+import com.vou.events.dto.ReturnItemDto;
 
 import java.util.List;
 
@@ -45,6 +46,10 @@ public interface IItemsService {
      * @return a list of items for the specified brands
      */
     default List<ItemDto> fetchItemsByBrands(List<String> brandIds) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    default List<ReturnItemDto> fetchItemsByVoucher(String voucherId) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 

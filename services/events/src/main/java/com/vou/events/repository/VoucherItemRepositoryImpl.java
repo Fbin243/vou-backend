@@ -7,6 +7,10 @@ import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 
+import com.vou.events.common.EventIntermediateTableStatus;
+
+import java.util.List;
+
 public class VoucherItemRepositoryImpl implements VoucherItemRepositoryCustom {
     
     @PersistenceContext
@@ -26,5 +30,16 @@ public class VoucherItemRepositoryImpl implements VoucherItemRepositoryCustom {
         } catch (NoResultException e) {
             return null;
         }
+    }
+
+    @Override
+    public List<VoucherItem> findByVoucher(String voucherId) {
+        TypedQuery<VoucherItem> query = entityManager.createQuery(
+                "SELECT vi FROM VoucherItem vi WHERE vi.voucher.id = :voucherId AND vi.activeStatus = :activeStatus",
+                VoucherItem.class
+        );
+        query.setParameter("voucherId", voucherId);
+        query.setParameter("activeStatus", EventIntermediateTableStatus.ACTIVE);
+        return query.getResultList();
     }
 }

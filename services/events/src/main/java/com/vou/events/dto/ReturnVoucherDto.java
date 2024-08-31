@@ -30,7 +30,7 @@ public class ReturnVoucherDto {
 
     private String description;
 
-    private LocalDateTime expiredDate;
+    private String expiredDate;
 
     private VoucherStatus status;
 

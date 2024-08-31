@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import com.vou.pkg.dto.ResponseDto;
 import com.vou.events.dto.ItemDto;
 import com.vou.events.service.IItemsService;
+import com.vou.events.dto.ReturnItemDto;
 
 import lombok.AllArgsConstructor;
 
@@ -40,6 +41,12 @@ public class ItemsController {
     @GetMapping("/brands")
     public ResponseEntity<List<ItemDto>> getItemsByBrands(@RequestBody List<String> brandIds) {
         List<ItemDto> itemDtos = itemService.fetchItemsByBrands(brandIds);
+        return ResponseEntity.ok(itemDtos);
+    }
+
+    @GetMapping("/voucher/{voucherId}")
+    public ResponseEntity<List<ReturnItemDto>> getItemsByVoucher(@PathVariable String voucherId) {
+        List<ReturnItemDto> itemDtos = itemService.fetchItemsByVoucher(voucherId);
         return ResponseEntity.ok(itemDtos);
     }
 

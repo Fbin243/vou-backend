@@ -1,11 +1,14 @@
 package com.vou.events.service;
 
 import com.vou.events.dto.ItemDto;
+import com.vou.events.dto.ReturnItemDto;
 import com.vou.events.entity.*;
 import com.vou.events.mapper.BrandMapper;
 import com.vou.events.mapper.ItemMapper;
 import com.vou.events.repository.*;
 import com.vou.pkg.exception.NotFoundException;
+import com.vou.events.dto.VoucherItemDto;
+import com.vou.events.mapper.VoucherItemMapper;
 
 import lombok.AllArgsConstructor;
 
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 @Service
 @AllArgsConstructor
@@ -20,6 +24,7 @@ public class ItemsService implements IItemsService {
     
     private final ItemRepository        itemRepository;
     private final BrandRepository       brandRepository;
+    private final VoucherItemRepository voucherItemRepository;
 
     @Override
     public List<ItemDto> fetchAllItems() {
@@ -45,6 +50,25 @@ public class ItemsService implements IItemsService {
     public List<ItemDto> fetchItemsByBrands(List<String> brandIds) {
         List<Item> items = itemRepository.findByBrands(brandIds);
         return items.stream().map(ItemMapper::toDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ReturnItemDto> fetchItemsByVoucher(String voucherId) {
+        List<VoucherItem> voucherItems = voucherItemRepository.findByVoucher(voucherId);
+        List<ReturnItemDto> returnItemDtos = new ArrayList<>();
+
+        for (VoucherItem voucherItem : voucherItems) {
+            VoucherItemDto voucherItemDto = VoucherItemMapper.toDto(voucherItem);
+            
+            returnItemDtos.add(new ReturnItemDto(voucherItemDto.getItem().getId(),
+                                                voucherItemDto.getItem().getBrand(),
+                                                voucherItemDto.getItem().getName(),
+                                                voucherItemDto.getItem().getIcon(),
+                                                voucherItemDto.getItem().getDescription(),
+                                                voucherItemDto.getNumberOfItem()));
+        }
+
+        return returnItemDtos;
     }
 
     @Override
