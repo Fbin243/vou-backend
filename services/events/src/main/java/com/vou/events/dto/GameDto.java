@@ -20,7 +20,7 @@ public class GameDto {
 
     private String type;
 
-    private Boolean itemSwappable;
+    private boolean itemSwappable;
 
     private String instruction;
 }

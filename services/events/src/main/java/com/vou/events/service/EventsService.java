@@ -179,7 +179,7 @@ public class EventsService implements IEventsService {
                                     gameDto.getName(),
                                     gameDto.getImage(),
                                     gameDto.getType(),
-                                    gameDto.getItemSwappable(),
+                                    gameDto.isItemSwappable(),
                                     gameDto.getInstruction(),
                                     eventGame.getStartTime()));
         }
