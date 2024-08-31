@@ -1,0 +1,8 @@
+D:\IT\SpringBoot\VOU\vou-backend\services\statistics\src\main\java\com\vou\statistics\dto\PlayerItemDto.java
+D:\IT\SpringBoot\VOU\vou-backend\services\statistics\src\main\java\com\vou\statistics\dto\PlayerVoucherDto.java
+D:\IT\SpringBoot\VOU\vou-backend\services\statistics\src\main\java\com\vou\statistics\dto\TransactionDto.java
+D:\IT\SpringBoot\VOU\vou-backend\services\statistics\src\main\java\com\vou\statistics\dto\VoucherStatisticDto.java
+D:\IT\SpringBoot\VOU\vou-backend\services\statistics\src\main\java\com\vou\statistics\entity\Transaction.java
+D:\IT\SpringBoot\VOU\vou-backend\services\statistics\src\main\java\com\vou\statistics\mapper\TransactionMapper.java
+D:\IT\SpringBoot\VOU\vou-backend\services\statistics\src\main\java\com\vou\statistics\repository\TransactionRepository.java
+D:\IT\SpringBoot\VOU\vou-backend\services\statistics\src\main\java\com\vou\statistics\StatisticsApplication.java

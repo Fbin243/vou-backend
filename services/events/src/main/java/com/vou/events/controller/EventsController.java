@@ -111,13 +111,13 @@ public class EventsController {
     //     return ResponseEntity.ok(eventDtos);
     // }
 
-    @GetMapping("/brands")
+    @PostMapping("/brands")
     public ResponseEntity<List<EventWithBrandActiveStatusDto>> getEventsByBrands(@RequestBody List<String> brandIds) {
         List<EventWithBrandActiveStatusDto> eventDtos = eventService.fetchEventsByBrands(brandIds);
         return ResponseEntity.ok(eventDtos);
     }
 
-    @PostMapping("/brands")
+    @PostMapping("/events_brands/brands")
     public ResponseEntity<ResponseDto> addBrandsToEvent(@RequestBody AddBrandsRequestDto addBrandsRequestDto) {
         eventService.addBrandsToEvent(addBrandsRequestDto.getEventId(), addBrandsRequestDto.getBrandIds());
         ResponseDto res = new ResponseDto(HttpStatus.CREATED, "Brands added to event successfully.");

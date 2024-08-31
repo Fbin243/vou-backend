@@ -38,7 +38,7 @@ public class VouchersController {
         return ResponseEntity.ok(voucherDtos);
     }
 
-    @GetMapping("/brands")
+    @PostMapping("/brands")
     public ResponseEntity<List<VoucherDto>> getVouchersByBrands(@RequestBody List<String> brandIds) {
         List<VoucherDto> voucherDtos = voucherService.fetchVouchersByBrands(brandIds);
         return ResponseEntity.ok(voucherDtos);

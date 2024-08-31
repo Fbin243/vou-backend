@@ -38,7 +38,7 @@ public class ItemsController {
         return ResponseEntity.ok(itemDtos);
     }
 
-    @GetMapping("/brands")
+    @PostMapping("/brands")
     public ResponseEntity<List<ItemDto>> getItemsByBrands(@RequestBody List<String> brandIds) {
         List<ItemDto> itemDtos = itemService.fetchItemsByBrands(brandIds);
         return ResponseEntity.ok(itemDtos);
