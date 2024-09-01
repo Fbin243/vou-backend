@@ -10,11 +10,16 @@ import com.vou.events.dto.AddBrandsRequestDto;
 import com.vou.events.dto.AddGamesRequestDto;
 import com.vou.events.dto.AddItemsRequestDto;
 import com.vou.events.dto.AddVouchersRequestDto;
+import com.vou.events.dto.BrandWithEventActiveStatusDto;
 import com.vou.events.dto.EventDto;
 import com.vou.events.dto.EventId_GameIdsDto;
 import com.vou.events.dto.EventId_ItemIdsDto;
 import com.vou.events.dto.EventId_VoucherIdsDto;
 import com.vou.events.dto.EventRegistrationInfoDto;
+import com.vou.events.dto.EventWithBrandActiveStatusDto;
+import com.vou.events.dto.GameDto;
+import com.vou.events.dto.ReturnGameDto;
+import com.vou.events.dto.ReturnVoucherDto;
 import com.vou.events.service.IEventsService;
 
 import lombok.AllArgsConstructor;
@@ -56,6 +61,18 @@ public class EventsController {
         return ResponseEntity.ok(eventDto);
     }
 
+    @GetMapping("/games/event/{eventId}")
+    public ResponseEntity<List<ReturnGameDto>> getGamesByEvent(@PathVariable String eventId) {
+        List<ReturnGameDto> gameDtos = eventService.fetchGamesByEvent(eventId);
+        return ResponseEntity.ok(gameDtos);
+    }
+
+    @GetMapping("/vouchers/event/{eventId}")
+    public ResponseEntity<List<ReturnVoucherDto>> getVouchersByEvent(@PathVariable String eventId) {
+        List<ReturnVoucherDto> voucherDtos = eventService.fetchVouchersByEvent(eventId);
+        return ResponseEntity.ok(voucherDtos);
+    }
+
     @PostMapping
     public ResponseEntity<ResponseDto> createEvent(@RequestBody EventDto eventDto) {
         eventService.createEvent(eventDto);
@@ -82,7 +99,25 @@ public class EventsController {
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
+    @GetMapping("/brands/{brandId}")
+    public ResponseEntity<List<EventWithBrandActiveStatusDto>> getEventsByBrand(@PathVariable String brandId) {
+        List<EventWithBrandActiveStatusDto> eventDtos = eventService.fetchEventsByBrand(brandId);
+        return ResponseEntity.ok(eventDtos);
+    }
+
+    // @GetMapping("/brands")
+    // public ResponseEntity<List<BrandWithEventActiveStatusDto>> getBrandsByEvent(@RequestParam("eventId") String eventId) {
+    //     List<BrandWithEventActiveStatusDto> eventDtos = eventService.fetchBrandsByEvent(eventId);
+    //     return ResponseEntity.ok(eventDtos);
+    // }
+
     @PostMapping("/brands")
+    public ResponseEntity<List<EventWithBrandActiveStatusDto>> getEventsByBrands(@RequestBody List<String> brandIds) {
+        List<EventWithBrandActiveStatusDto> eventDtos = eventService.fetchEventsByBrands(brandIds);
+        return ResponseEntity.ok(eventDtos);
+    }
+
+    @PostMapping("/events_brands/brands")
     public ResponseEntity<ResponseDto> addBrandsToEvent(@RequestBody AddBrandsRequestDto addBrandsRequestDto) {
         eventService.addBrandsToEvent(addBrandsRequestDto.getEventId(), addBrandsRequestDto.getBrandIds());
         ResponseDto res = new ResponseDto(HttpStatus.CREATED, "Brands added to event successfully.");

@@ -4,9 +4,14 @@ import com.vou.events.common.GameId_StartTime;
 import com.vou.events.common.ItemId_Quantity;
 import com.vou.events.common.VoucherId_Quantity;
 import com.vou.events.dto.BrandDto;
+import com.vou.events.dto.BrandWithEventActiveStatusDto;
 import com.vou.events.dto.EventDto;
 import com.vou.events.dto.EventRegistrationInfoDto;
+import com.vou.events.dto.EventWithBrandActiveStatusDto;
+import com.vou.events.dto.GameDto;
+import com.vou.events.dto.ReturnGameDto;
 import com.vou.pkg.dto.ResponseDto;
+import com.vou.events.dto.ReturnVoucherDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -64,11 +69,37 @@ public interface IEventsService {
     }
 
     /**
+     * Fetches all events filtered by game.
+     *
+     * @return a list of events filtered by game
+     */
+    default List<ReturnGameDto> fetchGamesByEvent(String eventId) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    default List<ReturnVoucherDto> fetchVouchersByEvent(String eventId) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
      * Fetches all events filtered by brand.
      *
      * @return a list of events filtered by brand
      */
-    default List<EventDto> fetchEventsByBrand() {
+    default List<EventWithBrandActiveStatusDto> fetchEventsByBrand(String brandId) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    default List<BrandWithEventActiveStatusDto> fetchBrandsByEvent(String eventId) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Fetches all events filtered by brands.
+     *
+     * @return a list of events filtered by brands
+     */
+    default List<EventWithBrandActiveStatusDto> fetchEventsByBrands(List<String> brandIds) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 

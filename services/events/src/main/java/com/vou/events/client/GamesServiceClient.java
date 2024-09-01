@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.vou.events.dto.GameDto;
 
-@FeignClient(name = "games-service", url = "http://games:8082/games")
+@FeignClient(name = "games-service", url = "http://localhost:8082/games")
 public interface GamesServiceClient {
 
     @GetMapping("/games/{id}")

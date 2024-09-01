@@ -1,0 +1,8 @@
+com\vou\statistics\dto\PlayerVoucherDto.class
+com\vou\statistics\mapper\TransactionMapper.class
+com\vou\statistics\dto\VoucherStatisticDto.class
+com\vou\statistics\dto\PlayerItemDto.class
+com\vou\statistics\entity\Transaction.class
+com\vou\statistics\repository\TransactionRepository.class
+com\vou\statistics\dto\TransactionDto.class
+com\vou\statistics\StatisticsApplication.class

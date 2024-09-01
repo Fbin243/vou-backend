@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.vou.events.dto.BrandDto;
 
-@FeignClient(name = "users-service", url = "http://users:8081/users")
+@FeignClient(name = "users-service", url = "http://localhost:8081/users")
 public interface UsersServiceClient {
 
     @PostMapping("/brands/public/emails")

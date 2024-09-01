@@ -32,6 +32,18 @@ public class VouchersController {
         return ResponseEntity.ok(voucherDto);
     }
 
+    @GetMapping("/brands/{brandId}")
+    public ResponseEntity<List<VoucherDto>> getVouchersByBrand(@PathVariable String brandId) {
+        List<VoucherDto> voucherDtos = voucherService.fetchVouchersByBrand(brandId);
+        return ResponseEntity.ok(voucherDtos);
+    }
+
+    @PostMapping("/brands")
+    public ResponseEntity<List<VoucherDto>> getVouchersByBrands(@RequestBody List<String> brandIds) {
+        List<VoucherDto> voucherDtos = voucherService.fetchVouchersByBrands(brandIds);
+        return ResponseEntity.ok(voucherDtos);
+    }
+
     @PostMapping
     public ResponseEntity<ResponseDto> createVoucher(@RequestBody VoucherDto voucherDto) {
         voucherService.createVoucher(voucherDto);
