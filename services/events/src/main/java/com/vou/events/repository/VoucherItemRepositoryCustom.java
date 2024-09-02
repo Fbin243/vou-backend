@@ -1,10 +1,10 @@
 package com.vou.events.repository;
 
-import com.vou.events.entity.VoucherItem;
+import java.util.Map;
 
-import java.util.List;
+import com.vou.events.entity.VoucherItem;
 
 public interface VoucherItemRepositoryCustom {
     VoucherItem findByVoucherAndItem(String voucherId, String itemId);
-    List<VoucherItem> findByVoucher(String voucherId);
+    Map<String, Integer> getItemsQuantitiesByVoucher(String voucherId);
 }

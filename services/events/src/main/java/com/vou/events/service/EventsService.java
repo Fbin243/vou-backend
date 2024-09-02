@@ -7,8 +7,6 @@ import com.vou.events.dto.EventWithBrandActiveStatusDto;
 import com.vou.events.dto.EventRegistrationInfoDto;
 import com.vou.events.dto.GameDto;
 import com.vou.events.dto.ItemDto;
-import com.vou.events.dto.ReturnGameDto;
-import com.vou.events.dto.ReturnVoucherDto;
 import com.vou.events.dto.VoucherDto;
 import com.vou.events.mapper.GameMapper;
 import com.vou.events.model.EventSessionInfo;
@@ -39,7 +37,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -170,55 +167,16 @@ public class EventsService implements IEventsService {
     }
 
     @Override
-    public List<ReturnGameDto> fetchGamesByEvent(String eventId) {
-        List<EventGame> eventGames = eventGameRepository.findByEvent(eventId);
-        List<ReturnGameDto> returnGameDtos = new ArrayList<>();
-
-        for (EventGame eventGame : eventGames) {
-            GameDto gameDto = gamesServiceClient.getGameById(eventGame.getGame().getId());
-            returnGameDtos.add(new ReturnGameDto(gameDto.getId(),
-                                    gameDto.getName(),
-                                    gameDto.getImage(),
-                                    gameDto.getType(),
-                                    gameDto.isItemSwappable(),
-                                    gameDto.getInstruction(),
-                                    eventGame.getStartTime()));
-        }
-
-        return returnGameDtos;
+    public List<EventDto> fetchEventsByIds(List<String> ids) {
+        List<Event> events = eventsRepository.findByIds(ids);
+        return events.stream().map(EventMapper::toDto).collect(Collectors.toList());
     }
 
     @Override
-    public List<ReturnVoucherDto> fetchVouchersByEvent(String eventId) {
-        List<EventVoucher> eventVouchers = eventVoucherRepository.findByEvent(eventId);
-        List<ReturnVoucherDto> returnVoucherDtos = new ArrayList<>();
-        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-
-        for (EventVoucher eventVoucher : eventVouchers) {
-            VoucherDto voucherDto = voucherService.fetchVoucherById(eventVoucher.getVoucher().getId());
-            String formatExpiredDateTime = voucherDto.getExpiredDate().format(format); 
-            returnVoucherDtos.add(new ReturnVoucherDto(voucherDto.getId(),
-                                    voucherDto.getBrand(),
-                                    voucherDto.getVoucherCode(),
-                                    voucherDto.getQrCode(),
-                                    voucherDto.getImage(),
-                                    voucherDto.getValue(),
-                                    voucherDto.getDescription(),
-                                    formatExpiredDateTime,
-                                    voucherDto.getStatus(),
-                                    voucherDto.getUnitValue(),
-                                    eventVoucher.getNumberOfVoucher()));
-        }
-
-        return returnVoucherDtos;
-    }
-
-    @Override
-    public String createEvent(EventDto eventDto) {
+    public EventDto createEvent(EventDto eventDto) {
         Event event = EventMapper.toEntity(eventDto);
-        event.setId(null);
         Event createdEvent = eventsRepository.save(event);
-        return createdEvent.getId().toString();
+        return EventMapper.toDto(createdEvent);
     }
 
     @Override
@@ -542,8 +500,13 @@ public class EventsService implements IEventsService {
         List<ItemId_Quantity>       listItemIdQuantity              = new ArrayList<>();
         String                      regexSplitStringLocalDateTime   = "T";
         Integer                     sumNumberOfVoucher              = 0;
+        EventDto                    eventDto                        = new EventDto();
         String                      eventId                         = null;
-        if (existEvent != null)     eventId                         = this.createEvent(existEvent);
+        if (existEvent != null)
+        {
+                                    eventDto                        = this.createEvent(existEvent);
+                                    eventId                         = eventDto.getId();
+        }
         List<BrandDto>              brands;
 
         if (eventId == null) {
@@ -624,14 +587,15 @@ public class EventsService implements IEventsService {
                             gameId_StartTime.getStartTime().toString(),
                             gameId_StartTime.getStartTime().plusMinutes(30).toString()
                         );
-                
+                        
+                        log.info("EventSessionInfo: " + eventSessionInfo.toString());
                         kafkaTemplateEventSessionInfo.send("event-session", eventSessionInfo);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
-                // wair for session response
+                // wait for session response
                 // Send notification to related brands
                 try {
                     // get list of brandIds from brands
@@ -640,9 +604,10 @@ public class EventsService implements IEventsService {
                         brandIds.add(brand.getId());
                     }
 
-                    String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(new NotificationInfo("NotificationId", "NotificationTitle", "NotificationDescription", "NotificationImageUrl"), brandIds));
-                    
-                    kafkaTemplateNotificationInfo.send("event-notification", new NotificationInfo(notificationId, "NotificationTitle", "NotificationDescription", "NotificationImageUrl"));
+                    NotificationInfo notificationInfo = new NotificationInfo("You've been invited to " + eventRegistrationInfoDto.getEvent().getName() + " event!", brands.get(0).getBrandName() + "invited you to join!", eventRegistrationInfoDto.getEvent().getImage());
+                    String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(notificationInfo, brandIds));
+                    System.out.println("NotificationId: " + notificationId);
+                    kafkaTemplateNotificationInfo.send("event-notification", notificationInfo);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -655,5 +620,38 @@ public class EventsService implements IEventsService {
 
         ResponseDto res = new ResponseDto(HttpStatus.CREATED, "Event created successfully.");
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
+    }
+
+    @Override
+    public boolean updateEventVoucher(String eventId, String voucherId, int additionalQuantity)
+    {
+        try {
+            Event event = eventsRepository.findById(eventId).orElseThrow(
+                    () -> new NotFoundException("Event", "id", eventId)
+            );
+
+            Voucher voucher = voucherRepository.findById(voucherId).orElseThrow(
+                    () -> new NotFoundException("Voucher", "id", voucherId)
+            );
+
+            EventVoucher eventVoucher = eventVoucherRepository.findByEventAndVoucher(eventId, voucherId);
+            if (eventVoucher != null) {
+                eventVoucher.setNumberOfVoucher(Math.max(0, eventVoucher.getNumberOfVoucher() + additionalQuantity));
+                eventVoucherRepository.save(eventVoucher);
+            }
+            else {
+                eventVoucher = new EventVoucher();
+                eventVoucher.setEvent(event);
+                eventVoucher.setVoucher(voucher);
+                eventVoucher.setActiveStatus(EventIntermediateTableStatus.ACTIVE);
+                eventVoucher.setNumberOfVoucher(Math.max(0, additionalQuantity));
+                eventVoucherRepository.save(eventVoucher);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
     }
 }
