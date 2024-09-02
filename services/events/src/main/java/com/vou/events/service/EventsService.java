@@ -640,9 +640,10 @@ public class EventsService implements IEventsService {
                         brandIds.add(brand.getId());
                     }
 
-                    String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(new NotificationInfo("NotificationId", "NotificationTitle", "NotificationDescription", "NotificationImageUrl"), brandIds));
-                    
-                    kafkaTemplateNotificationInfo.send("event-notification", new NotificationInfo(notificationId, "NotificationTitle", "NotificationDescription", "NotificationImageUrl"));
+                    NotificationInfo notificationInfo = new NotificationInfo("You've been invited to " + eventRegistrationInfoDto.getEvent().getName() + " event!", brands.get(0).getBrandName() + "invited you to join!", eventRegistrationInfoDto.getEvent().getImage());
+                    String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(notificationInfo, brandIds));
+                    System.out.println("NotificationId: " + notificationId);
+                    kafkaTemplateNotificationInfo.send("event-notification", notificationInfo);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
