@@ -4,8 +4,10 @@ import com.vou.events.common.GameId_StartTime;
 import com.vou.events.common.ItemId_Quantity;
 import com.vou.events.common.VoucherId_Quantity;
 import com.vou.events.dto.BrandDto;
+import com.vou.events.dto.BrandWithEventActiveStatusDto;
 import com.vou.events.dto.EventDto;
 import com.vou.events.dto.EventRegistrationInfoDto;
+import com.vou.events.dto.EventWithBrandActiveStatusDto;
 import com.vou.pkg.dto.ResponseDto;
 
 import java.time.LocalDateTime;
@@ -68,7 +70,20 @@ public interface IEventsService {
      *
      * @return a list of events filtered by brand
      */
-    default List<EventDto> fetchEventsByBrand() {
+    default List<EventWithBrandActiveStatusDto> fetchEventsByBrand(String brandId) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    default List<BrandWithEventActiveStatusDto> fetchBrandsByEvent(String eventId) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Fetches all events filtered by brands.
+     *
+     * @return a list of events filtered by brands
+     */
+    default List<EventWithBrandActiveStatusDto> fetchEventsByBrands(List<String> brandIds) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
@@ -92,12 +107,22 @@ public interface IEventsService {
     }
 
     /**
+     * Fetches events by their ids.
+     *  
+     * @param ids the ids of the events to fetch
+     * @return a list of fetched events
+     */
+    default List<EventDto> fetchEventsByIds(List<String> ids) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
      * Creates a new event.
      *
      * @param eventDto the DTO of the event to create
      * @return the created event id
      */
-    String createEvent(EventDto eventDto);
+    EventDto createEvent(EventDto eventDto);
 
     /**
      * Updates an existing event.
@@ -221,6 +246,10 @@ public interface IEventsService {
      * @return true if the event was created successfully, false otherwise
      */
     default ResponseEntity<ResponseDto> createEventWithSessionInfo(EventRegistrationInfoDto eventRegistrationInfoDto) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    default boolean updateEventVoucher(String eventId, String voucherId, int additionalQuantity) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 }

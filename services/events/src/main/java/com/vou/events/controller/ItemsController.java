@@ -31,11 +31,28 @@ public class ItemsController {
         return ResponseEntity.ok(itemDto);
     }
 
+    @GetMapping("/ids")
+    public ResponseEntity<List<ItemDto>> getItemsByIds(@RequestBody List<String> ids) {
+        List<ItemDto> itemDtos = itemService.fetchItemsByIds(ids);
+        return ResponseEntity.ok(itemDtos);
+    }
+
+    @GetMapping("/brands/{brandId}")
+    public ResponseEntity<List<ItemDto>> getItemsByBrand(@PathVariable String brandId) {
+        List<ItemDto> itemDtos = itemService.fetchItemsByBrand(brandId);
+        return ResponseEntity.ok(itemDtos);
+    }
+
+    @GetMapping("/brands")
+    public ResponseEntity<List<ItemDto>> getItemsByBrands(@RequestBody List<String> brandIds) {
+        List<ItemDto> itemDtos = itemService.fetchItemsByBrands(brandIds);
+        return ResponseEntity.ok(itemDtos);
+    }
+
     @PostMapping
-    public ResponseEntity<ResponseDto> createItem(@RequestBody ItemDto itemDto) {
-        itemService.createItem(itemDto);
-        ResponseDto res = new ResponseDto(HttpStatus.CREATED, "Item created successfully.");
-        return ResponseEntity.status(HttpStatus.CREATED).body(res);
+    public ResponseEntity<ItemDto> createItem(@RequestBody ItemDto itemDto) {
+        ItemDto createdItem = itemService.createItem(itemDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdItem);
     }
 
     @PutMapping

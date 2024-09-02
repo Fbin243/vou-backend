@@ -7,6 +7,7 @@ import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 
+import java.util.List;
 
 public class EventBrandRepositoryImpl implements EventBrandRepositoryCustom {
 
@@ -27,5 +28,35 @@ public class EventBrandRepositoryImpl implements EventBrandRepositoryCustom {
         } catch (NoResultException e) {
             return null;
         }
+    }
+
+    @Override
+    public List<EventBrand> findByBrand(String brandId) {
+        TypedQuery<EventBrand> query = entityManager.createQuery(
+                "SELECT eb FROM EventBrand eb WHERE eb.brand.id = :brandId",
+                EventBrand.class
+        );
+        query.setParameter("brandId", brandId);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<EventBrand> findByEvent(String eventId) {
+        TypedQuery<EventBrand> query = entityManager.createQuery(
+                "SELECT eb FROM EventBrand eb WHERE eb.event.id = :eventId",
+                EventBrand.class
+        );
+        query.setParameter("eventId", eventId);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<EventBrand> findByBrands(List<String> brandIds) {
+        TypedQuery<EventBrand> query = entityManager.createQuery(
+                "SELECT eb FROM EventBrand eb WHERE eb.brand.id IN :brandIds",
+                EventBrand.class
+        );
+        query.setParameter("brandIds", brandIds);
+        return query.getResultList();
     }
 }

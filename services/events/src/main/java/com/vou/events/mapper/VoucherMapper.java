@@ -1,5 +1,6 @@
 package com.vou.events.mapper;
 
+import com.vou.events.common.VoucherUnitValue;
 import com.vou.events.dto.VoucherDto;
 import com.vou.events.entity.Voucher;
 
@@ -24,6 +25,9 @@ public class VoucherMapper {
         voucherDto.setDescription(voucher.getDescription());
         voucherDto.setExpiredDate(voucher.getExpiredDate());
         voucherDto.setStatus(voucher.getStatus());
+        if (voucher.getUnitValue() != null) {
+            voucherDto.setUnitValue(voucher.getUnitValue());
+        }
 
         return voucherDto;
     }
@@ -44,6 +48,9 @@ public class VoucherMapper {
         voucher.setDescription(dto.getDescription());
         voucher.setExpiredDate(dto.getExpiredDate());
         voucher.setStatus(dto.getStatus());
+        if (dto.getUnitValue() != null) {
+            voucher.setUnitValue(dto.getUnitValue());
+        }
 
         return voucher;
     }

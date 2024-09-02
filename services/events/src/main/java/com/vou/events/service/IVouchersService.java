@@ -39,12 +39,42 @@ public interface IVouchersService {
     }
 
     /**
+     * Fetches vouchers by their ids.
+     *  
+     * @param ids the ids of the vouchers to fetch
+     * @return a list of fetched vouchers
+     */
+    default List<VoucherDto> fetchVouchersByIds(List<String> ids) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Fetches all vouchers by brand.
+     *  
+     * @param brandId the id of the brand to fetch vouchers for
+     * @return a list of vouchers for the specified brand
+     */
+    default List<VoucherDto> fetchVouchersByBrand(String brandId) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
+     * Fetches all vouchers by brands.
+     *  
+     * @param brandIds the ids of the brands to fetch vouchers for
+     * @return a list of vouchers for the specified brands
+     */
+    default List<VoucherDto> fetchVouchersByBrands(List<String> brandIds) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    /**
      * Creates a new voucher.
      *  
      * @param voucherDto the voucher to create
      * @return the created voucher
      */
-    default String createVoucher(VoucherDto voucherDto) {
+    default VoucherDto createVoucher(VoucherDto voucherDto) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 

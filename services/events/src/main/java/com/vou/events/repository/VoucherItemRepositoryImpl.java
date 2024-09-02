@@ -1,5 +1,9 @@
 package com.vou.events.repository;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import com.vou.events.common.EventIntermediateTableStatus;
 import com.vou.events.entity.VoucherItem;
 
 import jakarta.persistence.EntityManager;
@@ -26,5 +30,21 @@ public class VoucherItemRepositoryImpl implements VoucherItemRepositoryCustom {
         } catch (NoResultException e) {
             return null;
         }
+    }
+
+    @Override
+    public Map<String, Integer> getItemsQuantitiesByVoucher(String voucherId) {
+        TypedQuery<VoucherItem> query = entityManager.createQuery(
+                "SELECT vi FROM VoucherItem vi WHERE vi.voucher.id = :voucherId AND vi.activeStatus = :activeStatus",
+                VoucherItem.class
+        );
+        query.setParameter("voucherId", voucherId);
+        query.setParameter("activeStatus", EventIntermediateTableStatus.ACTIVE);
+        return query.getResultList().stream().collect(
+                Collectors.toMap(
+                        vi -> vi.getItem().getId(),
+                        VoucherItem::getNumberOfItem
+                )
+        );
     }
 }

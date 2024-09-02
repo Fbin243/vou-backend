@@ -1,6 +1,7 @@
 package com.vou.events.entity;
 
 import com.vou.events.common.VoucherStatus;
+import com.vou.events.common.VoucherUnitValue;
 import com.vou.pkg.entity.Base;
 
 import lombok.Getter;
@@ -47,4 +48,7 @@ public class Voucher extends Base {
 
     @Column(name = "status")
     private VoucherStatus status;
+
+    @Column(name = "unit_value")
+    private VoucherUnitValue unitValue;
 }

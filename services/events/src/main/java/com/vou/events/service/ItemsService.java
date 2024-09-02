@@ -1,5 +1,7 @@
 package com.vou.events.service;
 
+import com.vou.events.client.UsersServiceClient;
+import com.vou.events.dto.BrandDto;
 import com.vou.events.dto.ItemDto;
 import com.vou.events.entity.*;
 import com.vou.events.mapper.BrandMapper;
@@ -20,6 +22,7 @@ public class ItemsService implements IItemsService {
     
     private final ItemRepository        itemRepository;
     private final BrandRepository       brandRepository;
+    private final UsersServiceClient    usersServiceClient;
 
     @Override
     public List<ItemDto> fetchAllItems() {
@@ -36,17 +39,30 @@ public class ItemsService implements IItemsService {
     }
 
     @Override
+    public List<ItemDto> fetchItemsByIds(List<String> ids) {
+        List<Item> items = itemRepository.findByIds(ids);
+        return items.stream().map(ItemMapper::toDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ItemDto> fetchItemsByBrand(String brandId) {
+        List<Item> items = itemRepository.findByBrand(brandId);
+        return items.stream().map(ItemMapper::toDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ItemDto> fetchItemsByBrands(List<String> brandIds) {
+        List<Item> items = itemRepository.findByBrands(brandIds);
+        return items.stream().map(ItemMapper::toDto).collect(Collectors.toList());
+    }
+
+    @Override
     public ItemDto createItem(ItemDto itemDto) {
-        if (brandRepository.findById(itemDto.getBrand().getId()) == null) {
-            brandRepository.save(BrandMapper.toEntity(itemDto.getBrand()));
-        }
 
-        Brand brand = brandRepository.findById(itemDto.getBrand().getId())
-                     .orElseGet(() -> brandRepository.save(BrandMapper.toEntity(itemDto.getBrand())));
+        BrandDto brandDto = usersServiceClient.getBrand(itemDto.getBrand().getId());
                      
-
         Item item = ItemMapper.toEntity(itemDto);
-        item.setBrand(brand);
+        item.setBrand(brandDto != null ? BrandMapper.toEntity(brandDto) : null);
         Item createdItem = itemRepository.save(item);
         return ItemMapper.toDto(createdItem);
     }
