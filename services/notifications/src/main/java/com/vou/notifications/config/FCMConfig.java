@@ -20,7 +20,7 @@ public class FCMConfig {
     @PostConstruct
     public void initialize() {
         try {
-            logger.info("GOOGLE_APPLICATION_CREDENTIALS: " + System.getenv("GOOGLE_APPLICATION_CREDENTIALS"));
+            // logger.info("GOOGLE_APPLICATION_CREDENTIALS: " + System.getenv("GOOGLE_APPLICATION_CREDENTIALS"));
             FileInputStream serviceAccount = new FileInputStream(System.getenv("GOOGLE_APPLICATION_CREDENTIALS"));
             
             logger.info("serviceAccount: " + serviceAccount);

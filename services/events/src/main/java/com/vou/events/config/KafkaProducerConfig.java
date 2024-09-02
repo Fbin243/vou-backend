@@ -10,8 +10,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 
 import com.vou.events.kafka.serializer.EventSessionInfoSerializer;
-import com.vou.events.kafka.serializer.NotificationInfoSerializer;
+import com.vou.events.kafka.serializer.Notifcation_Event_Created_Data_Serializer;
 import com.vou.events.model.EventSessionInfo;
+import com.vou.events.model.Notifcation_Event_Created_Data;
 import com.vou.events.model.NotificationInfo;
 
 import java.util.HashMap;
@@ -32,11 +33,11 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public ProducerFactory<String, NotificationInfo> notificationProducerFactory() {
+    public ProducerFactory<String, Notifcation_Event_Created_Data> notificationProducerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, NotificationInfoSerializer.class);
+        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, Notifcation_Event_Created_Data_Serializer.class);
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
@@ -46,7 +47,7 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, NotificationInfo> kafkaTemplateNotificationInfo() {
+    public KafkaTemplate<String, Notifcation_Event_Created_Data> kafkaTemplateNotificationInfo() {
         return new KafkaTemplate<>(notificationProducerFactory());
     }
 }

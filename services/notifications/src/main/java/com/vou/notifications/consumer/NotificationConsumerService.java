@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import com.vou.notifications.config.FCMConfig;
 import com.vou.notifications.dto.NotificationDto;
 import com.vou.notifications.entity.NotificationRelatedPair;
+import com.vou.notifications.model.Notifcation_Event_Created_Data;
 import com.vou.notifications.model.NotificationInfo;
 import com.vou.notifications.repository.NotificationRelatedPairRepository;
 import com.vou.notifications.repository.NotificationUserRepository;
@@ -37,24 +38,24 @@ public class NotificationConsumerService {
     private static final Logger logger = Logger.getLogger(NotificationConsumerService.class.getName());
 
     @KafkaListener(topics = "event-notification", groupId = "group_id", containerFactory = "kafkaListenerContainerFactory")
-    public void listenEventNotification(ConsumerRecord<String, NotificationInfo> record, Acknowledgment acknowledgment) {
+    public void listenEventNotification(ConsumerRecord<String, Notifcation_Event_Created_Data> record, Acknowledgment acknowledgment) {
         try {
-            NotificationInfo notificationDto = record.value();
+            Notifcation_Event_Created_Data notificationDto = record.value();
             
-            List<String> userIds = notificationUserRepository.findUserIdsByNotificationId(notificationDto.getId());
-            
+            // List<String> userIds = notificationUserRepository.findUserIdsByNotificationId(notificationDto.getId());
+            List<String> userIds = notificationDto.getUserIds();
             // Create a list to hold all CompletableFutures
             List<CompletableFuture<Void>> futures = new ArrayList<>();
 
             if (userIds == null || userIds.isEmpty()) {
-                logger.info("No users found for notification: " + notificationDto.getId());
+                logger.info("No users found for notification: " + notificationDto.getNotificationInfo().getId());
                 acknowledgment.acknowledge();
                 return;
             }
             
             for (String userId : userIds) {
                 logger.info("Processing notification for userId: " + userId);
-                futures.add(processUserNotificationAsync(userId, notificationDto));
+                futures.add(processUserNotificationAsync(userId, notificationDto.getNotificationInfo()));
             }
 
             // Wait for all CompletableFutures to complete
@@ -84,6 +85,7 @@ public class NotificationConsumerService {
                     }
         
                     fcmService.sendNotification(token, notificationDto, data);
+                    logger.info("Notification sent to userId: " + userId);
                 }
 
             } catch (Exception e) {

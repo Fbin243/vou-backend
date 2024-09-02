@@ -33,7 +33,7 @@ spring:
       group-id: group_id
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: com.vou.notifications.kafka.deserializer.NotificationInfoDeserializer
+      value-deserializer: com.vou.notifications.kafka.deserializer.Notifcation_Event_Created_Data_Deserializer
       enable-auto-commit: false
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer

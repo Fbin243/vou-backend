@@ -58,18 +58,25 @@ public class UserTokenRepositoryImpl implements UserTokenRepositoryCustom {
         String token = null;
 
         try {
-            Query query = firestore.collection("users_tokens")
-                    .whereEqualTo("user_id", userId)
-                    .limit(1);
+            // Query query = firestore.collection("users_tokens")
+            //         .whereEqualTo("user_id", userId)
+            //         .limit(1);
+
+            DocumentReference docRef = firestore.collection("users_tokens").document(userId);
+
+            DocumentSnapshot document = docRef.get().get();
+            if (document.exists()) {
+                token = document.getString("token");
+            }
 
             // DocumentReference documentReference = query.get().get().getDocuments().get(0).getReference();
             // token = documentReference.get().get().getString("token");
 
-            List<QueryDocumentSnapshot> documents = query.get().get().getDocuments();
-            if (!documents.isEmpty()) {
-                DocumentReference documentReference = documents.get(0).getReference();
-                token = documentReference.get().get().getString("token");
-            }
+            // List<QueryDocumentSnapshot> documents = query.get().get().getDocuments();
+            // if (!documents.isEmpty()) {
+            //     DocumentReference documentReference = documents.get(0).getReference();
+            //     token = documentReference.get().get().getString("token");
+            // }
         } catch (InterruptedException e) {
             // Handle InterruptedException
             Thread.currentThread().interrupt(); // Restore the interrupted status
