@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.cloud.firestore.CollectionReference;
@@ -23,16 +22,17 @@ public class TokenService {
 
     // private UserTokenRepository userTokenRepository;
     private final Firestore firestore;
+    // private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     public void saveOrUpdateToken(String userId, String fcmToken) {
         CollectionReference tokensRef = firestore.collection("users_tokens");
 
-        DocumentReference userTokenRef = tokensRef.document(userId);
         Map<String, Object> tokenData = new HashMap<>();
+        tokenData.put("user_id", userId);
         tokenData.put("token", fcmToken);
-        tokenData.put("updatedAt", FieldValue.serverTimestamp());
+        tokenData.put("updated_at", FieldValue.serverTimestamp());
 
-        userTokenRef.set(tokenData);
+        tokensRef.document(userId).set(tokenData);
     }
 
     public String getTokenByUserId(String userId) throws Exception {

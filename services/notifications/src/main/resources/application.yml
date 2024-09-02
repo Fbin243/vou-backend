@@ -1,5 +1,7 @@
 server:
   port: 8086
+  servlet:
+    context-path: /notifications
 
 spring:
   application:
@@ -31,7 +33,7 @@ spring:
       group-id: group_id
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: com.vou.notifications.kafka.deserializer.EventSessionInfoDeserializer
+      value-deserializer: com.vou.notifications.kafka.deserializer.NotificationInfoDeserializer
       enable-auto-commit: false
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
