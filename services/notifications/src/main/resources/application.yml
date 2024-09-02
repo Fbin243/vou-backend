@@ -28,7 +28,7 @@ spring:
           enabled: false
 
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: kafka:9093
     consumer:
       group-id: group_id
       auto-offset-reset: earliest

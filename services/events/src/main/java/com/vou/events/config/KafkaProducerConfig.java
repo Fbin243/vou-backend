@@ -13,7 +13,6 @@ import com.vou.events.kafka.serializer.EventSessionInfoSerializer;
 import com.vou.events.kafka.serializer.Notifcation_Event_Created_Data_Serializer;
 import com.vou.events.model.EventSessionInfo;
 import com.vou.events.model.Notifcation_Event_Created_Data;
-import com.vou.events.model.NotificationInfo;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +34,7 @@ public class KafkaProducerConfig {
     @Bean
     public ProducerFactory<String, Notifcation_Event_Created_Data> notificationProducerFactory() {
         Map<String, Object> configProps = new HashMap<>();
-        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, Notifcation_Event_Created_Data_Serializer.class);
         return new DefaultKafkaProducerFactory<>(configProps);
