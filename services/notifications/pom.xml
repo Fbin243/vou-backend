@@ -184,6 +184,14 @@
 <!--							</platform>-->
 <!--						</platforms>-->
 <!--					</from>-->
+					<extraDirectories>
+						<paths>
+							<path>
+								<from>src/main/resources</from>
+								<into>/google</into>
+							</path>
+						</paths>
+					</extraDirectories>
 					<to>
 						<image>haina2410/${project.artifactId}</image>
 					</to>
