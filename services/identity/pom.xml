@@ -219,7 +219,7 @@
 <!--						</platforms>-->
 <!--					</from>-->
 					<to>
-						<image>fbin243/${project.artifactId}</image>
+						<image>haina2410/${project.artifactId}</image>
 					</to>
 				</configuration>
 			</plugin>

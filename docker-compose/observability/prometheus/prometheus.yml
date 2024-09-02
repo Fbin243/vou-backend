@@ -27,5 +27,14 @@ scrape_configs:
     metrics_path: '/sessions/actuator/prometheus'
     static_configs:
       - targets: [ 'sessions:8084' ]
-
-  
+  - job_name: 'events'
+    metrics_path: '/events/actuator/prometheus'
+    static_configs:
+      - targets: [ 'events:8083' ]
+  - job_name: 'notifications'
+    metrics_path: '/notifications/actuator/prometheus'
+    static_configs:
+      - targets: [ 'notifications:8086' ]
+  - job_name: node
+    static_configs:
+      - targets: ['host.docker.internal:9100']

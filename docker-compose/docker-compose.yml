@@ -90,6 +90,8 @@ services:
     extends:
       file: common-config.yml
       service: network-config
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   grafana:
     image: grafana/grafana:11.0.0
@@ -203,6 +205,7 @@ services:
 
   ############### MY SQL #####################
   mysqldb:
+    image: mysql:8.0
     ports:
       - 3300:3306
     container_name: mysqldb
@@ -229,7 +232,7 @@ services:
       service: base-config
 
   kafka:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka
     container_name: kafka
     depends_on:
       - zookeeper
@@ -250,7 +253,7 @@ services:
 
   ###################### SERVICES ##########################
   discovery-server:
-    image: fbin243/discovery-server
+    image: haina2410/discovery-server
     container_name: discovery-server
     ports:
       - 8761:8761
@@ -267,7 +270,7 @@ services:
       SPRING_APPLICATION_NAME: "discovery-server"
 
   users:
-    image: fbin243/users
+    image: haina2410/users
     container_name: users
     ports:
       - 8081:8081
@@ -290,7 +293,7 @@ services:
       service: discovery-config
 
   identity:
-    image: fbin243/identity
+    image: haina2410/identity
     container_name: identity
     ports:
       - 8071:8071
@@ -314,7 +317,7 @@ services:
       service: discovery-config
 
   games:
-    image: fbin243/games
+    image: haina2410/games
     container_name: games
     ports:
       - 8082:8082
@@ -337,7 +340,7 @@ services:
       service: discovery-config
 
   events:
-    image: fbin243/events
+    image: haina2410/events
     container_name: events
     ports:
       - 8083:8083
@@ -361,10 +364,10 @@ services:
       service: discovery-config
 
   sessions:
-    image: fbin243/sessions
+    image: haina2410/sessions
     container_name: sessions
     env_file:
-      - ../.env
+      - ../stack.env
     ports:
       - 8084:8084
     healthcheck:
@@ -382,30 +385,29 @@ services:
       file: common-config.yml
       service: discovery-config
 
-#  notifications:
-#    image: fbin243/notifications
-#    container_name: notifications
-#    env_file:
-#      - ../serviceAccountKey.json
-#    ports:
-#      - 8086:8086
-#    healthcheck:
-#      test: "curl --fail --silent localhost:8086/notifications/actuator/health/readiness | grep UP || exit 1"
-#      interval: 20s
-#      timeout: 5s
-#      retries: 10
-#      start_period: 10s
-#    environment:
-#      SPRING_APPLICATION_NAME: "notifications"
-#      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-#    depends_on:
-#      - kafka
-#    extends:
-#      file: common-config.yml
-#      service: discovery-config
+  notifications:
+    image: haina2410/notifications
+    container_name: notifications
+    ports:
+      - 8086:8086
+    healthcheck:
+      test: "curl --fail --silent localhost:8086/notifications/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    environment:
+      GOOGLE_APPLICATION_CREDENTIALS: /google/serviceAccountKey.json
+      SPRING_APPLICATION_NAME: "notifications"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      - kafka
+    extends:
+      file: common-config.yml
+      service: discovery-config
 
   api-gateway:
-    image: fbin243/api-gateway
+    image: haina2410/api-gateway
     container_name: api-gateway
     ports:
       - 8888:8888
@@ -419,12 +421,6 @@ services:
       identity:
         condition: service_healthy
       users:
-        condition: service_healthy
-      games:
-        condition: service_healthy
-      sessions:
-        condition: service_healthy
-      events:
         condition: service_healthy
     environment:
       DISCOVERY_SERVER_URI: "http://discovery-server:8761"
@@ -440,3 +436,4 @@ networks:
 ################ VOLUME ###############
 volumes:
   mysql-data:
+  metabase-data:

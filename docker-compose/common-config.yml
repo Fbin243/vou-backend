@@ -22,7 +22,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
     extends:
-      service: base-config
+      service: network-config
 
   discovery-config:
     depends_on:
