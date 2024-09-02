@@ -32,4 +32,14 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
         query.setParameter("brandIds", brandIds);
         return query.getResultList();
     }
+
+    @Override
+    public List<Item> findByIds(List<String> ids) {
+        TypedQuery<Item> query = entityManager.createQuery(
+                "SELECT i FROM Item i WHERE i.id IN :ids",
+                Item.class
+        );
+        query.setParameter("ids", ids);
+        return query.getResultList();
+    }
 }

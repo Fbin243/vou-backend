@@ -6,19 +6,24 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import com.vou.pkg.dto.ResponseDto;
+import com.vou.events.common.ItemId_Quantity;
 import com.vou.events.dto.ConversionVoucherItems;
 import com.vou.events.dto.VoucherDto;
+import com.vou.events.entity.VoucherItem;
 import com.vou.events.service.IVouchersService;
+import com.vou.events.service.VoucherItemService;
 
 import lombok.AllArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/api/vouchers", produces = {MediaType.APPLICATION_JSON_VALUE})
 public class VouchersController {
-    private final IVouchersService voucherService;
+    private final IVouchersService      voucherService;
+    private final VoucherItemService    voucherItemService;
 
     @GetMapping
     public ResponseEntity<List<VoucherDto>> getAllVouchers() {
@@ -32,23 +37,33 @@ public class VouchersController {
         return ResponseEntity.ok(voucherDto);
     }
 
+    @GetMapping("/ids")
+    public ResponseEntity<List<VoucherDto>> getVouchersByIds(@RequestBody List<String> ids) {
+        List<VoucherDto> voucherDtos = voucherService.fetchVouchersByIds(ids);
+        return ResponseEntity.ok(voucherDtos);
+    }
+
     @GetMapping("/brands/{brandId}")
     public ResponseEntity<List<VoucherDto>> getVouchersByBrand(@PathVariable String brandId) {
         List<VoucherDto> voucherDtos = voucherService.fetchVouchersByBrand(brandId);
         return ResponseEntity.ok(voucherDtos);
     }
 
-    @PostMapping("/brands")
+    @GetMapping("/brands")
     public ResponseEntity<List<VoucherDto>> getVouchersByBrands(@RequestBody List<String> brandIds) {
         List<VoucherDto> voucherDtos = voucherService.fetchVouchersByBrands(brandIds);
         return ResponseEntity.ok(voucherDtos);
     }
 
+    @GetMapping("/voucher_item/voucher/{voucherId}")
+    public ResponseEntity<Map<String, Integer>> getItemsQuantitiesByVoucher(@PathVariable String voucherId) {
+        return ResponseEntity.ok(voucherItemService.getItemsQuantitiesByVoucher(voucherId));
+    }
+
     @PostMapping
-    public ResponseEntity<ResponseDto> createVoucher(@RequestBody VoucherDto voucherDto) {
-        voucherService.createVoucher(voucherDto);
-        ResponseDto res = new ResponseDto(HttpStatus.CREATED, "Voucher created successfully.");
-        return ResponseEntity.status(HttpStatus.CREATED).body(res);
+    public ResponseEntity<VoucherDto> createVoucher(@RequestBody VoucherDto voucherDto) {
+        VoucherDto createdVoucher = voucherService.createVoucher(voucherDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdVoucher);
     }
 
     @PutMapping
@@ -76,9 +91,8 @@ public class VouchersController {
     }
 
     @PostMapping("/conversion")
-    public ResponseEntity<ResponseDto> addVoucherItemConversion (@RequestBody ConversionVoucherItems conversionVoucherItems) {
+    public ResponseEntity<Boolean> addVoucherItemConversion(@RequestBody ConversionVoucherItems conversionVoucherItems) {
         voucherService.addVoucherItemConversion(conversionVoucherItems.getVoucherId(), conversionVoucherItems.getItemIds_quantities());
-        ResponseDto res = new ResponseDto(HttpStatus.CREATED, "Voucher item conversion added successfully.");
-        return ResponseEntity.status(HttpStatus.CREATED).body(res);
+        return ResponseEntity.ok(true);
     }
 }
