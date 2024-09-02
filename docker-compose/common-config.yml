@@ -7,14 +7,14 @@ services:
     deploy:
       resources:
         limits:
-          memory: 300m
+          memory: 500m
     extends:
       service: network-config
 
   db-config:
     image: mysql
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 10s
       retries: 10
       interval: 10s
