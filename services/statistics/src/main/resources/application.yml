@@ -1,0 +1,21 @@
+server:
+  port: 8085
+  servlet:
+    context-path: /statistics
+    
+spring:
+  application:
+    name: statistics
+  data:
+    mongodb:
+      uri: mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@vou.hvasc.mongodb.net/${MONGO_DBNAME}
+      database: vou
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
