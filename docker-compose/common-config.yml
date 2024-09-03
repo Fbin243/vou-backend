@@ -8,6 +8,8 @@ services:
       resources:
         limits:
           memory: 500m
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
     extends:
       service: network-config
 
@@ -21,6 +23,7 @@ services:
       start_period: 10s
     environment:
       MYSQL_ROOT_PASSWORD: root
+      TZ: Asia/Ho_Chi_Minh
     extends:
       service: network-config
 
