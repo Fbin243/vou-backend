@@ -13,5 +13,6 @@ import java.time.LocalTime;
 @Setter
 public class GameId_StartTime {
     Long gameId;
+    String gameType;
     LocalTime startTime;
 }
