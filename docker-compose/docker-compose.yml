@@ -431,6 +431,8 @@ services:
   statistics:
     image: haina2410/statistics
     container_name: statistics
+    env_file:
+      - ../stack.env
     ports:
       - 8085:8085
     healthcheck:
