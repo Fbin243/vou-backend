@@ -8,7 +8,9 @@ import com.vou.sessions.entity.shakinggame.ShakingRecordEntity;
 import com.vou.sessions.mapper.RecordMapper;
 import com.vou.sessions.repository.SessionsRepository;
 import com.vou.sessions.utils.Utils;
-import lombok.AllArgsConstructor;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -17,11 +19,23 @@ import java.util.Map;
 import java.util.Optional;
 
 @Component
-@AllArgsConstructor
 public class ShakingGameEngine extends GameEngine {
 	private static final String EVENT_ITEMS_KEY = "EVENT_ITEMS";
 	private SessionsRepository sessionsRepository;
 	private RecordMapper shakingRecordMapper;
+	
+	@Autowired
+	ShakingGameEngine(RedisTemplate<String, Object> redisTemplate, SessionsRepository sessionsRepository,
+	                  RecordMapper shakingRecordMapper) {
+		this.redisTemplate = redisTemplate;
+		this.sessionsRepository = sessionsRepository;
+		this.shakingRecordMapper = shakingRecordMapper;
+	}
+	
+	@PostConstruct
+	public void init() {
+		hashOps = redisTemplate.opsForHash();
+	}
 	
 	@Override
 	public void setUp(String sessionId) {
@@ -99,11 +113,11 @@ public class ShakingGameEngine extends GameEngine {
 				String key = entry.getKey();
 				Object value = entry.getValue();
 				ShakingRecord shakingRecord = objectMapper.convertValue(value, ShakingRecord.class);
-				ShakingRecordEntity quizRecordEntity = new ShakingRecordEntity();
-				quizRecordEntity.setUserId(key);
-				quizRecordEntity.setTurns(shakingRecord.getTurns());
-				quizRecordEntity.setTotalTime(shakingRecord.getTotalTime());
-				return quizRecordEntity;
+				ShakingRecordEntity shakingRecordEntity = new ShakingRecordEntity();
+				shakingRecordEntity.setUserId(key);
+				shakingRecordEntity.setTurns(shakingRecord.getTurns());
+				shakingRecordEntity.setTotalTime(shakingRecord.getTotalTime());
+				return shakingRecordEntity;
 			})
 			.toList();
 		
@@ -113,6 +127,18 @@ public class ShakingGameEngine extends GameEngine {
 	
 	@Override
 	protected void updateTotalTime(String sessionId, String playerId) {
-	
+		ShakingRecord shakingRecord = getShakingRecord(sessionId, playerId).orElseThrow(
+			() -> new NotFoundException("Player record", "sessionId, playerId",
+				String.format("%s, %s", sessionId, playerId)));
+		if (shakingRecord == null) {
+			log.info("Update totalTime failed");
+		}
+		if (shakingRecord.getStartPlayTime() == -1) {
+			return;
+		}
+		
+		shakingRecord.setTotalTime(shakingRecord.getTotalTime() + Utils.now() - shakingRecord.getStartPlayTime());
+		shakingRecord.setStartPlayTime(-1); // Means the player is off
+		putShakingRecord(sessionId, playerId, shakingRecord);
 	}
 }

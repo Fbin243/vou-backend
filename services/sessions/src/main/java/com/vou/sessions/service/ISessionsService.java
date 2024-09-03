@@ -1,9 +1,11 @@
 package com.vou.sessions.service;
 
 import com.vou.sessions.dto.SessionDto;
-import com.vou.sessions.entity.SessionEntity;
+
+import java.time.LocalDate;
 
 public interface ISessionsService {
-
-    SessionEntity createSession(SessionDto sessionDto);
+	public SessionDto findSessionByEventIdAndGameIdAndDate(String eventId, String gameId, LocalDate date);
+	
+	SessionDto createSession(SessionDto sessionDto);
 }
