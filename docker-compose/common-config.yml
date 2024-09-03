@@ -7,7 +7,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 500m
+          memory: 450m
     environment:
       - TZ=Asia/Ho_Chi_Minh
     extends:
