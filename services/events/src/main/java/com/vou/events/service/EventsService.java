@@ -146,7 +146,7 @@ public class EventsService implements IEventsService {
         List<EventBrand> eventBrands = eventBrandRepository.findByBrands(brandIds);
 
         return eventBrands.stream()
-                .filter(eventBrand -> brandIds.contains(eventBrand.getBrand().getId()))
+                .filter(eventBrand -> brandIds.contains(eventBrand.getBrand_id()))
                 .map(eventBrand -> {
                     Event event = eventBrand.getEvent();
                     return new EventWithBrandActiveStatusDto(
@@ -176,7 +176,7 @@ public class EventsService implements IEventsService {
         List<ReturnGameDto> returnGameDtos = new ArrayList<>();
 
         for (EventGame eventGame : eventGames) {
-            GameDto gameDto = gamesServiceClient.getGameById(eventGame.getGame().getId());
+            GameDto gameDto = gamesServiceClient.getGameById(eventGame.getGame_id());
             returnGameDtos.add(new ReturnGameDto(gameDto.getId(),
                                     gameDto.getName(),
                                     gameDto.getImage(),
@@ -199,7 +199,7 @@ public class EventsService implements IEventsService {
             VoucherDto voucherDto = voucherService.fetchVoucherById(eventVoucher.getVoucher().getId());
             String formatExpiredDateTime = voucherDto.getExpiredDate().format(format); 
             returnVoucherDtos.add(new ReturnVoucherDto(voucherDto.getId(),
-                                    voucherDto.getBrand(),
+                                    voucherDto.getBrand_id(),
                                     voucherDto.getVoucherCode(),
                                     voucherDto.getQrCode(),
                                     voucherDto.getImage(),
@@ -215,11 +215,16 @@ public class EventsService implements IEventsService {
     }
 
     @Override
-    public String createEvent(EventDto eventDto) {
+    public List<EventDto> fetchEventsByIds(List<String> ids) {
+        List<Event> events = eventsRepository.findByIds(ids);
+        return events.stream().map(EventMapper::toDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public EventDto createEvent(EventDto eventDto) {
         Event event = EventMapper.toEntity(eventDto);
-        event.setId(null);
         Event createdEvent = eventsRepository.save(event);
-        return createdEvent.getId().toString();
+        return EventMapper.toDto(createdEvent);
     }
 
     @Override
@@ -278,7 +283,7 @@ public class EventsService implements IEventsService {
                 else {
                     eventBrand = new EventBrand();
                     eventBrand.setEvent(event);
-                    eventBrand.setBrand(brand);
+                    eventBrand.setBrand_id(brandId);
                     eventBrand.setActiveStatus(EventIntermediateTableStatus.ACTIVE);
                     eventBrandRepository.save(eventBrand);
                 }
@@ -311,7 +316,7 @@ public class EventsService implements IEventsService {
                     else {
                         eventBrand = new EventBrand();
                         eventBrand.setEvent(event);
-                        eventBrand.setBrand(_brandEntity);
+                        eventBrand.setBrand_id(_brandEntity.getId());
                         eventBrand.setActiveStatus(EventIntermediateTableStatus.ACTIVE);
                         eventBrandRepository.save(eventBrand);
                     }
@@ -492,7 +497,7 @@ public class EventsService implements IEventsService {
                 else {
                     eventGame = new EventGame();
                     eventGame.setEvent(event);
-                    eventGame.setGame(game);
+                    eventGame.setGame_id(gameId_startTime.getGameId());
                     eventGame.setActiveStatus(EventIntermediateTableStatus.ACTIVE);
                     eventGame.setStartTime(gameId_startTime.getStartTime());
                     eventGameRepository.save(eventGame);
@@ -543,8 +548,13 @@ public class EventsService implements IEventsService {
         List<ItemId_Quantity>       listItemIdQuantity              = new ArrayList<>();
         String                      regexSplitStringLocalDateTime   = "T";
         Integer                     sumNumberOfVoucher              = 0;
+        EventDto                    eventDto                        = new EventDto();
         String                      eventId                         = null;
-        if (existEvent != null)     eventId                         = this.createEvent(existEvent);
+        if (existEvent != null)
+        {
+                                    eventDto                        = this.createEvent(existEvent);
+                                    eventId                         = eventDto.getId();
+        }
         List<BrandDto>              brands;
 
         if (eventId == null) {
@@ -625,14 +635,15 @@ public class EventsService implements IEventsService {
                             gameId_StartTime.getStartTime().toString(),
                             gameId_StartTime.getStartTime().plusMinutes(30).toString()
                         );
-                
+                        
+                        log.info("EventSessionInfo: " + eventSessionInfo.toString());
                         kafkaTemplateEventSessionInfo.send("event-session", eventSessionInfo);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
-                // wair for session response
+                // wait for session response
                 // Send notification to related brands
                 try {
                     // get list of brandIds from brands
@@ -658,5 +669,38 @@ public class EventsService implements IEventsService {
 
         ResponseDto res = new ResponseDto(HttpStatus.CREATED, "Event created successfully.");
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
+    }
+
+    @Override
+    public boolean updateEventVoucher(String eventId, String voucherId, int additionalQuantity)
+    {
+        try {
+            Event event = eventsRepository.findById(eventId).orElseThrow(
+                    () -> new NotFoundException("Event", "id", eventId)
+            );
+
+            Voucher voucher = voucherRepository.findById(voucherId).orElseThrow(
+                    () -> new NotFoundException("Voucher", "id", voucherId)
+            );
+
+            EventVoucher eventVoucher = eventVoucherRepository.findByEventAndVoucher(eventId, voucherId);
+            if (eventVoucher != null) {
+                eventVoucher.setNumberOfVoucher(Math.max(0, eventVoucher.getNumberOfVoucher() + additionalQuantity));
+                eventVoucherRepository.save(eventVoucher);
+            }
+            else {
+                eventVoucher = new EventVoucher();
+                eventVoucher.setEvent(event);
+                eventVoucher.setVoucher(voucher);
+                eventVoucher.setActiveStatus(EventIntermediateTableStatus.ACTIVE);
+                eventVoucher.setNumberOfVoucher(Math.max(0, additionalQuantity));
+                eventVoucherRepository.save(eventVoucher);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
     }
 }

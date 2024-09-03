@@ -13,7 +13,7 @@ import java.io.Serializable;
 public class EventBrandId implements Serializable {
     private Event event;
 
-    private Brand brand;
+    private String brand_id;
 
     // equals() and hashCode()
 }

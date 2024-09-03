@@ -10,12 +10,12 @@ import com.vou.events.dto.AddBrandsRequestDto;
 import com.vou.events.dto.AddGamesRequestDto;
 import com.vou.events.dto.AddItemsRequestDto;
 import com.vou.events.dto.AddVouchersRequestDto;
-import com.vou.events.dto.BrandWithEventActiveStatusDto;
 import com.vou.events.dto.EventDto;
 import com.vou.events.dto.EventId_GameIdsDto;
 import com.vou.events.dto.EventId_ItemIdsDto;
 import com.vou.events.dto.EventId_VoucherIdsDto;
 import com.vou.events.dto.EventRegistrationInfoDto;
+import com.vou.events.dto.EventVoucherAndAdditionQuantityDto;
 import com.vou.events.dto.EventWithBrandActiveStatusDto;
 import com.vou.events.dto.GameDto;
 import com.vou.events.dto.ReturnGameDto;
@@ -61,6 +61,12 @@ public class EventsController {
         return ResponseEntity.ok(eventDto);
     }
 
+    @GetMapping("/ids")
+    public ResponseEntity<List<EventDto>> getEventsByIds(@PathVariable List<String> ids) {
+        List<EventDto> eventDtos = eventService.fetchEventsByIds(ids);
+        return ResponseEntity.ok(eventDtos);
+    }
+
     @GetMapping("/games/event/{eventId}")
     public ResponseEntity<List<ReturnGameDto>> getGamesByEvent(@PathVariable String eventId) {
         List<ReturnGameDto> gameDtos = eventService.fetchGamesByEvent(eventId);
@@ -74,10 +80,9 @@ public class EventsController {
     }
 
     @PostMapping
-    public ResponseEntity<ResponseDto> createEvent(@RequestBody EventDto eventDto) {
-        eventService.createEvent(eventDto);
-        ResponseDto res = new ResponseDto(HttpStatus.CREATED, "Event created successfully.");
-        return ResponseEntity.status(HttpStatus.CREATED).body(res);
+    public ResponseEntity<EventDto> createEvent(@RequestBody EventDto eventDto) {
+        EventDto createdEvent = eventService.createEvent(eventDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdEvent);
     }
 
     @PostMapping("/create")
@@ -170,6 +175,14 @@ public class EventsController {
     public ResponseEntity<ResponseDto> removeGamesFromEvent(@RequestBody EventId_GameIdsDto eventId_GameIds) {
         eventService.removeGamesFromEvent(eventId_GameIds.getEventId(), eventId_GameIds.getGameIds());
         ResponseDto res = new ResponseDto(HttpStatus.OK, "Games removed from event successfully.");
+        return ResponseEntity.status(HttpStatus.OK).body(res);
+    }
+
+    // update events_vouchers table
+    @PutMapping("/events_vouchers")
+    public ResponseEntity<ResponseDto> addQuantityToEventVoucher(@RequestBody EventVoucherAndAdditionQuantityDto eventVoucherAndAdditionQuantityDto) {
+        eventService.updateEventVoucher(eventVoucherAndAdditionQuantityDto.getEventId(), eventVoucherAndAdditionQuantityDto.getVoucherId(), eventVoucherAndAdditionQuantityDto.getAdditionalQuantity());
+        ResponseDto res = new ResponseDto(HttpStatus.OK, "Event voucher updated successfully.");
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 }

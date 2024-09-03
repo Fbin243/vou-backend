@@ -17,7 +17,7 @@ public class VoucherMapper {
 
         VoucherDto voucherDto = new VoucherDto();
         voucherDto.setId(voucher.getId());
-        voucherDto.setBrand(BrandMapper.toDto(voucher.getBrand()));
+        voucherDto.setBrand_id(voucher.getBrand_id());
         voucherDto.setVoucherCode(voucher.getVoucherCode());
         voucherDto.setQrCode(voucher.getQrCode());
         voucherDto.setImage(voucher.getImage());
@@ -40,7 +40,7 @@ public class VoucherMapper {
 
         Voucher voucher = new Voucher();
         voucher.setId(dto.getId());
-        voucher.setBrand(BrandMapper.toEntity(dto.getBrand()));
+        voucher.setBrand_id(dto.getBrand_id());
         voucher.setVoucherCode(dto.getVoucherCode());
         voucher.setQrCode(dto.getQrCode());
         voucher.setImage(dto.getImage());

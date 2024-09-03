@@ -32,4 +32,14 @@ public class VoucherRepositoryImpl implements VoucherRepositoryCustom {
         query.setParameter("brandIds", brandIds);
         return query.getResultList();
     }
+
+    @Override
+    public List<Voucher> findByIds(List<String> ids) {
+        TypedQuery<Voucher> query = entityManager.createQuery(
+                "SELECT v FROM Voucher v WHERE v.id IN :ids",
+                Voucher.class
+        );
+        query.setParameter("ids", ids);
+        return query.getResultList();
+    }
 }

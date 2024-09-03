@@ -68,4 +68,9 @@ public class PlayerServiceImpl implements PlayerService {
     public Player findByEmail(String email) {
         return playerRepository.findByEmail(email);
     }
+
+    @Override
+    public List<Player> findManyPlayersByManyIds(List<String> theIds) {
+        return playerRepository.findManyPlayersByManyIds(theIds);
+    }
 }
