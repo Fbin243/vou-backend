@@ -24,7 +24,7 @@ public class VoucherUsedTransactionStrategy implements TransactionStrategy {
             VoucherUsedTransaction voucherUsedTransaction = (VoucherUsedTransaction) transaction;
 
             // update player's voucher
-            playerVoucherService.addPlayerVoucher(new PlayerVoucherDto(voucherUsedTransaction.getPlayerId(), voucherUsedTransaction.getVoucherId(), voucherUsedTransaction.getQuantity() * -1));
+            playerVoucherService.addPlayerVoucher(new PlayerVoucherDto(voucherUsedTransaction.getPlayerId(), voucherUsedTransaction.getArtifactId(), voucherUsedTransaction.getQuantity() * -1));
 
             // save voucher used transaction
             saveTransaction(voucherUsedTransaction);

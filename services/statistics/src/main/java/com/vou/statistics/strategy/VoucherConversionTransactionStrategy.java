@@ -39,7 +39,7 @@ public class VoucherConversionTransactionStrategy implements TransactionStrategy
             }
 
             // enough conditions to trade items for voucher
-            playerVoucherService.addPlayerVoucher(new PlayerVoucherDto(voucherItemsConversionTransaction.getPlayerId(), voucherItemsConversionTransaction.getVoucherId(), voucherItemsConversionTransaction.getQuantity()));
+            playerVoucherService.addPlayerVoucher(new PlayerVoucherDto(voucherItemsConversionTransaction.getPlayerId(), voucherItemsConversionTransaction.getArtifactId(), voucherItemsConversionTransaction.getQuantity()));
             for (ItemId_Quantity item_quantity : voucherItemsConversionTransaction.getItems()) {
                 playerItemService.addPlayerItem(new PlayerItemDto(voucherItemsConversionTransaction.getPlayerId(), item_quantity.getItemId(), items_quantities.get(item_quantity.getItemId()) * voucherItemsConversionTransaction.getQuantity() * -1));
             }
@@ -48,7 +48,7 @@ public class VoucherConversionTransactionStrategy implements TransactionStrategy
             saveTransaction(voucherItemsConversionTransaction);
 
             // update events_vouchers table
-            eventsServiceClient.addQuantityToEventVoucher(new EventVoucherAndAdditionQuantityDto(voucherItemsConversionTransaction.getEventId(), voucherItemsConversionTransaction.getVoucherId(), voucherItemsConversionTransaction.getQuantity() * -1));
+            eventsServiceClient.addQuantityToEventVoucher(new EventVoucherAndAdditionQuantityDto(voucherItemsConversionTransaction.getEventId(), voucherItemsConversionTransaction.getArtifactId(), voucherItemsConversionTransaction.getQuantity() * -1));
 
         }
         catch (Exception e) {
