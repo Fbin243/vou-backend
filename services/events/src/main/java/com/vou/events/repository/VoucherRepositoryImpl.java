@@ -16,7 +16,7 @@ public class VoucherRepositoryImpl implements VoucherRepositoryCustom {
     @Override
     public List<Voucher> findByBrand(String brandId) {
         TypedQuery<Voucher> query = entityManager.createQuery(
-                "SELECT v FROM Voucher v WHERE v.brand.id = :brandId",
+                "SELECT v FROM Voucher v WHERE v.brand_id = :brandId",
                 Voucher.class
         );
         query.setParameter("brandId", brandId);
@@ -26,7 +26,7 @@ public class VoucherRepositoryImpl implements VoucherRepositoryCustom {
     @Override
     public List<Voucher> findByBrands(List<String> brandIds) {
         TypedQuery<Voucher> query = entityManager.createQuery(
-                "SELECT v FROM Voucher v WHERE v.brand.id IN :brandIds",
+                "SELECT v FROM Voucher v WHERE v.brand_id IN :brandIds",
                 Voucher.class
         );
         query.setParameter("brandIds", brandIds);

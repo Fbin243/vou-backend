@@ -16,7 +16,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     @Override
     public List<Item> findByBrand(String brandId) {
         TypedQuery<Item> query = entityManager.createQuery(
-                "SELECT i FROM Item i WHERE i.brand.id = :brandId",
+                "SELECT i FROM Item i WHERE i.brand_id = :brandId",
                 Item.class
         );
         query.setParameter("brandId", brandId);
@@ -26,7 +26,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     @Override
     public List<Item> findByBrands(List<String> brandIds) {
         TypedQuery<Item> query = entityManager.createQuery(
-                "SELECT i FROM Item i WHERE i.brand.id IN :brandIds",
+                "SELECT i FROM Item i WHERE i.brand_id IN :brandIds",
                 Item.class
         );
         query.setParameter("brandIds", brandIds);
