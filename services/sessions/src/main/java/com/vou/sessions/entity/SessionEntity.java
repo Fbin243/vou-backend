@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Document(collection = "sessions")
@@ -19,6 +20,9 @@ public class SessionEntity {
 	
 	@Field(value = "game_id")
 	private String gameId;
+	
+	@Field(value = "date")
+	private LocalDate date;
 	
 	@Field(value = "users")
 	private List<RecordEntity> users;

@@ -1,16 +1,13 @@
 package com.vou.sessions.engine.quizgame;
 
-import com.amazonaws.services.polly.model.OutputFormat;
 import com.vou.pkg.exception.NotFoundException;
+import com.vou.sessions.client.HQTriviaFeignClient;
 import com.vou.sessions.dto.RecordDto;
-import com.vou.sessions.dto.quizgame.QuizRecordDto;
-import com.vou.sessions.engine.Record;
-import com.vou.sessions.entity.SessionEntity;
 import com.vou.sessions.engine.GameEngine;
+import com.vou.sessions.entity.SessionEntity;
 import com.vou.sessions.entity.quizgame.QuizRecordEntity;
 import com.vou.sessions.mapper.RecordMapper;
 import com.vou.sessions.repository.SessionsRepository;
-import com.vou.sessions.client.HQTriviaFeignClient;
 import com.vou.sessions.texttospeech.AmazonPollyService;
 import com.vou.sessions.utils.Utils;
 import jakarta.annotation.PostConstruct;
@@ -19,7 +16,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.io.InputStream;
 import java.util.*;
 
 @Primary
@@ -56,28 +52,28 @@ public class QuizGameEngine extends GameEngine {
 		}
 		
 		// Step 1: Fetch data from OpenTrivia
-		QuizResponse quizResponse = hqTriviaFeignClient.getQuestions(3);
-		shuffleCorrectAnswer(quizResponse);
-		
-		// Step 2: Generate audio files from questions by Amazon Polly and save it to
-		// AWS S3
-		List<QuizQuestion> quizQuestions = quizResponse.getResults();
-		for (int i = 0; i < quizQuestions.size(); i++) {
-			String ssmlString = amazonPollyService.convertQuizQuestionToSSML(quizQuestions.get(i), i + 1);
-			try (InputStream inputStream = amazonPollyService.synthesize(ssmlString, OutputFormat.Mp3)) {
-				String key = String.format("questions/%s/%d.mp3", sessionId, i + 1);
-				log.info("S3key: {}", key);
-				String url = amazonPollyService.uploadToS3(inputStream, key);
-				log.info("S3url: {}", url);
-				quizQuestions.get(i).setAudioUrl(url);
-			} catch (Exception e) {
-				e.printStackTrace();
-				throw new RuntimeException("Failed to set up quiz game");
-			}
-		}
-		
-		// Step 3: Save quiz response to Redis and MongoDB
-		hashOps.put(sessionId, QUIZ_RESPONSE_KEY, quizResponse);
+//		QuizResponse quizResponse = hqTriviaFeignClient.getQuestions(3);
+//		shuffleCorrectAnswer(quizResponse);
+//
+//		// Step 2: Generate audio files from questions by Amazon Polly and save it to
+//		// AWS S3
+//		List<QuizQuestion> quizQuestions = quizResponse.getResults();
+//		for (int i = 0; i < quizQuestions.size(); i++) {
+//			String ssmlString = amazonPollyService.convertQuizQuestionToSSML(quizQuestions.get(i), i + 1);
+//			try (InputStream inputStream = amazonPollyService.synthesize(ssmlString, OutputFormat.Mp3)) {
+//				String key = String.format("questions/%s/%d.mp3", sessionId, i + 1);
+//				log.info("S3key: {}", key);
+//				String url = amazonPollyService.uploadToS3(inputStream, key);
+//				log.info("S3url: {}", url);
+//				quizQuestions.get(i).setAudioUrl(url);
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//				throw new RuntimeException("Failed to set up quiz game");
+//			}
+//		}
+//
+//		// Step 3: Save quiz response to Redis and MongoDB
+//		hashOps.put(sessionId, QUIZ_RESPONSE_KEY, quizResponse);
 	}
 	
 	@Override
@@ -123,19 +119,7 @@ public class QuizGameEngine extends GameEngine {
 	
 	@Override
 	public void updateTotalTime(String sessionId, String playerId) {
-		QuizRecord quizRecord = getQuizRecord(sessionId, playerId).orElseThrow(
-			() -> new NotFoundException("Player record", "sessionId, playerId",
-				String.format("%s, %s", sessionId, playerId)));
-		if (quizRecord == null) {
-			log.info("Update totalTime failed");
-		}
-		if (quizRecord.getStartPlayTime() == -1) {
-			return;
-		}
-		
-		quizRecord.setTotalTime(quizRecord.getTotalTime() + Utils.now() - quizRecord.getStartPlayTime());
-		quizRecord.setStartPlayTime(-1); // Means the player is off
-		putQuizRecord(sessionId, playerId, quizRecord);
+	
 	}
 	
 	private Optional<QuizResponse> getQuizResponse(String sessionId, int amount) {
