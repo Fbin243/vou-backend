@@ -149,19 +149,38 @@ public class TransactionController {
     }
     
     // usually one happens at a time
-    @PostMapping("/item_shared/process")
+    @PostMapping("/process")
     public ResponseEntity<Boolean> processTransactions(@RequestBody List<TransactionDto> transactionDtos) {
-        List<? extends Transaction> transactions = transactionDtos.stream()
+        System.out.println("Processing transactions...");
+        List<Transaction> transactions = transactionDtos.stream()
             .map(TransactionMapper::toEntity)
             .collect(Collectors.toList());
+
+        System.out.println("Transactions: " + transactions);
 
         for (Transaction _transaction : transactions) {
             TransactionContext transactionContext = new TransactionContext();
 
             TransactionFactory transactionFactory = TransactionFactoryCreator.getTransactionFactory(_transaction.getTransactionType());
-            _transaction = transactionFactory.createTransaction(); // not sure
-            transactionContext.setTransactionStrategy(TransactionFactoryCreator.getTransactionStrategy(_transaction.getTransactionType()));
-            if (transactionContext.executeStrategy(_transaction) == false) {
+            if (transactionFactory == null) {
+                // Handle the case where no factory is found
+                return ResponseEntity.ok(false);
+            }
+
+            // _transaction = transactionFactory.createTransaction(); // not sure
+            // transactionContext.setTransactionStrategy(TransactionFactoryCreator.getTransactionStrategy(_transaction.getTransactionType()));
+            // if (transactionContext.executeStrategy(_transaction) == false) {
+            //     return ResponseEntity.ok(false);
+            // }
+            System.out.println("Transaction type: " + _transaction.getTransactionType());
+            // // Create the transaction based on the factory
+            Transaction createdTransaction = transactionFactory.createTransaction(TransactionMapper.toDto(_transaction));  // Pass original transaction or additional data if needed
+            System.out.println("Created transaction: " + createdTransaction);
+            // // Create the transaction based on the factory
+            TransactionStrategy transactionStrategy = TransactionFactoryCreator.getTransactionStrategy(_transaction.getTransactionType());
+            transactionContext.setTransactionStrategy(transactionStrategy);
+
+            if (transactionContext.executeStrategy(createdTransaction) == false) {
                 return ResponseEntity.ok(false);
             }
         }

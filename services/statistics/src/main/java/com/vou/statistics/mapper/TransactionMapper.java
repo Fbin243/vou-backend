@@ -25,7 +25,9 @@ public class TransactionMapper {
             ItemSharedTransaction itemSharedTransaction = (ItemSharedTransaction) transaction;
             ItemSharedTransactionDto dto = new ItemSharedTransactionDto();
             // Copy common fields
-            dto.setId(itemSharedTransaction.getId().toString());
+            if (itemSharedTransaction.getId() != null) {
+                dto.setId(itemSharedTransaction.getId().toString());
+            }
             dto.setPlayerId(itemSharedTransaction.getPlayerId());
             dto.setRecipientId(itemSharedTransaction.getRecipientId());
             dto.setArtifactId(itemSharedTransaction.getArtifactId());
@@ -39,7 +41,9 @@ public class TransactionMapper {
             VoucherUsedTransaction voucherTransaction = (VoucherUsedTransaction) transaction;
             VoucherUsedTransactionDto dto = new VoucherUsedTransactionDto();
             // Copy common fields
-            dto.setId(voucherTransaction.getId().toString());
+            if (voucherTransaction.getId() != null) {
+                dto.setId(voucherTransaction.getId().toString());
+            }
             dto.setPlayerId(voucherTransaction.getPlayerId());
             dto.setRecipientId(voucherTransaction.getRecipientId());
             dto.setArtifactId(voucherTransaction.getArtifactId());
@@ -53,7 +57,9 @@ public class TransactionMapper {
             VoucherConversionTransaction voucherTransaction = (VoucherConversionTransaction) transaction;
             VoucherConversionTransactionDto dto = new VoucherConversionTransactionDto();
             // Copy common fields
-            dto.setId(voucherTransaction.getId().toString());
+            if (voucherTransaction.getId() != null) {
+                dto.setId(voucherTransaction.getId().toString());
+            }
             dto.setPlayerId(voucherTransaction.getPlayerId());
             dto.setRecipientId(voucherTransaction.getRecipientId());
             dto.setArtifactId(voucherTransaction.getArtifactId());
@@ -75,7 +81,9 @@ public class TransactionMapper {
             ItemSharedTransactionDto itemSharedTransactionDto = (ItemSharedTransactionDto) dto;
             ItemSharedTransaction entity = new ItemSharedTransaction();
             // Copy common fields
-            entity.setId(new ObjectId(itemSharedTransactionDto.getId()));
+            if (itemSharedTransactionDto.getId() != null) {
+                entity.setId(new ObjectId(itemSharedTransactionDto.getId()));
+            }
             entity.setPlayerId(itemSharedTransactionDto.getPlayerId());
             entity.setRecipientId(itemSharedTransactionDto.getRecipientId());
             entity.setArtifactId(itemSharedTransactionDto.getArtifactId());
@@ -88,7 +96,9 @@ public class TransactionMapper {
             VoucherUsedTransactionDto voucherTransactionDto = (VoucherUsedTransactionDto) dto;
             VoucherUsedTransaction entity = new VoucherUsedTransaction();
             // Copy common fields
-            entity.setId(new ObjectId(voucherTransactionDto.getId()));
+            if (voucherTransactionDto.getId() != null) {
+                entity.setId(new ObjectId(voucherTransactionDto.getId()));
+            }
             entity.setPlayerId(voucherTransactionDto.getPlayerId());
             entity.setRecipientId(voucherTransactionDto.getRecipientId());
             entity.setArtifactId(voucherTransactionDto.getArtifactId());
@@ -101,7 +111,9 @@ public class TransactionMapper {
             VoucherConversionTransactionDto voucherTransactionDto = (VoucherConversionTransactionDto) dto;
             VoucherConversionTransaction entity = new VoucherConversionTransaction();
             // Copy common fields
-            entity.setId(new ObjectId(voucherTransactionDto.getId()));
+            if (voucherTransactionDto.getId() != null) {
+                entity.setId(new ObjectId(voucherTransactionDto.getId()));
+            }
             entity.setPlayerId(voucherTransactionDto.getPlayerId());
             entity.setRecipientId(voucherTransactionDto.getRecipientId());
             entity.setArtifactId(voucherTransactionDto.getArtifactId());

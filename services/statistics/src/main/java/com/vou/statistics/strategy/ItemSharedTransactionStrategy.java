@@ -20,9 +20,13 @@ public class ItemSharedTransactionStrategy implements TransactionStrategy {
         }
 
         try {
+            System.out.println("ItemSharedTransactionStrategy.processTransaction1");
             playerItemService.addPlayerItem(new PlayerItemDto(transaction.getRecipientId(), transaction.getArtifactId(), transaction.getQuantity()));
+            System.out.println("ItemSharedTransactionStrategy.processTransaction2");
             playerItemService.deletePlayerItem(new PlayerItemDto(transaction.getPlayerId(), transaction.getArtifactId(), transaction.getQuantity()));
+            System.out.println("ItemSharedTransactionStrategy.processTransaction3");
             saveTransaction(transaction);
+            System.out.println("ItemSharedTransactionStrategy.processTransaction4");
         }
         catch (Exception e) {
             e.getStackTrace();

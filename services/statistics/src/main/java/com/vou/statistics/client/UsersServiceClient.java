@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.vou.statistics.dto.PlayerDto;
 
-@FeignClient(name = "users-service", url = "http://users:8081/players")
+@FeignClient(name = "users-service", url = "http://users:8081/users/players")
 public interface UsersServiceClient {
 
     // get Players By Ids
