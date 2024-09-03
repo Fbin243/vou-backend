@@ -17,7 +17,7 @@ public class EventBrandRepositoryImpl implements EventBrandRepositoryCustom {
     @Override
     public EventBrand findByEventAndBrand(String eventId, String brandId) {
         TypedQuery<EventBrand> query = entityManager.createQuery(
-                "SELECT eb FROM EventBrand eb WHERE eb.event.id = :eventId AND eb.brand.id = :brandId",
+                "SELECT eb FROM EventBrand eb WHERE eb.event.id = :eventId AND eb.brand_id = :brandId",
                 EventBrand.class
         );
         query.setParameter("eventId", eventId);
@@ -33,7 +33,7 @@ public class EventBrandRepositoryImpl implements EventBrandRepositoryCustom {
     @Override
     public List<EventBrand> findByBrand(String brandId) {
         TypedQuery<EventBrand> query = entityManager.createQuery(
-                "SELECT eb FROM EventBrand eb WHERE eb.brand.id = :brandId",
+                "SELECT eb FROM EventBrand eb WHERE eb.brand_id = :brandId",
                 EventBrand.class
         );
         query.setParameter("brandId", brandId);
@@ -53,7 +53,7 @@ public class EventBrandRepositoryImpl implements EventBrandRepositoryCustom {
     @Override
     public List<EventBrand> findByBrands(List<String> brandIds) {
         TypedQuery<EventBrand> query = entityManager.createQuery(
-                "SELECT eb FROM EventBrand eb WHERE eb.brand.id IN :brandIds",
+                "SELECT eb FROM EventBrand eb WHERE eb.brand_id IN :brandIds",
                 EventBrand.class
         );
         query.setParameter("brandIds", brandIds);

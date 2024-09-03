@@ -1,10 +1,12 @@
 package com.vou.events.service;
 
+import com.vou.events.dto.BrandDto;
 import com.vou.events.dto.VoucherDto;
 import com.vou.events.entity.*;
 import com.vou.events.mapper.BrandMapper;
 import com.vou.events.mapper.VoucherMapper;
 import com.vou.events.repository.*;
+import com.vou.events.client.UsersServiceClient;
 import com.vou.events.common.EventIntermediateTableStatus;
 import com.vou.events.common.ItemId_Quantity;
 import com.vou.pkg.exception.NotFoundException;
@@ -24,6 +26,7 @@ public class VouchersService implements IVouchersService {
     private final ItemRepository        itemRepository;
     private final VoucherItemRepository voucherItemRepository;
     private final BrandRepository       brandRepository;
+    private final UsersServiceClient    usersServiceClient;
 
     @Override
     public List<VoucherDto> fetchAllVouchers() {
@@ -40,6 +43,12 @@ public class VouchersService implements IVouchersService {
     }
 
     @Override
+    public List<VoucherDto> fetchVouchersByIds(List<String> ids) {
+        List<Voucher> vouchers = voucherRepository.findByIds(ids);
+        return vouchers.stream().map(VoucherMapper::toDto).collect(Collectors.toList());
+    }
+
+    @Override
     public List<VoucherDto> fetchVouchersByBrand(String brandId) {
         List<Voucher> vouchers = voucherRepository.findByBrand(brandId);
         return vouchers.stream().map(VoucherMapper::toDto).collect(Collectors.toList());
@@ -52,19 +61,14 @@ public class VouchersService implements IVouchersService {
     }
 
     @Override
-    public String createVoucher(VoucherDto voucherDto) {
-        if (brandRepository.findById(voucherDto.getBrand().getId()) == null) {
-            brandRepository.save(BrandMapper.toEntity(voucherDto.getBrand()));
-        }
-
-        Brand brand = brandRepository.findById(voucherDto.getBrand().getId())
-                     .orElseGet(() -> brandRepository.save(BrandMapper.toEntity(voucherDto.getBrand())));
+    public VoucherDto createVoucher(VoucherDto voucherDto) {
+        
+        BrandDto brandDto = usersServiceClient.getBrand(voucherDto.getBrand_id());
 
         Voucher voucher = VoucherMapper.toEntity(voucherDto);
-        voucher.setBrand(brand);
-        voucher.setId(null);
-        Voucher createdVoucher = voucherRepository.save(voucher);
-        return createdVoucher.getId().toString();
+        voucher.setBrand_id(brandDto.getId());
+        voucherRepository.save(voucher);
+        return VoucherMapper.toDto(voucher);
     }
 
     @Override

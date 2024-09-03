@@ -26,10 +26,14 @@ public class EventBrand implements Serializable {
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
+    // @Id
+    // @ManyToOne(cascade = CascadeType.MERGE)
+    // @JoinColumn(name = "brand_id", nullable = false)
+    // private Brand brand;
+
     @Id
-    @ManyToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "brand_id", nullable = false)
-    private Brand brand;
+    @Column(name = "brand_id", nullable = false)
+    private String brand_id;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "active_status")

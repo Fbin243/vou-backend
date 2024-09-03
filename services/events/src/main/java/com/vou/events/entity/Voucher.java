@@ -24,9 +24,12 @@ public class Voucher extends Base {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @ManyToOne
-    @JoinColumn(name = "brand_id", nullable = false)
-    private Brand brand;
+    // @ManyToOne
+    // @JoinColumn(name = "brand_id", nullable = false)
+    // private Brand brand;
+
+    @Column(name = "brand_id")
+    private String brand_id;
 
     @Column(name = "voucher_code")
     private String voucherCode;

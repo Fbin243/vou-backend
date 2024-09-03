@@ -19,7 +19,7 @@ public class EventGameRepositoryImpl implements EventGameRepositoryCustom {
     @Override
     public EventGame findByEventAndGame(String eventId, Long gameId) {
         TypedQuery<EventGame> query = entityManager.createQuery(
-                "SELECT eg FROM EventGame eg WHERE eg.event.id = :eventId AND eg.game.id = :gameId",
+                "SELECT eg FROM EventGame eg WHERE eg.event.id = :eventId AND eg.game_id = :gameId",
                 EventGame.class
         );
         query.setParameter("eventId", eventId);

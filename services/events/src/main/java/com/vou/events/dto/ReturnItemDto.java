@@ -14,7 +14,7 @@ import lombok.Setter;
 public class ReturnItemDto {
     private String id;
 
-    private BrandDto brand;
+    private String brand_id;
 
     private String name;
 

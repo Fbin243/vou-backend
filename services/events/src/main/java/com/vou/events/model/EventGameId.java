@@ -13,7 +13,7 @@ import java.io.Serializable;
 public class EventGameId implements Serializable {
     private Event event;
 
-    private Game game;
+    private Long game_id;
 
     // equals() and hashCode()
 }

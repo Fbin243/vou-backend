@@ -11,4 +11,5 @@ public interface PlayerService {
     void deletePlayerById(String theId);
     Player findPlayerByPhoneNumber(String phoneNumber);
     Player findByEmail(String email);
+    List<Player> findManyPlayersByManyIds(List<String> ids);
 }
