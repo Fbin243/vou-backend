@@ -5,6 +5,7 @@ import static com.vou.statistics.common.Constants.TRANSACTION_TYPE_VOUCHER_USED;
 import com.vou.statistics.dto.PlayerVoucherDto;
 import com.vou.statistics.entity.VoucherUsedTransaction;
 import com.vou.statistics.model.Transaction;
+import com.vou.statistics.service.PlayerItemService;
 import com.vou.statistics.service.PlayerVoucherService;
 
 import com.vou.statistics.repository.VoucherUsedTransactionRepository;
@@ -15,7 +16,7 @@ public class VoucherUsedTransactionStrategy implements TransactionStrategy {
     private VoucherUsedTransactionRepository    voucherUsedTransactionRepository;
 
     @Override
-    public boolean processTransaction(Transaction transaction) {
+    public boolean processTransaction(Transaction transaction, PlayerVoucherService playerVoucherService, PlayerItemService playerItemService) {
         if (!transaction.getTransactionType().equalsIgnoreCase(TRANSACTION_TYPE_VOUCHER_USED)) {
             throw new IllegalArgumentException("Invalid transaction type for VoucherUsedTransactionStrategy");
         }

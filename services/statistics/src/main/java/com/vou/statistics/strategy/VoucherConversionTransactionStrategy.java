@@ -23,7 +23,7 @@ public class VoucherConversionTransactionStrategy implements TransactionStrategy
     private VoucherConversionTransactionRepository      voucherConversionTransactionRepository;
 
     @Override
-    public boolean processTransaction(Transaction transaction) {
+    public boolean processTransaction(Transaction transaction, PlayerVoucherService playerVoucherService, PlayerItemService playerItemService) {
         if (!transaction.getTransactionType().equalsIgnoreCase(TRANSACTION_TYPE_VOUCHER_CONVERSION)) {
             throw new IllegalArgumentException("Invalid transaction type for VoucherConversionTransactionStrategy");
         }

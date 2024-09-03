@@ -24,6 +24,8 @@ import com.vou.statistics.entity.VoucherConversionTransaction;
 import com.vou.statistics.entity.VoucherUsedTransaction;
 import com.vou.statistics.factory.TransactionFactory;
 import com.vou.statistics.mapper.TransactionMapper;
+import com.vou.statistics.service.PlayerItemService;
+import com.vou.statistics.service.PlayerVoucherService;
 // import com.vou.statistics.mapper.TransactionMapper;
 import com.vou.statistics.service.TransactionService;
 import com.vou.statistics.strategy.ItemSharedTransactionStrategy;
@@ -36,14 +38,16 @@ public class TransactionController {
     private TransactionService<ItemSharedTransaction>           itemSharedTransactionService;
     private TransactionService<VoucherUsedTransaction>          voucherUsedTransactionService;
     private TransactionService<VoucherConversionTransaction>    voucherConversionTransactionService;
+    private PlayerVoucherService                                playerVoucherService;
+    private PlayerItemService                                   playerItemService;
 
     @Autowired
-    public TransactionController(TransactionService<ItemSharedTransaction> itemSharedTransactionService,
-                                 TransactionService<VoucherUsedTransaction> voucherUsedTransactionService,
-                                 TransactionService<VoucherConversionTransaction> voucherConversionTransactionService) {
+    public TransactionController(TransactionService<ItemSharedTransaction> itemSharedTransactionService, TransactionService<VoucherUsedTransaction> voucherUsedTransactionService, TransactionService<VoucherConversionTransaction> voucherConversionTransactionService, PlayerVoucherService playerVoucherService, PlayerItemService playerItemService) {
         this.itemSharedTransactionService = itemSharedTransactionService;
         this.voucherUsedTransactionService = voucherUsedTransactionService;
         this.voucherConversionTransactionService = voucherConversionTransactionService;
+        this.playerVoucherService = playerVoucherService;
+        this.playerItemService = playerItemService;
     }
 
     @GetMapping("/item_shared")
@@ -180,7 +184,7 @@ public class TransactionController {
             TransactionStrategy transactionStrategy = TransactionFactoryCreator.getTransactionStrategy(_transaction.getTransactionType());
             transactionContext.setTransactionStrategy(transactionStrategy);
 
-            if (transactionContext.executeStrategy(createdTransaction) == false) {
+            if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService) == false) {
                 return ResponseEntity.ok(false);
             }
         }

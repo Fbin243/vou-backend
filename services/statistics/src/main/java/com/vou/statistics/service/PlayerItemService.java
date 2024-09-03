@@ -20,20 +20,30 @@ import com.vou.statistics.dto.PlayerItemDto;
 import com.vou.statistics.dto.Player_ItemQuantitiesDto;
 import com.vou.statistics.entity.PlayerItem;
 import com.vou.statistics.repository.PlayerItemRepository;
+import com.vou.statistics.strategy.ItemSharedTransactionStrategy;
 
 @Service
 @NoArgsConstructor
 //@AllArgsConstructor
 public class PlayerItemService implements IPlayerItemService {
     
-    // @Autowired
+    @Autowired
     private PlayerItemRepository        playerItemRepository;
+
+    @Autowired
     private UsersServiceClient          usersServiceClient;
+
+    @Autowired
     private EventsServiceClient         eventsServiceClient;
+
+    @Autowired
+    public PlayerItemService(PlayerItemRepository playerItemRepository) {
+        this.playerItemRepository = playerItemRepository;
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(PlayerItemService.class);
 
-    @Autowired
+    // @Autowired
     public PlayerItemService(PlayerItemRepository playerItemRepository, UsersServiceClient usersServiceClient, EventsServiceClient eventsServiceClient) {
         this.playerItemRepository = playerItemRepository;
         this.usersServiceClient = usersServiceClient;
@@ -66,8 +76,13 @@ public class PlayerItemService implements IPlayerItemService {
 
     @Override
     public PlayerItem addPlayerItem(PlayerItemDto dto) {
+        System.out.println("PlayerItemService.addPlayerItem1 " + playerItemRepository);
+        System.out.println("PlayerItemService.addPlayerItem2-5 " + dto);
+        System.out.println("PlayerItemService.addPlayerItem2-6 " + playerItemRepository.findByPlayerIdAndItemId(dto.getPlayerId(), dto.getItemId()));
+        // playerItemRepository = new PlayerItemRepository();
         Optional<PlayerItem> existingPlayerItem = playerItemRepository.findByPlayerIdAndItemId(dto.getPlayerId(), dto.getItemId());
-
+        System.out.println("PlayerItemService.addPlayerItem2 " + existingPlayerItem);
+        // System.out.println("PlayerItemService.addPlayerItem1 " + playerItemRepository);
         if (existingPlayerItem.isPresent()) {
             // If the record exists, update the quantity
             PlayerItem playerItem = existingPlayerItem.get();
