@@ -19,6 +19,7 @@ import com.vou.statistics.dto.PlayerItemsDto;
 import com.vou.statistics.dto.PlayerVouchersDto;
 import com.vou.statistics.dto.Player_ItemQuantitiesDto;
 import com.vou.statistics.dto.Player_VoucherQuantitiesDto;
+import com.vou.statistics.dto.ReturnItemDto;
 import com.vou.statistics.dto.VoucherDto;
 import com.vou.statistics.entity.PlayerItem;
 import com.vou.statistics.entity.PlayerVoucher;
@@ -59,7 +60,7 @@ public class StatisticsController {
     }
     
     @GetMapping("/player_item/player/{playerId}")
-    public ResponseEntity<List<ItemDto>> getItemsByPlayer(@PathVariable String playerId) {
+    public ResponseEntity<List<ReturnItemDto>> getItemsByPlayer(@PathVariable String playerId) {
         return ResponseEntity.ok(playerItemService.getItemsByPlayer(playerId));
     }
 

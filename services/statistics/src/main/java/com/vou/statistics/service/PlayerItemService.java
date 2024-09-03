@@ -1,5 +1,6 @@
 package com.vou.statistics.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,6 +19,7 @@ import com.vou.statistics.dto.ItemDto;
 import com.vou.statistics.dto.PlayerDto;
 import com.vou.statistics.dto.PlayerItemDto;
 import com.vou.statistics.dto.Player_ItemQuantitiesDto;
+import com.vou.statistics.dto.ReturnItemDto;
 import com.vou.statistics.entity.PlayerItem;
 import com.vou.statistics.repository.PlayerItemRepository;
 import com.vou.statistics.strategy.ItemSharedTransactionStrategy;
@@ -61,10 +63,17 @@ public class PlayerItemService implements IPlayerItemService {
     }
 
     @Override
-    public List<ItemDto> getItemsByPlayer(String playerId) {
+    public List<ReturnItemDto> getItemsByPlayer(String playerId) {
         List<PlayerItem> playerItems = playerItemRepository.findByPlayerId(playerId);
         List<ItemDto> items = eventsServiceClient.getItemsByIds(playerItems.stream().map(PlayerItem::getItemId).collect(Collectors.toList()));
-        return items;
+        
+        List<ReturnItemDto> returnItemDtos = new ArrayList<>();
+
+        for (ItemDto item : items) {
+            returnItemDtos.add(new ReturnItemDto(item, playerItems.stream().filter(playerItem -> playerItem.getItemId().equals(item.getId())).findFirst().get().getQuantity()));
+        }
+
+        return returnItemDtos;
     }
 
     @Override
@@ -76,13 +85,8 @@ public class PlayerItemService implements IPlayerItemService {
 
     @Override
     public PlayerItem addPlayerItem(PlayerItemDto dto) {
-        System.out.println("PlayerItemService.addPlayerItem1 " + playerItemRepository);
-        System.out.println("PlayerItemService.addPlayerItem2-5 " + dto);
-        System.out.println("PlayerItemService.addPlayerItem2-6 " + playerItemRepository.findByPlayerIdAndItemId(dto.getPlayerId(), dto.getItemId()));
         // playerItemRepository = new PlayerItemRepository();
         Optional<PlayerItem> existingPlayerItem = playerItemRepository.findByPlayerIdAndItemId(dto.getPlayerId(), dto.getItemId());
-        System.out.println("PlayerItemService.addPlayerItem2 " + existingPlayerItem);
-        // System.out.println("PlayerItemService.addPlayerItem1 " + playerItemRepository);
         if (existingPlayerItem.isPresent()) {
             // If the record exists, update the quantity
             PlayerItem playerItem = existingPlayerItem.get();

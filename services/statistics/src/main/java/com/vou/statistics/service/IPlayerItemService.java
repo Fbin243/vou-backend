@@ -7,6 +7,7 @@ import com.vou.statistics.dto.PlayerDto;
 import com.vou.statistics.dto.PlayerItemDto;
 import com.vou.statistics.dto.PlayerItemsDto;
 import com.vou.statistics.dto.Player_ItemQuantitiesDto;
+import com.vou.statistics.dto.ReturnItemDto;
 import com.vou.statistics.entity.PlayerItem;
 
 /**
@@ -41,7 +42,7 @@ public interface IPlayerItemService {
      * @param itemId the item id
      * @return the player item
      */
-    default List<ItemDto> getItemsByPlayer(String playerId) {
+    default List<ReturnItemDto> getItemsByPlayer(String playerId) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 

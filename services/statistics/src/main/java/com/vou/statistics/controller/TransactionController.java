@@ -20,6 +20,7 @@ import com.vou.statistics.creator.TransactionFactoryCreator;
 import com.vou.statistics.dto.TransactionDto;
 import com.vou.statistics.dto.VoucherItemsConversionInfo;
 import com.vou.statistics.entity.ItemSharedTransaction;
+import com.vou.statistics.entity.ItemReceivedTransaction;
 import com.vou.statistics.entity.VoucherConversionTransaction;
 import com.vou.statistics.entity.VoucherUsedTransaction;
 import com.vou.statistics.factory.TransactionFactory;
@@ -36,6 +37,7 @@ import com.vou.statistics.strategy.TransactionStrategy;
 public class TransactionController {
     
     private TransactionService<ItemSharedTransaction>           itemSharedTransactionService;
+    private TransactionService<ItemReceivedTransaction>         itemReceivedTransactionService;
     private TransactionService<VoucherUsedTransaction>          voucherUsedTransactionService;
     private TransactionService<VoucherConversionTransaction>    voucherConversionTransactionService;
     private PlayerVoucherService                                playerVoucherService;
@@ -55,6 +57,11 @@ public class TransactionController {
         return ResponseEntity.ok(itemSharedTransactionService.getAllTransactions());
     }
 
+    @GetMapping("/item_received")
+    public ResponseEntity<List<ItemReceivedTransaction>> getAllItemReceivedTransactions() {
+        return ResponseEntity.ok(itemReceivedTransactionService.getAllTransactions());
+    }
+
     @GetMapping("/voucher_used")
     public ResponseEntity<List<VoucherUsedTransaction>> getAllVoucherUsedTransactions() {
         return ResponseEntity.ok(voucherUsedTransactionService.getAllTransactions());
@@ -72,6 +79,15 @@ public class TransactionController {
         }
 
         return ResponseEntity.ok(itemSharedTransactionService.getTransactionById(new ObjectId(id)));
+    }
+
+    @GetMapping("/item_received/{id}")
+    public ResponseEntity<ItemReceivedTransaction> getItemReceivedTransactionById(@PathVariable String id) {
+        if (id.length() != 24) {
+            return ResponseEntity.badRequest().body(null); // Or return a custom error message
+        }
+
+        return ResponseEntity.ok(itemReceivedTransactionService.getTransactionById(new ObjectId(id)));
     }
 
     @GetMapping("/voucher_used/{id}")
@@ -112,6 +128,11 @@ public class TransactionController {
         return ResponseEntity.ok(itemSharedTransactionService.getTransactionsByRecipient(recipientId));
     }
 
+    @GetMapping("/item_received/recipient/{recipientId}")
+    public ResponseEntity<List<ItemReceivedTransaction>> getItemReceivedTransactionsByRecipient(@PathVariable String recipientId) {
+        return ResponseEntity.ok(itemReceivedTransactionService.getTransactionsByRecipient(recipientId));
+    }
+
     @GetMapping("/voucher_used/recipient/{recipientId}")
     public ResponseEntity<List<VoucherUsedTransaction>> getVoucherUsedTransactionsByRecipient(@PathVariable String recipientId) {
         return ResponseEntity.ok(voucherUsedTransactionService.getTransactionsByRecipient(recipientId));
@@ -140,6 +161,11 @@ public class TransactionController {
     @GetMapping("/item_shared/artifact/{artifactId}")
     public ResponseEntity<List<ItemSharedTransaction>> getTransactionsByArtifact(@PathVariable String artifactId) {
         return ResponseEntity.ok(itemSharedTransactionService.getTransactionsByArtifact(artifactId));
+    }
+
+    @GetMapping("/item_received/artifact/{artifactId}")
+    public ResponseEntity<List<ItemReceivedTransaction>> getItemReceivedTransactionsByArtifact(@PathVariable String artifactId) {
+        return ResponseEntity.ok(itemReceivedTransactionService.getTransactionsByArtifact(artifactId));
     }
 
     @GetMapping("/voucher_used/artifact/{artifactId}")

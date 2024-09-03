@@ -37,14 +37,9 @@ public class ItemSharedTransactionStrategy implements TransactionStrategy {
         }
 
         try {
-            // playerItemService = new PlayerItemService();
-            System.out.println("ItemSharedTransactionStrategy.processTransaction1 " + playerItemService);
             playerItemService.addPlayerItem(new PlayerItemDto(transaction.getRecipientId(), transaction.getArtifactId(), transaction.getQuantity()));
-            System.out.println("ItemSharedTransactionStrategy.processTransaction2");
             playerItemService.deletePlayerItem(new PlayerItemDto(transaction.getPlayerId(), transaction.getArtifactId(), transaction.getQuantity()));
-            System.out.println("ItemSharedTransactionStrategy.processTransaction3");
             saveTransaction(transaction);
-            System.out.println("ItemSharedTransactionStrategy.processTransaction4");
         }
         catch (Exception e) {
             e.getStackTrace();
@@ -61,7 +56,6 @@ public class ItemSharedTransactionStrategy implements TransactionStrategy {
         }
 
         try {
-            // itemSharedTransactionRepository = new ItemSharedTransactionRepository();
             ItemSharedTransaction itemSharedTransaction = (ItemSharedTransaction) transaction;
             itemSharedTransactionRepository.save(itemSharedTransaction);
         }

@@ -1,16 +1,19 @@
 package com.vou.statistics.mapper;
 
 import static com.vou.statistics.common.Constants.TRANSACTION_TYPE_ITEM_SHARED;
+import static com.vou.statistics.common.Constants.TRANSACTION_TYPE_ITEM_RECEIVED;
 import static com.vou.statistics.common.Constants.TRANSACTION_TYPE_VOUCHER_CONVERSION;
 import static com.vou.statistics.common.Constants.TRANSACTION_TYPE_VOUCHER_USED;
 
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
+import com.vou.statistics.dto.ItemReceivedTransactionDto;
 import com.vou.statistics.dto.ItemSharedTransactionDto;
 import com.vou.statistics.dto.TransactionDto;
 import com.vou.statistics.dto.VoucherConversionTransactionDto;
 import com.vou.statistics.dto.VoucherUsedTransactionDto;
+import com.vou.statistics.entity.ItemReceivedTransaction;
 import com.vou.statistics.entity.ItemSharedTransaction;
 import com.vou.statistics.entity.VoucherConversionTransaction;
 import com.vou.statistics.entity.VoucherUsedTransaction;
@@ -70,6 +73,22 @@ public class TransactionMapper {
             dto.setEventId(voucherTransaction.getEventId());
             dto.setItems(voucherTransaction.getItems());
             return dto;
+        } else if (transaction instanceof ItemReceivedTransaction) {
+            ItemReceivedTransaction itemReceivedTransaction = (ItemReceivedTransaction) transaction;
+            ItemReceivedTransactionDto dto = new ItemReceivedTransactionDto();
+            // Copy common fields
+            if (itemReceivedTransaction.getId() != null) {
+                dto.setId(itemReceivedTransaction.getId().toString());
+            }
+            dto.setPlayerId(itemReceivedTransaction.getPlayerId());
+            dto.setRecipientId(itemReceivedTransaction.getRecipientId());
+            dto.setArtifactId(itemReceivedTransaction.getArtifactId());
+            dto.setTransactionDate(itemReceivedTransaction.getTransactionDate());
+            dto.setQuantity(itemReceivedTransaction.getQuantity());
+            dto.setTransactionType(TRANSACTION_TYPE_ITEM_RECEIVED);
+            // Copy specific fields
+            dto.setGameId(itemReceivedTransaction.getGameId());
+            return dto;
         }
 
         return null;
@@ -122,6 +141,21 @@ public class TransactionMapper {
             // Copy specific fields
             entity.setEventId(voucherTransactionDto.getEventId());
             entity.setItems(voucherTransactionDto.getItems());
+            return entity;
+        } else if (dto instanceof ItemReceivedTransactionDto) {
+            ItemReceivedTransactionDto itemReceivedTransactionDto = (ItemReceivedTransactionDto) dto;
+            ItemReceivedTransaction entity = new ItemReceivedTransaction();
+            // Copy common fields
+            if (itemReceivedTransactionDto.getId() != null) {
+                entity.setId(new ObjectId(itemReceivedTransactionDto.getId()));
+            }
+            entity.setPlayerId(itemReceivedTransactionDto.getPlayerId());
+            entity.setRecipientId(itemReceivedTransactionDto.getRecipientId());
+            entity.setArtifactId(itemReceivedTransactionDto.getArtifactId());
+            entity.setTransactionDate(itemReceivedTransactionDto.getTransactionDate());
+            entity.setQuantity(itemReceivedTransactionDto.getQuantity());
+            // Copy specific fields
+            entity.setGameId(itemReceivedTransactionDto.getGameId());
             return entity;
         }
 

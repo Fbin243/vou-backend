@@ -7,6 +7,7 @@ public final class Constants {
     }
 
     public static final String TRANSACTION_TYPE_ITEM_SHARED = "item_shared";
+    public static final String TRANSACTION_TYPE_ITEM_RECEIVED = "item_received";
     public static final String TRANSACTION_TYPE_VOUCHER_CONVERSION = "voucher_conversion";
     public static final String TRANSACTION_TYPE_VOUCHER_USED = "voucher_used";
 }

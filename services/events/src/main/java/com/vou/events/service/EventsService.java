@@ -8,6 +8,7 @@ import com.vou.events.dto.EventRegistrationInfoDto;
 import com.vou.events.dto.GameDto;
 import com.vou.events.dto.ItemDto;
 import com.vou.events.dto.ReturnGameDto;
+import com.vou.events.dto.ReturnItemDto;
 import com.vou.events.dto.ReturnVoucherDto;
 import com.vou.events.dto.VoucherDto;
 import com.vou.events.mapper.GameMapper;
@@ -212,6 +213,23 @@ public class EventsService implements IEventsService {
         }
 
         return returnVoucherDtos;
+    }
+
+    @Override
+    public List<ItemDto> fetchItemsByEvent(String eventId) {
+        List<EventItem> eventItems = eventItemRepository.findByEvent(eventId);
+        List<ItemDto> itemDtos = new ArrayList<>();
+
+        for (EventItem eventItem : eventItems) {
+            ItemDto itemDto = itemService.fetchItemById(eventItem.getItem().getId());
+            itemDtos.add(new ItemDto(itemDto.getId(),
+                                    itemDto.getBrand_id(),
+                                    itemDto.getName(),
+                                    itemDto.getIcon(),
+                                    itemDto.getDescription()));
+        }
+
+        return itemDtos;
     }
 
     @Override
