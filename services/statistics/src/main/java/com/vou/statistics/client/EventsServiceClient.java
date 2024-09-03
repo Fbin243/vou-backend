@@ -14,7 +14,7 @@ import com.vou.statistics.dto.EventVoucherAndAdditionQuantityDto;
 import com.vou.statistics.dto.ItemDto;
 import com.vou.statistics.dto.VoucherDto;
 
-@FeignClient(name = "events-service", url = "http://localhost:8083/events/api")
+@FeignClient(name = "events-service", url = "http://events:8083/events/api")
 public interface EventsServiceClient {
     
     @PostMapping("/vouchers/ids")
