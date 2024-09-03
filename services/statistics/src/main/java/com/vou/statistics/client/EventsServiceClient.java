@@ -23,7 +23,7 @@ public interface EventsServiceClient {
     @GetMapping("/vouchers/voucher_item/voucher/{voucherId}")
     Map<String, Integer> getItemsQuantitiesByVoucher(@PathVariable String voucherId);
 
-    @GetMapping("/items/ids")
+    @PostMapping("/items/ids")
     List<ItemDto> getItemsByIds(@RequestBody List<String> ids);
 
     @PutMapping("/events/events_vouchers")

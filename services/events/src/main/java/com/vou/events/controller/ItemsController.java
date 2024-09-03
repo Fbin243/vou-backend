@@ -32,7 +32,7 @@ public class ItemsController {
         return ResponseEntity.ok(itemDto);
     }
 
-    @GetMapping("/ids")
+    @PostMapping("/ids")
     public ResponseEntity<List<ItemDto>> getItemsByIds(@RequestBody List<String> ids) {
         List<ItemDto> itemDtos = itemService.fetchItemsByIds(ids);
         return ResponseEntity.ok(itemDtos);
