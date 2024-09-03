@@ -630,6 +630,7 @@ public class EventsService implements IEventsService {
                         EventSessionInfo eventSessionInfo = new EventSessionInfo(
                             eventId,
                             gameId_StartTime.getGameId().toString(),
+                            gameId_StartTime.getGameType(),
                             eventRegistrationInfoDto.getEvent().getStartDate().toString().split(regexSplitStringLocalDateTime)[0],
                             eventRegistrationInfoDto.getEvent().getEndDate().toString().split(regexSplitStringLocalDateTime)[0],
                             gameId_StartTime.getStartTime().toString(),

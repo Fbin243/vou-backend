@@ -18,6 +18,8 @@ public class EventSessionInfo {
     
     private String gameId;
 
+    private String gameType;
+
     private String startDate;
 
     private String endDate;
