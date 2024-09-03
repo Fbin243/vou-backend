@@ -18,7 +18,7 @@ spring:
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
       - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
   kafka:
-    bootstrap-servers: kafka:9093
+    bootstrap-servers: localhost:9092
     consumer:
       group-id: group_id
       auto-offset-reset: earliest

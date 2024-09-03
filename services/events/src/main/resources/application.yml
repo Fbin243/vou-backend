@@ -17,7 +17,7 @@ spring:
   config:
     import: optional:configserver:http://localhost:8071/
   kafka:
-    bootstrap-servers: kafka:9093
+    bootstrap-servers: localhost:9092
     consumer:
       group-id: group_id
       auto-offset-reset: earliest

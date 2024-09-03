@@ -25,96 +25,58 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Controller
 @AllArgsConstructor
 public class SessionsController {
-    private KafkaConsumerService kafkaConsumerService;
-    private static final Logger log = LoggerFactory.getLogger(SessionsController.class);
-    private static ObjectMapper objectMapper = new ObjectMapper();
-    private SimpMessagingTemplate messagingTemplate;
-    private ISessionsService sessionsService;
-    private SchedulerService schedulerService;
-    private GameEngine gameEngine;
-
-    @MessageMapping("/game")
-    public void executeGame(MessageDto message, SimpMessageHeaderAccessor headerAccessor) {
-        String playerId, sessionId;
-        JsonNode reqNode;
-
-        try {
-            log.info("payload: {}", message.getPayload());
-            reqNode = objectMapper.readTree(message.getPayload());
-            playerId = reqNode.get("playerId").asText();
-            sessionId = reqNode.get("sessionId").asText();
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Cannot parse payload");
-        }
-
-        switch (message.getType()) {
-            case CONNECTION:
-                log.info("Connect game ...");
-                headerAccessor.getSessionAttributes().put("sessionId", sessionId);
-                headerAccessor.getSessionAttributes().put("playerId", playerId);
-                messagingTemplate.convertAndSend("/topic/connection/" + sessionId, gameEngine.connect(sessionId));
-                break;
-            case START:
-                log.info("Start game ...");
-                log.info("Game started, playerId: {}", playerId);
-                // Send quiz questions
-                messagingTemplate.convertAndSend("/topic/start/" + playerId, gameEngine.start(sessionId, playerId));
-                break;
-            case UPDATE:
-                log.info("Update game ...");
-                int score = reqNode.get("score").asInt();
-                gameEngine.update(sessionId, playerId, score);
-                break;
-            default:
-                log.info("Invalid message type");
-                break;
-        }
-    }
-
-    @PostMapping("/api/start")
-    public void setUpSession(@RequestBody SetUpSessionDto setUpSessionDto) {
-        EventSessionInfo eventSessionInfo = kafkaConsumerService.getNewestMessage();
-
-        // This is information received from Broker of Event services
-//        String gameId = eventSessionInfo.getGameId();
-//        String eventId = eventSessionInfo.getEventId();
-//        String startDate = eventSessionInfo.getStartDate();
-//        String endDate = eventSessionInfo.getEndDate();
-//        String startTime = eventSessionInfo.getStartTime();
-//        String endTime = "23:00:00";
-
-        String gameId = setUpSessionDto.getGameId();
-        String eventId = setUpSessionDto.getEventId();
-        String startDate = setUpSessionDto.getStartDate();
-        String endDate = setUpSessionDto.getEndDate();
-        String startTime = setUpSessionDto.getStartTime();
-        String endTime = setUpSessionDto.getEndTime();
-
-        Runnable setUpGame = () -> {
-            // Save data to MongoDB and get sessionId
-            String sessionId = "669fedc17ada690bd952c608";
-//            gameEngine.setUp(sessionId);
-            log.info("set up session");
-
-            Runnable updateTime = () -> {
-                updateTimeAndLeaderboard(sessionId, 1, 2);
-            };
-            schedulerService.createCronJobs(updateTime, startDate, endDate, startTime, endTime, true);
-        };
-
-        schedulerService.createCronJobs(setUpGame, startDate, endDate, startTime, endTime, false);
-    }
-
-    private void updateTimeAndLeaderboard(String sessionId, long startTime, int duration) {
-        long now = Utils.now();
-        log.info("Time: {}", now);
-        messagingTemplate.convertAndSend("/topic/time/" + sessionId, now);
-        // Update leaderboard when switch question
-        // if ((now - startTime) % duration == 0) {
-        // sessionsService.getLeaderboardBySessionId(sessionId);
-        // messagingTemplate.convertAndSend("/topic/leaderboard/" + sessionId,
-        // sessionsService.getLeaderboardBySessionId(sessionId));
-        // }
-    }
+	private KafkaConsumerService kafkaConsumerService;
+	private static final Logger log = LoggerFactory.getLogger(SessionsController.class);
+	private static ObjectMapper objectMapper = new ObjectMapper();
+	private SimpMessagingTemplate messagingTemplate;
+	private ISessionsService sessionsService;
+	private SchedulerService schedulerService;
+	private GameEngine gameEngine;
+	
+	@MessageMapping("/game")
+	public void executeGame(MessageDto message, SimpMessageHeaderAccessor headerAccessor) {
+		String playerId, sessionId;
+		JsonNode reqNode;
+		
+		try {
+			log.info("payload: {}", message.getPayload());
+			reqNode = objectMapper.readTree(message.getPayload());
+			playerId = reqNode.get("playerId").asText();
+			sessionId = reqNode.get("sessionId").asText();
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot parse payload");
+		}
+		log.info("Message type {}", message.getType());
+		switch (message.getType()) {
+			case CONNECTION:
+				log.info("Connect game ...");
+				headerAccessor.getSessionAttributes().put("sessionId", sessionId);
+				headerAccessor.getSessionAttributes().put("playerId", playerId);
+				messagingTemplate.convertAndSend("/topic/connection/" + sessionId, gameEngine.connect(sessionId));
+				break;
+			case DISCONNECT:
+				log.info("Disconnect game ...");
+				gameEngine.disconnect(sessionId, playerId);
+				break;
+			case START:
+				log.info("Start game ...");
+				log.info("Game started, playerId: {}", playerId);
+				// Send quiz questions
+				messagingTemplate.convertAndSend("/topic/start/" + sessionId + "/" + playerId, gameEngine.start(sessionId, playerId));
+				break;
+			case UPDATE:
+				log.info("Update game ...");
+				int score = reqNode.get("score").asInt();
+				gameEngine.update(sessionId, playerId, score);
+				break;
+			case END:
+				log.info("End game ...");
+				messagingTemplate.convertAndSend("/topic/end/" + sessionId, gameEngine.end(sessionId));
+				break;
+			default:
+				log.info("Invalid message type");
+				break;
+		}
+	}
 }

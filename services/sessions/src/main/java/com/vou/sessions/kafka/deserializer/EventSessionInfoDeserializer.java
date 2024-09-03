@@ -6,7 +6,6 @@ import com.vou.sessions.model.EventSessionInfo;
 import org.apache.kafka.common.serialization.Deserializer;
 
 public class EventSessionInfoDeserializer implements Deserializer<EventSessionInfo> {
-
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override

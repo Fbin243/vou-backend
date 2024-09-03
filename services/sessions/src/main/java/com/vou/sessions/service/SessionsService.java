@@ -1,6 +1,7 @@
 package com.vou.sessions.service;
 
 import com.vou.sessions.dto.SessionDto;
+import com.vou.sessions.entity.SessionEntity;
 import com.vou.sessions.mapper.SessionMapper;
 import com.vou.sessions.repository.SessionsRepository;
 import lombok.AllArgsConstructor;
@@ -13,9 +14,8 @@ public class SessionsService implements ISessionsService {
     private SessionMapper sessionMapper;
 
     @Override
-    public SessionDto findSessionByEventIdAndGameId(String eventId, String gameId) {
-        return null;
+    public SessionEntity createSession(SessionDto sessionDto) {
+        SessionEntity sessionEntity = sessionMapper.toSession(sessionDto);
+        return sessionsRepository.save(sessionEntity);
     }
 }
-
-

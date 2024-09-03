@@ -1,4 +1,4 @@
-package com.vou.sessions.service.client;
+package com.vou.sessions.client;
 
 import com.vou.sessions.engine.quizgame.QuizResponse;
 import org.springframework.cloud.openfeign.FeignClient;

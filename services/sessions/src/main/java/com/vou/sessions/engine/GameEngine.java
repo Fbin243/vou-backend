@@ -2,12 +2,16 @@ package com.vou.sessions.engine;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.vou.sessions.dto.RecordDto;
+import com.vou.sessions.dto.quizgame.QuizRecordDto;
 import com.vou.sessions.service.SessionsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public abstract class GameEngine {
@@ -50,7 +54,7 @@ public abstract class GameEngine {
 
     public abstract void update(String sessionId, String playerId, Object update);
 
-    public abstract void end(String sessionId, String playerId);
+    public abstract List<RecordDto> end(String sessionId);
 
     protected abstract void updateTotalTime(String sessionId, String playerId);
 }
