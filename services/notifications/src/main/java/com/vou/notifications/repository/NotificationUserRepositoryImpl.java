@@ -12,14 +12,18 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.Query;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
+import com.vou.notifications.consumer.NotificationConsumerService;
 import com.vou.notifications.entity.NotificationUser;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
+import java.util.logging.Logger;
 
 public class NotificationUserRepositoryImpl implements NotificationUserRepositoryCustom {
+
+    private static final Logger logger = Logger.getLogger(NotificationConsumerService.class.getName());
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -69,13 +73,24 @@ public class NotificationUserRepositoryImpl implements NotificationUserRepositor
         // }
         List<String> userIds = new ArrayList<>();
         try {
+            logger.info("Retrieving documents from Firestore with notificationId: " + notificationId);
+            
             Query query = firestore.collection("notifications_users")
                     .whereEqualTo("notification_id", notificationId);
 
+            // logger.info("Retrieving documents from Firestore with query: " + query.toString());
+
+            // get all record from the query
             ApiFuture<QuerySnapshot> querySnapshotFuture = query.get(); // This returns an ApiFuture
             QuerySnapshot querySnapshot = querySnapshotFuture.get(); // Retrieve the QuerySnapshot
+
+            // ApiFuture<QuerySnapshot> querySnapshotFuture = query.get(); // This returns an ApiFuture
+            // QuerySnapshot querySnapshot = querySnapshotFuture.get(); // Retrieve the QuerySnapshot
+
+            logger.info("Retrieved " + querySnapshot.size() + " documents");
             
             for (QueryDocumentSnapshot document : querySnapshot.getDocuments()) {
+                logger.info("Document data: " + document.getData());
                 String userId = document.getString("user_id");
                 if (userId != null) {
                     userIds.add(userId);

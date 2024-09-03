@@ -28,12 +28,12 @@ spring:
           enabled: false
 
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: kafka:9093
     consumer:
       group-id: group_id
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: com.vou.notifications.kafka.deserializer.EventSessionInfoDeserializer
+      value-deserializer: com.vou.notifications.kafka.deserializer.Notifcation_Event_Created_Data_Deserializer
       enable-auto-commit: false
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -66,4 +66,3 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
-

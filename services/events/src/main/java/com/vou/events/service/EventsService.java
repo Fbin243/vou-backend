@@ -12,6 +12,7 @@ import com.vou.events.dto.ReturnVoucherDto;
 import com.vou.events.dto.VoucherDto;
 import com.vou.events.mapper.GameMapper;
 import com.vou.events.model.EventSessionInfo;
+import com.vou.events.model.Notifcation_Event_Created_Data;
 import com.vou.events.model.NotificationInfo;
 import com.vou.events.entity.*;
 import com.vou.events.mapper.BrandMapper;
@@ -74,7 +75,7 @@ public class EventsService implements IEventsService {
     private KafkaTemplate<String, EventSessionInfo> kafkaTemplateEventSessionInfo;
 
     @Autowired
-    private KafkaTemplate<String, NotificationInfo> kafkaTemplateNotificationInfo;
+    private KafkaTemplate<String, Notifcation_Event_Created_Data> kafkaTemplateNotificationInfo;
 
     @Override
     public List<EventDto> fetchAllEvents() {
@@ -640,9 +641,11 @@ public class EventsService implements IEventsService {
                         brandIds.add(brand.getId());
                     }
 
-                    String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(new NotificationInfo("NotificationId", "NotificationTitle", "NotificationDescription", "NotificationImageUrl"), brandIds));
-                    
-                    kafkaTemplateNotificationInfo.send("event-notification", new NotificationInfo(notificationId, "NotificationTitle", "NotificationDescription", "NotificationImageUrl"));
+                    NotificationInfo notificationInfo = new NotificationInfo("You've been invited to " + eventRegistrationInfoDto.getEvent().getName() + " event!", brands.get(0).getBrandName() + " invited you to join!", eventRegistrationInfoDto.getEvent().getImage());
+                    Notifcation_Event_Created_Data notification_Event_Created_Data = new Notifcation_Event_Created_Data(notificationInfo, brandIds);
+                    String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(notificationInfo, brandIds));
+                    System.out.println("NotificationId: " + notificationId);
+                    kafkaTemplateNotificationInfo.send("event-notification", notification_Event_Created_Data);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

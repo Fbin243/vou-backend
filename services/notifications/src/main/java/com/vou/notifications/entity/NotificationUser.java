@@ -13,7 +13,6 @@ import com.vou.notifications.model.NotificationUserId;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "notifications_users")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
