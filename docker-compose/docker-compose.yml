@@ -367,7 +367,7 @@ services:
     image: haina2410/sessions
     container_name: sessions
     env_file:
-      - ../stack.env
+      - ../.env
     ports:
       - 8084:8084
     healthcheck:
@@ -412,7 +412,7 @@ services:
     ports:
       - 8888:8888
     healthcheck:
-      test: "curl --fail --silent localhost:8888/actuator/health/readiness | grep UP || exit 1"
+      test: "curl --fail --silent localhost:8888/actuator/health | grep UP || exit 1"
       interval: 20s
       timeout: 5s
       retries: 10
@@ -432,11 +432,11 @@ services:
     image: haina2410/statistics
     container_name: statistics
     env_file:
-      - ../stack.env
+      - ../.env
     ports:
       - 8085:8085
     healthcheck:
-      test: "curl --fail --silent localhost:8085/actuator/health/readiness | grep UP || exit 1"
+      test: "curl --fail --silent localhost:8085/statistics/actuator/health | grep UP || exit 1"
       interval: 20s
       timeout: 5s
       retries: 10
