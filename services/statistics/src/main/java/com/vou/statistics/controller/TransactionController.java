@@ -3,11 +3,14 @@ package com.vou.statistics.controller;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.vou.statistics.model.NotificationData;
+import com.vou.statistics.model.NotificationInfo;
 import com.vou.statistics.model.Transaction;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,9 +19,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vou.statistics.client.EventsServiceClient;
+import com.vou.statistics.client.NotificationsServiceClient;
 import com.vou.statistics.context.TransactionContext;
 import com.vou.statistics.creator.TransactionFactoryCreator;
+import com.vou.statistics.dto.AddUsersRequestDto;
+import com.vou.statistics.dto.ItemDto;
 import com.vou.statistics.dto.TransactionDto;
+import com.vou.statistics.dto.VoucherDto;
 import com.vou.statistics.dto.VoucherItemsConversionInfo;
 import com.vou.statistics.entity.ItemSharedTransaction;
 import com.vou.statistics.entity.ItemReceivedTransaction;
@@ -33,6 +40,11 @@ import com.vou.statistics.service.TransactionService;
 import com.vou.statistics.strategy.ItemSharedTransactionStrategy;
 import com.vou.statistics.strategy.TransactionStrategy;
 
+import lombok.AllArgsConstructor;
+
+import java.util.Collections;
+
+@AllArgsConstructor
 @RestController
 @RequestMapping("/api/transactions")
 public class TransactionController {
@@ -44,16 +56,20 @@ public class TransactionController {
     private PlayerVoucherService                                playerVoucherService;
     private PlayerItemService                                   playerItemService;
     private EventsServiceClient                                 eventsServiceClient;
+    private NotificationsServiceClient                          notificationsServiceClient;
 
     @Autowired
-    public TransactionController(TransactionService<ItemSharedTransaction> itemSharedTransactionService, TransactionService<VoucherUsedTransaction> voucherUsedTransactionService, TransactionService<VoucherConversionTransaction> voucherConversionTransactionService, PlayerVoucherService playerVoucherService, PlayerItemService playerItemService, EventsServiceClient eventsServiceClient) {
-        this.itemSharedTransactionService = itemSharedTransactionService;
-        this.voucherUsedTransactionService = voucherUsedTransactionService;
-        this.voucherConversionTransactionService = voucherConversionTransactionService;
-        this.playerVoucherService = playerVoucherService;
-        this.playerItemService = playerItemService;
-        this.eventsServiceClient = eventsServiceClient;
-    }
+	private KafkaTemplate<String, NotificationData> kafkaTemplateNotificationInfo;
+
+    // @Autowired
+    // public TransactionController(TransactionService<ItemSharedTransaction> itemSharedTransactionService, TransactionService<VoucherUsedTransaction> voucherUsedTransactionService, TransactionService<VoucherConversionTransaction> voucherConversionTransactionService, PlayerVoucherService playerVoucherService, PlayerItemService playerItemService, EventsServiceClient eventsServiceClient) {
+    //     this.itemSharedTransactionService = itemSharedTransactionService;
+    //     this.voucherUsedTransactionService = voucherUsedTransactionService;
+    //     this.voucherConversionTransactionService = voucherConversionTransactionService;
+    //     this.playerVoucherService = playerVoucherService;
+    //     this.playerItemService = playerItemService;
+    //     this.eventsServiceClient = eventsServiceClient;
+    // }
 
     @GetMapping("/item_shared")
     public ResponseEntity<List<ItemSharedTransaction>> getAllItemSharedTransactions() {
@@ -213,10 +229,45 @@ public class TransactionController {
             TransactionStrategy transactionStrategy = TransactionFactoryCreator.getTransactionStrategy(_transaction.getTransactionType());
             transactionContext.setTransactionStrategy(transactionStrategy);
 
+            /////
+            // find in the item
+            String artifactName = "";
+            String artifactImage = "";
+
+            List<ItemDto> items = eventsServiceClient.getItemsByIds(Collections.singletonList(createdTransaction.getArtifactId()));
+            if (items.isEmpty()) {
+                // find in the voucher
+                List<VoucherDto> vouchers = eventsServiceClient.getVouchersByIds(Collections.singletonList(createdTransaction.getArtifactId()));
+                if (vouchers.isEmpty()) {
+                    throw new RuntimeException("Item or voucher not found for transaction: " + _transaction);
+                } else {
+                    artifactName = vouchers.get(0).getVoucherCode();
+                    artifactImage = vouchers.get(0).getImage();
+                }
+            } else {
+                artifactName = items.get(0).getName();
+                artifactImage = items.get(0).getIcon();
+            }
+
+
             if (createdTransaction.getTransactionType().equalsIgnoreCase("voucher_conversion")) {
                 if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, eventsServiceClient) == false) {
                     return ResponseEntity.ok(false);
                 }
+            } else if (createdTransaction.getTransactionType().equalsIgnoreCase("voucher_used")) {
+                if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, null) == false) {
+                    return ResponseEntity.ok(false);
+                }
+                System.out.println("Transaction processed successfully");
+
+                NotificationInfo notificationInfo = new NotificationInfo("You've used voucher " + artifactName + " successfully!", "Check your inventory for updates", artifactImage);
+                NotificationData notificationData = new NotificationData(notificationInfo, Collections.singletonList(_transaction.getRecipientId()));
+                String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(notificationInfo, Collections.singletonList(_transaction.getRecipientId())));
+                
+                System.out.println("Notification IDDD: " + notificationId);
+
+                // notificationsServiceClient.sendNotification(notificationData);
+                kafkaTemplateNotificationInfo.send("event-notification", notificationData);
             } else {
                 if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, null) == false) {
                     return ResponseEntity.ok(false);

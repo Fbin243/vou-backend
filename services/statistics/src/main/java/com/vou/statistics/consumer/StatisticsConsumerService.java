@@ -62,7 +62,7 @@ public class StatisticsConsumerService {
     @Autowired
 	private KafkaTemplate<String, NotificationData> kafkaTemplateNotificationInfo;
 
-    @KafkaListener(topics = "session-transaction", groupId = "statistics_group", containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = "session-transaction", groupId = "group_id", containerFactory = "kafkaListenerContainerFactory")
     public void listenSessionTransaction(ConsumerRecord<String, List<TransactionDto>> record, Acknowledgment acknowledgment) {
         try {
             List<TransactionDto> transactionDtos = record.value();
