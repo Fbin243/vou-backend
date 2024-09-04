@@ -69,7 +69,7 @@ public class PlayerItemService implements IPlayerItemService {
         
         List<ReturnItemDto> returnItemDtos = new ArrayList<>();
 
-        for (int i = 0; i <= items.size(); ++i) {
+        for (int i = 0; i < items.size(); ++i) {
             returnItemDtos.add(new ReturnItemDto(items.get(i), playerItems.get(i).getQuantity()));
         }
 
