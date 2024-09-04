@@ -17,6 +17,8 @@ public class EventItemMapper {
         EventItemDto eventItemDto = new EventItemDto();
         eventItemDto.setEvent(EventMapper.toDto(eventItem.getEvent()));
         eventItemDto.setItem(ItemMapper.toDto(eventItem.getItem()));
+        eventItemDto.setNumberOfItem(eventItem.getNumberOfItem());
+        eventItemDto.setActiveStatus(eventItem.getActiveStatus());
 
         return eventItemDto;
     }
@@ -30,6 +32,8 @@ public class EventItemMapper {
         EventItem eventItem = new EventItem();
         eventItem.setEvent(EventMapper.toEntity(dto.getEvent()));
         eventItem.setItem(ItemMapper.toEntity(dto.getItem()));
+        eventItem.setNumberOfItem(dto.getNumberOfItem());
+        eventItem.setActiveStatus(dto.getActiveStatus());
 
         return eventItem;
     }
