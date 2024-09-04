@@ -39,8 +39,10 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -56,6 +58,9 @@ public class StatisticsConsumerService {
     private EventsServiceClient             eventsServiceClient;
 
     private static final Logger logger = Logger.getLogger(StatisticsConsumerService.class.getName());
+
+    @Autowired
+	private KafkaTemplate<String, NotificationData> kafkaTemplateNotificationInfo;
 
     @KafkaListener(topics = "session-transaction", groupId = "statistics_group", containerFactory = "kafkaListenerContainerFactory")
     public void listenSessionTransaction(ConsumerRecord<String, List<TransactionDto>> record, Acknowledgment acknowledgment) {
@@ -130,7 +135,8 @@ public class StatisticsConsumerService {
                     
                     System.out.println("Notification IDDD: " + notificationId);
 
-                    notificationsServiceClient.sendNotification(notificationData);
+                    // notificationsServiceClient.sendNotification(notificationData);
+                    kafkaTemplateNotificationInfo.send("event-notification", notificationData);
                 } else {
                     System.out.println("Transaction processing failed");
                 }

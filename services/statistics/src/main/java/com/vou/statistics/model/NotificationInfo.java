@@ -4,6 +4,8 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -24,6 +26,7 @@ public class NotificationInfo {
     private String imageUrl;
 
     public NotificationInfo(String title, String description, String imageUrl) {
+        this.id = UUID.randomUUID().toString(); // Auto-generate unique ID
         this.title = title;
         this.description = description;
         this.imageUrl = imageUrl;
