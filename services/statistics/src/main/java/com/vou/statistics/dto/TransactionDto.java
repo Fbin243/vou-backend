@@ -22,7 +22,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonSubTypes({
     @JsonSubTypes.Type(value = ItemSharedTransactionDto.class, name = "item_shared"),
     @JsonSubTypes.Type(value = VoucherUsedTransactionDto.class, name = "voucher_used"),
-    @JsonSubTypes.Type(value = VoucherConversionTransactionDto.class, name = "voucher_conversion")
+    @JsonSubTypes.Type(value = VoucherConversionTransactionDto.class, name = "voucher_conversion"),
+    @JsonSubTypes.Type(value = ItemReceivedTransactionDto.class, name = "item_received")
 })
 public abstract class TransactionDto {
     // @Id
