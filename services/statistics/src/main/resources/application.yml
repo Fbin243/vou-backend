@@ -11,6 +11,18 @@ spring:
       uri: mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@vou.hvasc.mongodb.net/${MONGO_DBNAME}
       database: vou
 
+  kafka:
+    bootstrap-servers: kafka:9093
+    consumer:
+      group-id: statistics_group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: com.vou.notifications.kafka.deserializer.TransactionDeserializer
+      enable-auto-commit: false
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
 eureka:
   instance:
     prefer-ip-address: true
