@@ -198,6 +198,19 @@ public class EventsService implements IEventsService {
 		
 		return returnVoucherDtos;
 	}
+
+	@Override
+	public List<ItemDto> fetchItemsByEvent(String eventId) {
+		List<EventItem> eventItems = eventItemRepository.findByEvent(eventId);
+		List<ItemDto> itemDtos = new ArrayList<>();
+		
+		for (EventItem eventItem : eventItems) {
+			ItemDto itemDto = itemService.fetchItemById(eventItem.getItem().getId());
+			itemDtos.add(itemDto);
+		}
+		
+		return itemDtos;
+	}
 	
 	@Override
 	public List<EventDto> fetchEventsByIds(List<String> ids) {
