@@ -69,8 +69,8 @@ public class PlayerItemService implements IPlayerItemService {
         
         List<ReturnItemDto> returnItemDtos = new ArrayList<>();
 
-        for (ItemDto item : items) {
-            returnItemDtos.add(new ReturnItemDto(item, playerItems.stream().filter(playerItem -> playerItem.getItemId().equals(item.getId())).findFirst().get().getQuantity()));
+        for (int i = 0; i <= items.size(); ++i) {
+            returnItemDtos.add(new ReturnItemDto(items.get(i), playerItems.get(i).getQuantity()));
         }
 
         return returnItemDtos;
