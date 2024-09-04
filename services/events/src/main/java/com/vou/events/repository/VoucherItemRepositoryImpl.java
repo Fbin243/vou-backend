@@ -52,16 +52,16 @@ public class VoucherItemRepositoryImpl implements VoucherItemRepositoryCustom {
 
     @Override
     public List<VoucherItem> findByVoucher(String voucherId) {
-        // TypedQuery<VoucherItem> query = entityManager.createQuery(
-        //         "SELECT vi FROM VoucherItem vi WHERE vi.voucher.id = :voucherId AND vi.activeStatus = :activeStatus",
-        //         VoucherItem.class
-        // );
         TypedQuery<VoucherItem> query = entityManager.createQuery(
-            "SELECT vi FROM VoucherItem vi WHERE vi.voucher.id = :voucherId",
-            VoucherItem.class
-    );
+                "SELECT vi FROM VoucherItem vi WHERE vi.voucher.id = :voucherId AND vi.activeStatus = :activeStatus",
+                VoucherItem.class
+        );
+        // TypedQuery<VoucherItem> query = entityManager.createQuery(
+        //     "SELECT vi FROM VoucherItem vi WHERE vi.voucher.id = :voucherId",
+        //     VoucherItem.class
+        // );
         query.setParameter("voucherId", voucherId);
-        // query.setParameter("activeStatus", EventIntermediateTableStatus.ACTIVE);
+        query.setParameter("activeStatus", EventIntermediateTableStatus.ACTIVE);
         return query.getResultList();
     }
 }
