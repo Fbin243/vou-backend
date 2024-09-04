@@ -18,6 +18,11 @@ import com.vou.statistics.service.PlayerVoucherService;
 import com.vou.statistics.repository.VoucherConversionTransactionRepository;
 import java.util.logging.Logger;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+@AllArgsConstructor
 public class VoucherConversionTransactionStrategy implements TransactionStrategy {
     
     private EventsServiceClient                         eventsServiceClient;
@@ -37,6 +42,7 @@ public class VoucherConversionTransactionStrategy implements TransactionStrategy
             VoucherConversionTransaction voucherItemsConversionTransaction = (VoucherConversionTransaction) transaction;
             logger.info("Processing VoucherConversionTransaction: " + voucherItemsConversionTransaction.toString());
             Map<String, Integer> items_quantities = eventsServiceClient.getItemsQuantitiesByVoucher(voucherItemsConversionTransaction.getArtifactId());
+            
             logger.info("Items quantities: " + items_quantities.toString());
             for (ItemId_Quantity item_quantity : voucherItemsConversionTransaction.getItems()) {
                 if (items_quantities.get(item_quantity.getItemId()) * voucherItemsConversionTransaction.getQuantity() > item_quantity.getQuantity()) {
