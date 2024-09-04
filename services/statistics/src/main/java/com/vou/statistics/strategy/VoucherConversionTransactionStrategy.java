@@ -33,7 +33,7 @@ public class VoucherConversionTransactionStrategy implements TransactionStrategy
     private static final Logger logger = Logger.getLogger(VoucherConversionTransactionStrategy.class.getName());
 
     @Override
-    public boolean processTransaction(Transaction transaction, PlayerVoucherService playerVoucherService, PlayerItemService playerItemService) {
+    public boolean processTransaction(Transaction transaction, PlayerVoucherService playerVoucherService, PlayerItemService playerItemService, EventsServiceClient _eventsServiceClient) {
         if (!transaction.getTransactionType().equalsIgnoreCase(TRANSACTION_TYPE_VOUCHER_CONVERSION)) {
             throw new IllegalArgumentException("Invalid transaction type for VoucherConversionTransactionStrategy");
         }
@@ -41,7 +41,7 @@ public class VoucherConversionTransactionStrategy implements TransactionStrategy
         try {
             VoucherConversionTransaction voucherItemsConversionTransaction = (VoucherConversionTransaction) transaction;
             logger.info("Processing VoucherConversionTransaction: " + voucherItemsConversionTransaction.toString());
-            Map<String, Integer> items_quantities = eventsServiceClient.getItemsQuantitiesByVoucher(voucherItemsConversionTransaction.getArtifactId());
+            Map<String, Integer> items_quantities = _eventsServiceClient.getItemsQuantitiesByVoucher(voucherItemsConversionTransaction.getArtifactId());
             
             logger.info("Items quantities: " + items_quantities.toString());
             for (ItemId_Quantity item_quantity : voucherItemsConversionTransaction.getItems()) {

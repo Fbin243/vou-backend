@@ -126,7 +126,7 @@ public class StatisticsConsumerService {
                     artifactImage = items.get(0).getIcon();
                 }
 
-                if (transactionContext.executeStrategy(_transaction, playerVoucherService, playerItemService)) {
+                if (transactionContext.executeStrategy(_transaction, playerVoucherService, playerItemService, null)) {
                     System.out.println("Transaction processed successfully");
 
                     NotificationInfo notificationInfo = new NotificationInfo("You've received item " + artifactName, "Check your inventory for updates", artifactImage);

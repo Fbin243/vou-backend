@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.vou.statistics.client.EventsServiceClient;
 import com.vou.statistics.context.TransactionContext;
 import com.vou.statistics.creator.TransactionFactoryCreator;
 import com.vou.statistics.dto.TransactionDto;
@@ -42,14 +43,16 @@ public class TransactionController {
     private TransactionService<VoucherConversionTransaction>    voucherConversionTransactionService;
     private PlayerVoucherService                                playerVoucherService;
     private PlayerItemService                                   playerItemService;
+    private EventsServiceClient                                 eventsServiceClient;
 
     @Autowired
-    public TransactionController(TransactionService<ItemSharedTransaction> itemSharedTransactionService, TransactionService<VoucherUsedTransaction> voucherUsedTransactionService, TransactionService<VoucherConversionTransaction> voucherConversionTransactionService, PlayerVoucherService playerVoucherService, PlayerItemService playerItemService) {
+    public TransactionController(TransactionService<ItemSharedTransaction> itemSharedTransactionService, TransactionService<VoucherUsedTransaction> voucherUsedTransactionService, TransactionService<VoucherConversionTransaction> voucherConversionTransactionService, PlayerVoucherService playerVoucherService, PlayerItemService playerItemService, EventsServiceClient eventsServiceClient) {
         this.itemSharedTransactionService = itemSharedTransactionService;
         this.voucherUsedTransactionService = voucherUsedTransactionService;
         this.voucherConversionTransactionService = voucherConversionTransactionService;
         this.playerVoucherService = playerVoucherService;
         this.playerItemService = playerItemService;
+        this.eventsServiceClient = eventsServiceClient;
     }
 
     @GetMapping("/item_shared")
@@ -210,9 +213,16 @@ public class TransactionController {
             TransactionStrategy transactionStrategy = TransactionFactoryCreator.getTransactionStrategy(_transaction.getTransactionType());
             transactionContext.setTransactionStrategy(transactionStrategy);
 
-            if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService) == false) {
-                return ResponseEntity.ok(false);
+            if (createdTransaction.getTransactionType().equalsIgnoreCase("voucher_conversion")) {
+                if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, eventsServiceClient) == false) {
+                    return ResponseEntity.ok(false);
+                }
+            } else {
+                if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, null) == false) {
+                    return ResponseEntity.ok(false);
+                }
             }
+
         }
 
         return ResponseEntity.ok(true);
