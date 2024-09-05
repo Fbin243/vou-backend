@@ -3,6 +3,8 @@ package com.vou.statistics.kafka.deserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vou.statistics.dto.TransactionDto;
 
+import java.util.List;
+
 import org.apache.kafka.common.serialization.Deserializer;
 
 public class TransactionDeserializer implements Deserializer<TransactionDto> {

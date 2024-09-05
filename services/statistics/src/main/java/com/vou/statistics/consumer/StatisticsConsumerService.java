@@ -63,20 +63,26 @@ public class StatisticsConsumerService {
 	private KafkaTemplate<String, NotificationData> kafkaTemplateNotificationInfo;
 
     @KafkaListener(topics = "session-transaction", groupId = "group_id", containerFactory = "kafkaListenerContainerFactory")
-    public void listenSessionTransaction(ConsumerRecord<String, List<TransactionDto>> record, Acknowledgment acknowledgment) {
+    public void listenSessionTransaction(ConsumerRecord<String, TransactionDto> record, Acknowledgment acknowledgment) {
         try {
-            List<TransactionDto> transactionDtos = record.value();
-            List<Transaction> transactions = transactionDtos.stream()
-            .map(TransactionMapper::toEntity)
-            .collect(Collectors.toList());
+            // List<TransactionDto> transactionDtos = record.value();
+            // List<Transaction> transactions = transactionDtos.stream()
+            // .map(TransactionMapper::toEntity)
+            // .collect(Collectors.toList());
+
+            TransactionDto transactionDto = record.value();
+
+            // convert to suitable TransactionDto
 
             List<CompletableFuture<Void>> futures = new ArrayList<>();
 
-            System.out.println("Transactions: " + transactions);
+            // System.out.println("Transactions: " + transactions);
 
-            for (Transaction _transaction : transactions) {
-                futures.add(processTransactionNotificationAsync(_transaction));
-            }
+            // for (Transaction _transaction : transactions) {
+            //     futures.add(processTransactionNotificationAsync(_transaction));
+            // }
+
+            futures.add(processTransactionNotificationAsync(TransactionMapper.toEntity(transactionDto)));
             
             // Wait for all CompletableFutures to complete
             CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
