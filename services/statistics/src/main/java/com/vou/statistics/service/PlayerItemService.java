@@ -2,6 +2,7 @@ package com.vou.statistics.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -63,18 +64,46 @@ public class PlayerItemService implements IPlayerItemService {
     }
 
     @Override
+    // public List<ReturnItemDto> getItemsByPlayer(String playerId) {
+    //     List<PlayerItem> playerItems = playerItemRepository.findByPlayerId(playerId);
+    //     List<ItemDto> items = eventsServiceClient.getItemsByIds(playerItems.stream().map(PlayerItem::getItemId).collect(Collectors.toList()));
+        
+    //     List<ReturnItemDto> returnItemDtos = new ArrayList<>();
+
+    //     for (int i = 0; i < items.size(); ++i) {
+    //         returnItemDtos.add(new ReturnItemDto(items.get(i), playerItems.get(i).getQuantity()));
+    //     }
+
+    //     return returnItemDtos;
+    // }
     public List<ReturnItemDto> getItemsByPlayer(String playerId) {
         List<PlayerItem> playerItems = playerItemRepository.findByPlayerId(playerId);
-        List<ItemDto> items = eventsServiceClient.getItemsByIds(playerItems.stream().map(PlayerItem::getItemId).collect(Collectors.toList()));
-        
+    
+        // Create a list of item IDs from playerItems
+        List<String> itemIds = playerItems.stream()
+                                          .map(PlayerItem::getItemId)
+                                          .collect(Collectors.toList());
+    
+        // Fetch the items based on itemIds
+        List<ItemDto> items = eventsServiceClient.getItemsByIds(itemIds);
+    
+        // Map items by their id for easy lookup
+        Map<String, ItemDto> itemMap = items.stream()
+                                            .collect(Collectors.toMap(ItemDto::getId, item -> item));
+    
         List<ReturnItemDto> returnItemDtos = new ArrayList<>();
-
-        for (int i = 0; i < items.size(); ++i) {
-            returnItemDtos.add(new ReturnItemDto(items.get(i), playerItems.get(i).getQuantity()));
+    
+        // Match playerItems with their corresponding items using itemMap
+        for (PlayerItem playerItem : playerItems) {
+            ItemDto correspondingItem = itemMap.get(playerItem.getItemId());
+            if (correspondingItem != null) {
+                returnItemDtos.add(new ReturnItemDto(correspondingItem, playerItem.getQuantity()));
+            }
         }
-
+    
         return returnItemDtos;
     }
+    
 
     @Override
     public List<PlayerDto> getPlayersByItem(String itemId) {

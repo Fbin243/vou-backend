@@ -72,7 +72,7 @@ public class EventsService implements IEventsService {
 	@Override
 	public List<EventDto> fetchEventsInProgress() {
 		return eventsRepository.findAll().stream()
-			.filter(event -> event.getStartDate().isBefore(LocalDateTime.now()) && event.getEndDate().isAfter(LocalDateTime.now()))
+			.filter(event -> event.getEndDate().isAfter(LocalDateTime.now()))
 			.map(EventMapper::toDto)
 			.collect(Collectors.toList());
 	}
