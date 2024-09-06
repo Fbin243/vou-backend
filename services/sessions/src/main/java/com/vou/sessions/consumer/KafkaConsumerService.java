@@ -1,5 +1,6 @@
 package com.vou.sessions.consumer;
 
+import com.vou.sessions.dto.RecordDto;
 import com.vou.sessions.dto.SessionDto;
 import com.vou.sessions.engine.GameEngine;
 import com.vou.sessions.engine.quizgame.QuizGameEngine;
@@ -46,7 +47,8 @@ public class KafkaConsumerService {
 		String startDate = eventSessionInfo.getStartDate();
 		String endDate = eventSessionInfo.getEndDate();
 		String startTime = eventSessionInfo.getStartTime() + ":00";
-		String endTime = eventSessionInfo.getEndTime() + ":00";
+//		String endTime = eventSessionInfo.getEndTime() + ":00";
+		String endTime = "23:59:59";
 		String gameType = eventSessionInfo.getGameType();
 		
 		log.info("Start date : {}", startDate);
@@ -72,7 +74,7 @@ public class KafkaConsumerService {
 			switch (gameType) {
 				case "quiz":
 					gameEngine = quizGameEngine;
-					sessionId = "66d5611b50080825d7cda679";
+					sessionId = createdSessionDto.getId().toHexString();
 					break;
 				case "shaking":
 					gameEngine = shakingGameEngine;
@@ -83,17 +85,16 @@ public class KafkaConsumerService {
 			}
 			
 			gameEngine.setUp(sessionId);
-//            Runnable endGame = () -> {
-//                log.info("END GAME, SAVE TO MONGODB AND DELETE REDIS");
-//                List<QuizRecordDto> leaderboard = gameEngine.end(sessionId);
-//                log.info("Leaderboard: {}", leaderboard);
-//                messagingTemplate.convertAndSend("/topic/end/" + sessionId, leaderboard);
-//            };
+			Runnable endGame = () -> {
+				log.info("END GAME, SAVE TO MONGODB AND DELETE REDIS");
+				List<RecordDto> leaderboard = gameEngine.end(sessionId);
+				log.info("Leaderboard: {}", leaderboard);
+			};
 			
 			Runnable updateTime = () -> {
 				updateTimeAndLeaderboard(sessionId);
 			};
-//            schedulerService.createCronJobs(endGame, startDate, endDate, endTime, endTime, false);
+			schedulerService.createCronJobs(endGame, startDate, endDate, endTime, endTime, false);
 			schedulerService.createCronJobs(updateTime, startDate, endDate, startTime, endTime, true);
 		};
 		

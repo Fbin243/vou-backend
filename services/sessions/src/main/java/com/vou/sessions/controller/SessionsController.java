@@ -6,12 +6,15 @@ import com.vou.sessions.dto.MessageDto;
 import com.vou.sessions.engine.GameEngine;
 import com.vou.sessions.engine.quizgame.QuizGameEngine;
 import com.vou.sessions.engine.shakinggame.ShakingGameEngine;
+import com.vou.sessions.model.ItemReceivedTransactionData;
+import com.vou.sessions.model.TransactionData;
 import com.vou.sessions.service.ISessionsService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @RestController
@@ -32,6 +36,7 @@ public class SessionsController {
 	private ISessionsService sessionsService;
 	private QuizGameEngine quizGameEngine;
 	private ShakingGameEngine shakingGameEngine;
+	private KafkaTemplate<String, TransactionData> kafkaTemplateTransactionData;
 	
 	@MessageMapping("/game")
 	public void executeGame(MessageDto message, SimpMessageHeaderAccessor headerAccessor) {
@@ -79,6 +84,17 @@ public class SessionsController {
 				log.info("Update game ...");
 				int score = reqNode.get("score").asInt();
 				gameEngine.update(sessionId, playerId, score);
+				break;
+			case RECEIVE:
+				log.info("Receive item ...");
+				// Send message to statistic through Kafka
+				String itemId = reqNode.get("itemId").asText();
+				Long gameId = reqNode.get("gameId").asLong();
+				log.info("ITEM_ID: {}", itemId);
+				log.info("GAME_ID: {}", playerId);
+				ItemReceivedTransactionData itemReceivedTransactionData = new ItemReceivedTransactionData("system", playerId, itemId, LocalDateTime.now(), 1, "item_received", gameId);
+				
+				kafkaTemplateTransactionData.send("session-transaction", itemReceivedTransactionData);
 				break;
 			case END:
 				log.info("End game ...");

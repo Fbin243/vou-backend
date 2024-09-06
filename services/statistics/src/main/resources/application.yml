@@ -2,7 +2,7 @@ server:
   port: 8085
   servlet:
     context-path: /statistics
-    
+
 spring:
   application:
     name: statistics
@@ -10,9 +10,9 @@ spring:
     mongodb:
       uri: mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@vou.hvasc.mongodb.net/${MONGO_DBNAME}
       database: vou
-
+  
   kafka:
-    bootstrap-servers: kafka:9093
+    bootstrap-servers: localhost:9092
     consumer:
       group-id: group_id
       auto-offset-reset: earliest
