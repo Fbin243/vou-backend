@@ -39,7 +39,7 @@ public class ShakingGameEngine extends GameEngine {
 	
 	@Override
 	public void setUp(String sessionId) {
-		// Check if session is exists
+		// Check if session is existed
 		if (hashOps.hasKey(sessionId, EVENT_ITEMS_KEY)) {
 			log.info("Session has been set up");
 			return;
@@ -132,7 +132,9 @@ public class ShakingGameEngine extends GameEngine {
 				String.format("%s, %s", sessionId, playerId)));
 		if (shakingRecord == null) {
 			log.info("Update totalTime failed");
+			return;
 		}
+		
 		if (shakingRecord.getStartPlayTime() == -1) {
 			return;
 		}

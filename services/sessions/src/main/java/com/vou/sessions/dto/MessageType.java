@@ -1,5 +1,5 @@
 package com.vou.sessions.dto;
 
 public enum MessageType {
-    START, UPDATE, END, CONNECTION, DISCONNECT
+	START, UPDATE, RECEIVE, END, CONNECTION, DISCONNECT
 }

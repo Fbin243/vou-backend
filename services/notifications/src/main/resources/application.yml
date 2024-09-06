@@ -17,18 +17,18 @@ spring:
   #     - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
   firebase:
     firebase-configuration-file: google/serviceAccountKey.json
-
+  
   main:
     allow-bean-definition-overriding: true
-
+  
   cloud:
     gcp:
       security:
         firebase:
           enabled: false
-
+  
   kafka:
-    bootstrap-servers: kafka:9093
+    bootstrap-servers: localhost:9092
     consumer:
       group-id: group_id
       auto-offset-reset: earliest
@@ -38,7 +38,7 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
-
+  
   # autoconfigure:
   #   exclude:
   #     - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
@@ -66,3 +66,12 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

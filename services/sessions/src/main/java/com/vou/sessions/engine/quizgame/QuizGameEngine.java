@@ -45,18 +45,19 @@ public class QuizGameEngine extends GameEngine {
 	
 	@Override
 	public void setUp(String sessionId) {
-		// Check if session is exists
+		log.info("SET UP QUIZ GAME FOR SESSION ID: {}", sessionId);
+		// Check if session is existed
 		if (hashOps.hasKey(sessionId, QUIZ_RESPONSE_KEY)) {
 			log.info("Session has been set up");
 			return;
 		}
 		
 		// Step 1: Fetch data from OpenTrivia
-//		QuizResponse quizResponse = hqTriviaFeignClient.getQuestions(3);
-//		shuffleCorrectAnswer(quizResponse);
-//
-//		// Step 2: Generate audio files from questions by Amazon Polly and save it to
-//		// AWS S3
+		QuizResponse quizResponse = hqTriviaFeignClient.getQuestions(3);
+		shuffleCorrectAnswer(quizResponse);
+		
+		// Step 2: Generate audio files from questions by Amazon Polly and save it to
+		// AWS S3
 //		List<QuizQuestion> quizQuestions = quizResponse.getResults();
 //		for (int i = 0; i < quizQuestions.size(); i++) {
 //			String ssmlString = amazonPollyService.convertQuizQuestionToSSML(quizQuestions.get(i), i + 1);
@@ -118,8 +119,22 @@ public class QuizGameEngine extends GameEngine {
 	}
 	
 	@Override
-	public void updateTotalTime(String sessionId, String playerId) {
-	
+	protected void updateTotalTime(String sessionId, String playerId) {
+		QuizRecord quizRecord = getQuizRecord(sessionId, playerId).orElseThrow(
+			() -> new NotFoundException("Player record", "sessionId, playerId",
+				String.format("%s, %s", sessionId, playerId)));
+		if (quizRecord == null) {
+			log.info("Update totalTime failed");
+			return;
+		}
+		
+		if (quizRecord.getStartPlayTime() == -1) {
+			return;
+		}
+		
+		quizRecord.setTotalTime(quizRecord.getTotalTime() + Utils.now() - quizRecord.getStartPlayTime());
+		quizRecord.setStartPlayTime(-1); // Means the player is off
+		putQuizRecord(sessionId, playerId, quizRecord);
 	}
 	
 	private Optional<QuizResponse> getQuizResponse(String sessionId, int amount) {
