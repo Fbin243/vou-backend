@@ -39,7 +39,7 @@ public class ItemSharedTransactionStrategy implements TransactionStrategy {
 
         try {
             playerItemService.addPlayerItem(new PlayerItemDto(transaction.getRecipientId(), transaction.getArtifactId(), transaction.getQuantity()));
-            playerItemService.deletePlayerItem(new PlayerItemDto(transaction.getPlayerId(), transaction.getArtifactId(), transaction.getQuantity()));
+            playerItemService.addPlayerItem(new PlayerItemDto(transaction.getPlayerId(), transaction.getArtifactId(), transaction.getQuantity() * -1));
             saveTransaction(transaction);
         }
         catch (Exception e) {
