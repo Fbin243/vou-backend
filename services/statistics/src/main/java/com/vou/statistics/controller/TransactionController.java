@@ -252,6 +252,17 @@ public class TransactionController {
 
             if (createdTransaction.getTransactionType().equalsIgnoreCase("voucher_conversion")) {
                 if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, eventsServiceClient) == false) {
+                    System.out.println("Transaction processed successfully");
+
+                    NotificationInfo notificationInfo = new NotificationInfo("You have new voucher " + artifactName + " successfully!", "Check your inventory for updates", artifactImage);
+                    NotificationData notificationData = new NotificationData(notificationInfo, Collections.singletonList(_transaction.getRecipientId()));
+                    String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(notificationInfo, Collections.singletonList(_transaction.getRecipientId())));
+                    
+                    System.out.println("Notification IDDD: " + notificationId);
+    
+                    // notificationsServiceClient.sendNotification(notificationData);
+                    kafkaTemplateNotificationInfo.send("event-notification", notificationData);
+
                     return ResponseEntity.ok(false);
                 }
             } else if (createdTransaction.getTransactionType().equalsIgnoreCase("voucher_used")) {
