@@ -1,4 +1,4 @@
-package com.vou.statistics.dto;
+package com.vou.sessions.model;
 
 import lombok.Data;
 import lombok.Getter;
@@ -12,6 +12,7 @@ import org.springframework.data.annotation.Id;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @Data
 @NoArgsConstructor
@@ -20,12 +21,13 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @Setter
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "transactionType")
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = ItemSharedTransactionDto.class, name = "item_shared"),
-    @JsonSubTypes.Type(value = VoucherUsedTransactionDto.class, name = "voucher_used"),
-    @JsonSubTypes.Type(value = VoucherConversionTransactionDto.class, name = "voucher_conversion"),
-    @JsonSubTypes.Type(value = ItemReceivedTransactionDto.class, name = "item_received")
+    @JsonSubTypes.Type(value = ItemSharedTransactionData.class, name = "item_shared"),
+    @JsonSubTypes.Type(value = VoucherUsedTransactionData.class, name = "voucher_used"),
+    @JsonSubTypes.Type(value = VoucherConversionTransactionData.class, name = "voucher_conversion"),
+    @JsonSubTypes.Type(value = ItemReceivedTransactionData.class, name = "item_received")
 })
-public abstract class TransactionDto {
+@JsonSerialize
+public abstract class TransactionData {
     // @Id
     private String id;
     private String playerId;
@@ -35,7 +37,7 @@ public abstract class TransactionDto {
     private int quantity;
     private String transactionType;
 
-    public TransactionDto(String playerId, String recipientId, String artifactId, LocalDateTime transactionDate, int quantity, String transactionType) {
+    public TransactionData(String playerId, String recipientId, String artifactId, LocalDateTime transactionDate, int quantity, String transactionType) {
         this.playerId = playerId;
         this.recipientId = recipientId;
         this.artifactId = artifactId;

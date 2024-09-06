@@ -1,4 +1,4 @@
-package com.vou.statistics.config;
+package com.vou.sessions.config;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -9,8 +9,8 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 
-import com.vou.statistics.kafka.serializer.NotificationDataSerializer;
-import com.vou.statistics.model.NotificationData;
+import com.vou.sessions.kafka.serializer.TransactionDataSerializer;
+import com.vou.sessions.model.TransactionData;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,11 +31,11 @@ public class KafkaProducerConfig {
     // }
 
     @Bean
-    public ProducerFactory<String, NotificationData> notificationProducerFactory() {
+    public ProducerFactory<String, TransactionData> transactionProducerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, NotificationDataSerializer.class);
+        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, TransactionDataSerializer.class);
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
@@ -45,7 +45,7 @@ public class KafkaProducerConfig {
     // }
 
     @Bean
-    public KafkaTemplate<String, NotificationData> kafkaTemplateNotificationData() {
-        return new KafkaTemplate<>(notificationProducerFactory());
+    public KafkaTemplate<String, TransactionData> kafkaTemplateTransactionDto() {
+        return new KafkaTemplate<>(transactionProducerFactory());
     }
 }

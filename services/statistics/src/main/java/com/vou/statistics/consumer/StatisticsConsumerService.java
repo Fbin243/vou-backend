@@ -39,8 +39,10 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -57,21 +59,30 @@ public class StatisticsConsumerService {
 
     private static final Logger logger = Logger.getLogger(StatisticsConsumerService.class.getName());
 
-    @KafkaListener(topics = "session-transaction", groupId = "statistics_group", containerFactory = "kafkaListenerContainerFactory")
-    public void listenSessionTransaction(ConsumerRecord<String, List<TransactionDto>> record, Acknowledgment acknowledgment) {
+    @Autowired
+	private KafkaTemplate<String, NotificationData> kafkaTemplateNotificationInfo;
+
+    @KafkaListener(topics = "session-transaction", groupId = "group_id", containerFactory = "kafkaListenerContainerFactory")
+    public void listenSessionTransaction(ConsumerRecord<String, TransactionDto> record, Acknowledgment acknowledgment) {
         try {
-            List<TransactionDto> transactionDtos = record.value();
-            List<Transaction> transactions = transactionDtos.stream()
-            .map(TransactionMapper::toEntity)
-            .collect(Collectors.toList());
+            // List<TransactionDto> transactionDtos = record.value();
+            // List<Transaction> transactions = transactionDtos.stream()
+            // .map(TransactionMapper::toEntity)
+            // .collect(Collectors.toList());
+
+            TransactionDto transactionDto = record.value();
+
+            // convert to suitable TransactionDto
 
             List<CompletableFuture<Void>> futures = new ArrayList<>();
 
-            System.out.println("Transactions: " + transactions);
+            // System.out.println("Transactions: " + transactions);
 
-            for (Transaction _transaction : transactions) {
-                futures.add(processTransactionNotificationAsync(_transaction));
-            }
+            // for (Transaction _transaction : transactions) {
+            //     futures.add(processTransactionNotificationAsync(_transaction));
+            // }
+
+            futures.add(processTransactionNotificationAsync(TransactionMapper.toEntity(transactionDto)));
             
             // Wait for all CompletableFutures to complete
             CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
@@ -121,7 +132,7 @@ public class StatisticsConsumerService {
                     artifactImage = items.get(0).getIcon();
                 }
 
-                if (transactionContext.executeStrategy(_transaction, playerVoucherService, playerItemService)) {
+                if (transactionContext.executeStrategy(_transaction, playerVoucherService, playerItemService, null)) {
                     System.out.println("Transaction processed successfully");
 
                     NotificationInfo notificationInfo = new NotificationInfo("You've received item " + artifactName, "Check your inventory for updates", artifactImage);
@@ -130,7 +141,8 @@ public class StatisticsConsumerService {
                     
                     System.out.println("Notification IDDD: " + notificationId);
 
-                    notificationsServiceClient.sendNotification(notificationData);
+                    // notificationsServiceClient.sendNotification(notificationData);
+                    kafkaTemplateNotificationInfo.send("event-notification", notificationData);
                 } else {
                     System.out.println("Transaction processing failed");
                 }

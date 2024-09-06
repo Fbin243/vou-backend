@@ -4,6 +4,7 @@ import static com.vou.statistics.common.Constants.TRANSACTION_TYPE_ITEM_RECEIVED
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.vou.statistics.client.EventsServiceClient;
 import com.vou.statistics.dto.PlayerItemDto;
 import com.vou.statistics.entity.ItemReceivedTransaction;
 import com.vou.statistics.model.Transaction;
@@ -29,7 +30,7 @@ public class ItemReceivedTransactionStrategy implements TransactionStrategy {
     }
 
     @Override
-    public boolean processTransaction(Transaction transaction, PlayerVoucherService playerVoucherService, PlayerItemService playerItemService) {
+    public boolean processTransaction(Transaction transaction, PlayerVoucherService playerVoucherService, PlayerItemService playerItemService, EventsServiceClient eventsServiceClient) {
         if (!transaction.getTransactionType().equalsIgnoreCase(TRANSACTION_TYPE_ITEM_RECEIVED)) {
             throw new IllegalArgumentException("Invalid transaction type for ItemReceivedTransactionStrategy");
         }
