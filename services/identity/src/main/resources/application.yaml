@@ -51,3 +51,6 @@ management:
       enabled: true
     tags:
       application: ${spring.application.name}
+
+speedsms:
+  apiAccessToken: A72mXM8yQbOcjYOZ-2FDcbVQ9psP6WKY

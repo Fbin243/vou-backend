@@ -17,7 +17,9 @@ public enum ErrorCode {
     UNAUTHORIZED(1007, "You do not have permission", HttpStatus.FORBIDDEN),
     INVALID_DOB(1008, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
     ROLE_NOT_EXISTED(1009, "Role needs to be specified", HttpStatus.BAD_REQUEST),
-    INVALID_ROLE(1010, "Role is invalid", HttpStatus.BAD_REQUEST);
+    INVALID_ROLE(1010, "Role is invalid", HttpStatus.BAD_REQUEST),
+    INVALID_OTP(1011, "Invalid OTP", HttpStatus.BAD_REQUEST),
+    OTP_SEND_FAILED(1012, "OTP send failed", HttpStatus.INTERNAL_SERVER_ERROR);
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;

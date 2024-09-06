@@ -25,6 +25,26 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.vonage</groupId>
+			<artifactId>server-sdk</artifactId>
+			<version>8.10.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.vonage</groupId>
+			<artifactId>client</artifactId>
+			<version>6.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jaxb</groupId>
+			<artifactId>jaxb-runtime</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
 		</dependency>
@@ -219,7 +239,7 @@
 <!--						</platforms>-->
 <!--					</from>-->
 					<to>
-						<image>fbin243/${project.artifactId}</image>
+						<image>haina2410/${project.artifactId}</image>
 					</to>
 				</configuration>
 			</plugin>
