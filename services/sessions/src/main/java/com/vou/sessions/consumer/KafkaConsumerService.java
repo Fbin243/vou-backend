@@ -6,6 +6,8 @@ import com.vou.sessions.engine.GameEngine;
 import com.vou.sessions.engine.quizgame.QuizGameEngine;
 import com.vou.sessions.engine.shakinggame.ShakingGameEngine;
 import com.vou.sessions.model.EventSessionInfo;
+import com.vou.sessions.model.NotificationData;
+import com.vou.sessions.model.NotificationInfo;
 import com.vou.sessions.schedule.SchedulerService;
 import com.vou.sessions.service.ISessionsService;
 import com.vou.sessions.utils.Utils;
@@ -14,10 +16,12 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -35,6 +39,8 @@ public class KafkaConsumerService {
 	private SimpMessagingTemplate messagingTemplate;
 	private QuizGameEngine quizGameEngine;
 	private ShakingGameEngine shakingGameEngine;
+	private KafkaTemplate<String, NotificationData> kafkaTemplateNotificationInfo;
+	
 	
 	@KafkaListener(topics = "event-session", groupId = "group_id", containerFactory = "kafkaListenerContainerFactory"
 		, concurrency = "1")
@@ -59,6 +65,15 @@ public class KafkaConsumerService {
 		log.info("End date : {}", endDate);
 		log.info("Start time : {}", startTime);
 		log.info("End time : {}", endTime);
+		
+		Runnable sendUpComingEventNotification = () -> {
+			log.info("SEND UPCOMING NOTIFICATION FOR EVENT_ID: {}", eventId);
+			NotificationInfo notificationInfo =
+				new NotificationInfo("You've been invited to " + eventId + " event!", brandId + " " + "invited you to join!", "fa-check");
+			NotificationData notificationData = new NotificationData(notificationInfo, new ArrayList<>());
+			
+			kafkaTemplateNotificationInfo.send("event-notification", notificationData);
+		};
 		
 		Runnable setUpGame = () -> {
 			log.info("SET UP GAME");
@@ -115,12 +130,19 @@ public class KafkaConsumerService {
 		};
 		
 		// Set up game before 5 minutes
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-		LocalTime time = LocalTime.parse(startTime, formatter);
+		DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+		LocalTime time = LocalTime.parse(startTime, timeFormatter);
 		LocalTime newStartTime = time.minusMinutes(5);
 		log.info("SET UP GAME BEFORE 5 MINUTES: {}", newStartTime.toString());
 		
 		schedulerService.createCronJobs(setUpGame, startDate, endDate, newStartTime.toString() + ":00", endTime, false);
+		
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		LocalDate _startDate = LocalDate.parse(startDate, dateTimeFormatter);
+		LocalDate newStartDate = _startDate.minusDays(1);
+		log.info("_Start date: {}", _startDate);
+		
+		schedulerService.createCronJobs(sendUpComingEventNotification, newStartDate.toString(), newStartDate.toString(), startTime, endTime, false);
 		
 		acknowledgment.acknowledge();
 	}
