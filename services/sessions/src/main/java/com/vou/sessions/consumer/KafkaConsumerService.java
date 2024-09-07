@@ -71,6 +71,7 @@ public class KafkaConsumerService {
 			sessionDto.setUsers(new ArrayList<>());
 			sessionDto.setDate(ZonedDateTime.now().toLocalDate());
 			SessionDto createdSessionDto = sessionsService.createSession(sessionDto);
+			String newEndTime = endTime.replace(":00", ":30");
 			
 			log.info("New session entity: {}", createdSessionDto);
 			String sessionId;
@@ -89,17 +90,28 @@ public class KafkaConsumerService {
 			}
 			
 			gameEngine.setUp(sessionId);
-			Runnable endGame = () -> {
-				log.info("END GAME, SAVE TO MONGODB AND RESET REDIS FOR SESSION_ID: {} ", sessionId);
-				List<RecordDto> leaderboard = gameEngine.end(sessionId);
+			Runnable getLeaderBoard = () -> {
+				log.info("GET LEADERBOARD FOR SESSION_ID: {} ", sessionId);
+				List<RecordDto> leaderboard = gameEngine.getLeaderBoardForGivingItem(sessionId);
 				log.info("Leaderboard: {}", leaderboard);
+				messagingTemplate.convertAndSend("/topic/end/" + sessionId, leaderboard);
+			};
+			
+			Runnable endAndReset = () -> {
+				log.info("END GAME FOR SESSION_ID: {}", sessionId);
+				gameEngine.end(sessionId);
 			};
 			
 			Runnable updateTime = () -> {
 				updateTimeAndLeaderboard(sessionId);
 			};
-			schedulerService.createCronJobs(endGame, startDate, endDate, endTime, endTime, false);
-			schedulerService.createCronJobs(updateTime, startDate, endDate, startTime, endTime, true);
+			schedulerService.createCronJobs(updateTime, startDate, endDate, startTime, newEndTime, true);
+			
+			schedulerService.createCronJobs(getLeaderBoard, startDate, endDate, endTime, endTime, false);
+			
+			// Reset session and save to mongodb after 10 seconds
+			log.info("Clear up redis and save to mongodb after 10 seconds: {}", newEndTime);
+			schedulerService.createCronJobs(endAndReset, startDate, endDate, newEndTime, newEndTime, false);
 		};
 		
 		// Set up game before 5 minutes

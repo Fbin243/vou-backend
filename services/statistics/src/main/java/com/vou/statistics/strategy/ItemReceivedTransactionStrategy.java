@@ -14,12 +14,12 @@ import org.springframework.stereotype.Service;
 import static com.vou.statistics.common.Constants.TRANSACTION_TYPE_ITEM_RECEIVED;
 
 @Service
-// @NoArgsConstructor
+@NoArgsConstructor
 // @AllArgsConstructor
 public class ItemReceivedTransactionStrategy implements TransactionStrategy {
 	
 	private PlayerItemService playerItemService;
-
+	
 	@Autowired
 	private ItemReceivedTransactionRepository itemReceivedTransactionRepository;
 	
