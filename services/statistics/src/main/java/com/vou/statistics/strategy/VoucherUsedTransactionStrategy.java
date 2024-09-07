@@ -25,6 +25,12 @@ public class VoucherUsedTransactionStrategy implements TransactionStrategy {
         try {
             VoucherUsedTransaction voucherUsedTransaction = (VoucherUsedTransaction) transaction;
 
+            int existVoucherQuantity = playerVoucherService.getQuantityByPlayerIdAndVoucherId(voucherUsedTransaction.getPlayerId(), voucherUsedTransaction.getArtifactId());
+
+            if (existVoucherQuantity < voucherUsedTransaction.getQuantity()) {
+                return false;
+            }
+            
             // update player's voucher
             playerVoucherService.addPlayerVoucher(new PlayerVoucherDto(voucherUsedTransaction.getPlayerId(), voucherUsedTransaction.getArtifactId(), voucherUsedTransaction.getQuantity() * -1));
 

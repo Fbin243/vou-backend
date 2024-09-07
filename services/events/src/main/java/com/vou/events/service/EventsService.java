@@ -626,6 +626,7 @@ public class EventsService implements IEventsService {
 							eventId,
 							gameId_StartTime.getGameId().toString(),
 							gameId_StartTime.getGameType(),
+							brands.get(0).getId(),
 							eventRegistrationInfoDto.getEvent().getStartDate().toString().split(regexSplitStringLocalDateTime)[0],
 							eventRegistrationInfoDto.getEvent().getEndDate().toString().split(regexSplitStringLocalDateTime)[0],
 							gameId_StartTime.getStartTime().toString(),

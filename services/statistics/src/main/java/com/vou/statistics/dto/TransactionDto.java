@@ -8,8 +8,6 @@ import java.time.LocalDateTime;
 
 import lombok.Setter;
 
-import org.springframework.data.annotation.Id;
-
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 

@@ -83,4 +83,8 @@ public interface IPlayerVoucherService {
     default Boolean deletePlayerVouchers(PlayerVouchersDto dto) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
+
+    default int getQuantityByPlayerIdAndVoucherId(String playerId, String voucherId) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
 }

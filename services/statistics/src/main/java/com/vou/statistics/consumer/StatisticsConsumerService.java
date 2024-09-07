@@ -6,10 +6,6 @@ import com.vou.statistics.client.EventsServiceClient;
 import com.vou.statistics.client.NotificationsServiceClient;
 import com.vou.statistics.context.TransactionContext;
 import com.vou.statistics.creator.TransactionFactoryCreator;
-// import com.vou.statistics.dto.ItemReceivedTransactionDto;
-// import com.vou.statistics.dto.ItemSharedTransactionDto;
-// import com.vou.statistics.dto.NotificationDto;
-// import com.vou.statistics.entity.NotificationRelatedPair;
 import com.vou.statistics.factory.TransactionFactory;
 import com.vou.statistics.mapper.TransactionMapper;
 import com.vou.statistics.dto.AddUsersRequestDto;
@@ -18,35 +14,24 @@ import com.vou.statistics.dto.TransactionDto;
 import com.vou.statistics.dto.VoucherDto;
 import com.vou.statistics.model.NotificationData;
 import com.vou.statistics.model.NotificationInfo;
-// import com.vou.statistics.dto.VoucherConversionTransactionDto;
-// import com.vou.statistics.dto.VoucherUsedTransactionDto;
-// import com.vou.statistics.model.NotificationInfo;
 import com.vou.statistics.model.Transaction;
-// import com.vou.statistics.repository.NotificationRelatedPairRepository;
-// import com.vou.statistics.repository.NotificationUserRepository;
-// import com.vou.statistics.repository.UserTokenRepository;
 import com.vou.statistics.service.PlayerItemService;
 import com.vou.statistics.service.PlayerVoucherService;
 import com.vou.statistics.strategy.TransactionStrategy;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
 @AllArgsConstructor

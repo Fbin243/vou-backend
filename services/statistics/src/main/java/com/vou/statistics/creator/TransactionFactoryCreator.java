@@ -8,7 +8,6 @@ import static com.vou.statistics.common.Constants.TRANSACTION_TYPE_VOUCHER_USED;
 import com.vou.statistics.factory.TransactionFactory;
 import com.vou.statistics.factory.VoucherConversionTransactionFactory;
 import com.vou.statistics.factory.VoucherUsedTransactionFactory;
-import com.vou.statistics.repository.TransactionRepository;
 import com.vou.statistics.strategy.ItemSharedTransactionStrategy;
 import com.vou.statistics.strategy.ItemReceivedTransactionStrategy;
 import com.vou.statistics.strategy.TransactionStrategy;

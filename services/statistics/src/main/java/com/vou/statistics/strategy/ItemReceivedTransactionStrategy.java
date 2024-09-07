@@ -35,12 +35,12 @@ public class ItemReceivedTransactionStrategy implements TransactionStrategy {
 		}
 		
 		try {
-			System.out.println("ItemReceivedTransactionStrategy.processTransaction " + _playerItemService);
+			// System.out.println("ItemReceivedTransactionStrategy.processTransaction " + _playerItemService);
 			_playerItemService.addPlayerItem(new PlayerItemDto(transaction.getRecipientId(), transaction.getArtifactId(), transaction.getQuantity()));
 			// playerItemService.deletePlayerItem(new PlayerItemDto(transaction.getPlayerId(), transaction.getArtifactId(), transaction.getQuantity()));
-			System.out.println("Passed addPlayerItem");
+			// System.out.println("Passed addPlayerItem");
 			saveTransaction(transaction);
-			System.out.println("ItemReceivedTransactionStrategy.processTransaction " + transaction);
+			// System.out.println("ItemReceivedTransactionStrategy.processTransaction " + transaction);
 		} catch (Exception e) {
 			e.getStackTrace();
 			e.printStackTrace();

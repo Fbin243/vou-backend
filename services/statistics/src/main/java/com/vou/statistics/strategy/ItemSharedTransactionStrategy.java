@@ -3,7 +3,6 @@ package com.vou.statistics.strategy;
 import static com.vou.statistics.common.Constants.TRANSACTION_TYPE_ITEM_SHARED;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import com.vou.statistics.client.EventsServiceClient;
 import com.vou.statistics.dto.PlayerItemDto;
@@ -13,7 +12,6 @@ import com.vou.statistics.repository.ItemSharedTransactionRepository;
 import com.vou.statistics.service.PlayerItemService;
 import com.vou.statistics.service.PlayerVoucherService;
 
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
