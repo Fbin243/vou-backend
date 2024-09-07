@@ -3,8 +3,6 @@ package com.vou.statistics.dto;
 import lombok.Data;
 import lombok.Getter;
 
-import org.hibernate.cache.spi.support.AbstractReadWriteAccess.Item;
-
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

@@ -44,4 +44,9 @@ public class LikeService {
         // Xóa like
         likeRepository.deleteByUserIdAndLikeableIdAndLikeableType(userId, likeableId, likeableType);
     }
+
+    public boolean isLiked(String userId, String likeableType, String likeableId) {
+        // Kiểm tra nếu user đã like đối tượng
+        return likeRepository.existsByUserIdAndLikeableIdAndLikeableType(userId, likeableId, likeableType);
+    }
 }

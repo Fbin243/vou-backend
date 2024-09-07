@@ -9,8 +9,6 @@ import org.springframework.stereotype.Repository;
 
 import com.vou.statistics.entity.PlayerItem;
 
-import lombok.NoArgsConstructor;
-
 @Repository
 public interface PlayerItemRepository extends MongoRepository<PlayerItem, ObjectId> 
 {

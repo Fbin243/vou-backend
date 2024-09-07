@@ -12,13 +12,10 @@ import com.vou.statistics.client.EventsServiceClient;
 import com.vou.statistics.client.UsersServiceClient;
 import com.vou.statistics.dto.PlayerDto;
 import com.vou.statistics.dto.PlayerVoucherDto;
-import com.vou.statistics.dto.PlayerVouchersDto;
 import com.vou.statistics.dto.Player_VoucherQuantitiesDto;
 import com.vou.statistics.dto.VoucherDto;
 import com.vou.statistics.entity.PlayerVoucher;
 import com.vou.statistics.repository.PlayerVoucherRepository;
-
-import lombok.AllArgsConstructor;
 
 @Service
 @NoArgsConstructor
@@ -84,6 +81,12 @@ public class PlayerVoucherService implements IPlayerVoucherService {
     @Override
     public List<PlayerVoucher> addPlayerVouchers(Player_VoucherQuantitiesDto dto) {
         return dto.getPlayerVouchers().stream().map(this::addPlayerVoucher).collect(Collectors.toList());
+    }
+
+    @Override
+    public int getQuantityByPlayerIdAndVoucherId(String playerId, String voucherId) {
+        Optional<PlayerVoucher> playerVoucher = playerVoucherRepository.findByPlayerIdAndVoucherId(playerId, voucherId);
+        return playerVoucher.map(PlayerVoucher::getQuantity).orElse(0);
     }
 
     // check later

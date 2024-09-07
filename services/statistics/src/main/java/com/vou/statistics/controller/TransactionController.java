@@ -26,7 +26,6 @@ import com.vou.statistics.dto.AddUsersRequestDto;
 import com.vou.statistics.dto.ItemDto;
 import com.vou.statistics.dto.TransactionDto;
 import com.vou.statistics.dto.VoucherDto;
-import com.vou.statistics.dto.VoucherItemsConversionInfo;
 import com.vou.statistics.entity.ItemSharedTransaction;
 import com.vou.statistics.entity.ItemReceivedTransaction;
 import com.vou.statistics.entity.VoucherConversionTransaction;
@@ -37,7 +36,6 @@ import com.vou.statistics.service.PlayerItemService;
 import com.vou.statistics.service.PlayerVoucherService;
 // import com.vou.statistics.mapper.TransactionMapper;
 import com.vou.statistics.service.TransactionService;
-import com.vou.statistics.strategy.ItemSharedTransactionStrategy;
 import com.vou.statistics.strategy.TransactionStrategy;
 
 import lombok.AllArgsConstructor;

@@ -4,8 +4,6 @@ import static com.vou.statistics.common.Constants.TRANSACTION_TYPE_VOUCHER_CONVE
 
 import java.util.Map;
 
-import org.springframework.boot.actuate.autoconfigure.metrics.MetricsProperties.System;
-
 import com.vou.statistics.client.EventsServiceClient;
 import com.vou.statistics.dto.EventVoucherAndAdditionQuantityDto;
 import com.vou.statistics.dto.ItemId_Quantity;
@@ -43,6 +41,8 @@ public class VoucherConversionTransactionStrategy implements TransactionStrategy
             logger.info("Processing VoucherConversionTransaction: " + voucherItemsConversionTransaction.toString());
             Map<String, Integer> items_quantities = _eventsServiceClient.getItemsQuantitiesByVoucher(voucherItemsConversionTransaction.getArtifactId());
             
+            // check
+
             logger.info("Items quantities: " + items_quantities.toString());
             for (ItemId_Quantity item_quantity : voucherItemsConversionTransaction.getItems()) {
                 if (items_quantities.get(item_quantity.getItemId()) * voucherItemsConversionTransaction.getQuantity() > item_quantity.getQuantity()) {
