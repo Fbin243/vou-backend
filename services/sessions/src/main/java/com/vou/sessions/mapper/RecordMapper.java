@@ -47,4 +47,12 @@ public interface RecordMapper {
 		// Handle the default case or throw an exception
 		throw new RuntimeException("Failed to map record dto to record entity");
 	}
+	
+	default List<RecordDto> mapRecordEntityListToRecordDtoList(List<RecordEntity> entities) {
+		return entities.stream().map(this::mapRecordEntityToRecordDto).toList();
+	}
+	
+	default List<RecordEntity> mapRecordDtoListToRecordEntityList(List<RecordDto> dtos) {
+		return dtos.stream().map(this::mapRecordDtoToRecordEntity).toList();
+	}
 }

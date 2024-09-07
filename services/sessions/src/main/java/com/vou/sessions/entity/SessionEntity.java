@@ -21,6 +21,9 @@ public class SessionEntity {
 	@Field(value = "game_id")
 	private String gameId;
 	
+	@Field(value = "brand_id")
+	private String brandId;
+	
 	@Field(value = "date")
 	private LocalDate date;
 	
