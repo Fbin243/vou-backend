@@ -2,6 +2,8 @@ package com.vou.statistics.strategy;
 
 import static com.vou.statistics.common.Constants.TRANSACTION_TYPE_VOUCHER_USED;
 
+import org.springframework.stereotype.Service;
+
 import com.vou.statistics.client.EventsServiceClient;
 import com.vou.statistics.dto.PlayerVoucherDto;
 import com.vou.statistics.entity.VoucherUsedTransaction;
@@ -9,8 +11,14 @@ import com.vou.statistics.model.Transaction;
 import com.vou.statistics.service.PlayerItemService;
 import com.vou.statistics.service.PlayerVoucherService;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 import com.vou.statistics.repository.VoucherUsedTransactionRepository;
 
+@Service
+@NoArgsConstructor
+@AllArgsConstructor
 public class VoucherUsedTransactionStrategy implements TransactionStrategy {
 
     private PlayerVoucherService                playerVoucherService;
