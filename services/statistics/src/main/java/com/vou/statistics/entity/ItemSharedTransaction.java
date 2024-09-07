@@ -11,7 +11,8 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import com.vou.statistics.model.Transaction;
 
-import jakarta.persistence.Id;
+// import jakarta.persistence.Id;
+import org.springframework.data.annotation.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import lombok.AllArgsConstructor;
