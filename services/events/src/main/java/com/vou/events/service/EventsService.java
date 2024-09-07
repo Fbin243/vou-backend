@@ -200,7 +200,7 @@ public class EventsService implements IEventsService {
 		
 		return returnVoucherDtos;
 	}
-
+	
 	@Override
 	public List<ItemDto> fetchItemsByEvent(String eventId) {
 		List<EventItem> eventItems = eventItemRepository.findByEvent(eventId);
@@ -632,7 +632,7 @@ public class EventsService implements IEventsService {
 							eventRegistrationInfoDto.getEvent().getStartDate().toString().split(regexSplitStringLocalDateTime)[0],
 							eventRegistrationInfoDto.getEvent().getEndDate().toString().split(regexSplitStringLocalDateTime)[0],
 							gameId_StartTime.getStartTime().toString(),
-							gameId_StartTime.getStartTime().plusMinutes(30).toString()
+							gameId_StartTime.getStartTime().plusMinutes(2).toString()
 						);
 						
 						log.info("EventSessionInfo: " + eventSessionInfo.toString());
