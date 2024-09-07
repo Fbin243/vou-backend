@@ -16,16 +16,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vou.statistics.dto.PlayerDto;
+import com.vou.statistics.dto.PlayerGameEventDto;
 import com.vou.statistics.dto.PlayerItemsDto;
 import com.vou.statistics.dto.PlayerVouchersDto;
 import com.vou.statistics.dto.Player_ItemQuantitiesDto;
 import com.vou.statistics.dto.Player_VoucherQuantitiesDto;
 import com.vou.statistics.dto.ReturnItemDto;
 import com.vou.statistics.dto.VoucherDto;
+import com.vou.statistics.entity.PlayerGameEvent;
 import com.vou.statistics.entity.PlayerItem;
 import com.vou.statistics.entity.PlayerVoucher;
 import com.vou.statistics.model.Like;
 import com.vou.statistics.service.LikeService;
+import com.vou.statistics.service.PlayerGameEventService;
 import com.vou.statistics.service.PlayerItemService;
 import com.vou.statistics.service.PlayerVoucherService;
 
@@ -37,6 +40,7 @@ public class StatisticsController {
     private LikeService             likeService;
     private PlayerVoucherService    playerVoucherService;
     private PlayerItemService       playerItemService;
+    private PlayerGameEventService  playerGameEventService;
 
     public StatisticsController(PlayerVoucherService playerVoucherService, PlayerItemService playerItemService) {
         this.playerVoucherService = playerVoucherService;
@@ -72,6 +76,17 @@ public class StatisticsController {
                                                 @RequestParam String likeableId,
                                                 @RequestParam String likeableType) {
         return ResponseEntity.ok(likeService.isLiked(userId, likeableType, likeableId));
+    }
+
+    @GetMapping("/player_game_event/player/event/{eventId}")
+    public ResponseEntity<List<PlayerDto>> getPlayersByEvent(@PathVariable String eventId) {
+        return ResponseEntity.ok(playerGameEventService.getPlayersEventId(eventId));
+    }
+
+    @GetMapping("/player_game_event/player")
+    public ResponseEntity<List<PlayerDto>> getPlayersByGameAndEvent(@RequestParam String gameId,
+                                                                    @RequestParam String eventId) {
+        return ResponseEntity.ok(playerGameEventService.getPlayersByGameIdAndEventId(gameId, eventId));
     }
 
     @PostMapping("/player_voucher")
@@ -114,6 +129,11 @@ public class StatisticsController {
             }
         }
         return ResponseEntity.ok(playerItems);
+    }
+
+    @PostMapping("/player_game_event")
+    public ResponseEntity<PlayerGameEvent> savePlayerGameEvent(@RequestBody PlayerGameEventDto dto) {
+        return ResponseEntity.ok(playerGameEventService.addPlayerGameEvent(dto));
     }
 
     @DeleteMapping("/player_item")
