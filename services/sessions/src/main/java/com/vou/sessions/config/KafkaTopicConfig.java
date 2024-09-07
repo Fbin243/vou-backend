@@ -26,4 +26,9 @@ public class KafkaTopicConfig {
     public NewTopic sessionTransaction() {
         return new NewTopic("session-transaction", 3, (short) 1);
     }
+
+    @Bean
+    public NewTopic eventNotification() {
+        return new NewTopic("event-notification", 3, (short) 1);
+    }
 }

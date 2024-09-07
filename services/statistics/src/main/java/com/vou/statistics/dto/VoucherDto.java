@@ -36,4 +36,6 @@ public class VoucherDto {
     private VoucherStatus status;
 
     private VoucherUnitValue unitValue;
+    
+    private String voucherType;
 }

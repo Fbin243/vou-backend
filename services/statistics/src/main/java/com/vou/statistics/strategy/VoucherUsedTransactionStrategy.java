@@ -2,10 +2,16 @@ package com.vou.statistics.strategy;
 
 import static com.vou.statistics.common.Constants.TRANSACTION_TYPE_VOUCHER_USED;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
 import org.springframework.stereotype.Service;
 
 import com.vou.statistics.client.EventsServiceClient;
 import com.vou.statistics.dto.PlayerVoucherDto;
+import com.vou.statistics.dto.ReturnVoucherDto;
+import com.vou.statistics.dto.VoucherDto;
 import com.vou.statistics.entity.VoucherUsedTransaction;
 import com.vou.statistics.model.Transaction;
 import com.vou.statistics.service.PlayerItemService;
@@ -38,9 +44,28 @@ public class VoucherUsedTransactionStrategy implements TransactionStrategy {
             if (existVoucherQuantity < voucherUsedTransaction.getQuantity()) {
                 return false;
             }
+
+            // get Voucher By Id
+            VoucherDto currentVoucher = eventsServiceClient.getVouchersByIds(Collections.singletonList(voucherUsedTransaction.getArtifactId())).get(0);
+
+            if (currentVoucher == null) {
+                return false;
+            }
+
+            if (currentVoucher.getVoucherType().equalsIgnoreCase("online")) {
+                List<ReturnVoucherDto> vouchers = eventsServiceClient.getVouchersByEvent(voucherUsedTransaction.getEventId());
+                Random rand = new Random();
+                for (int i = 0; i < voucherUsedTransaction.getQuantity(); ++i) {
+                    playerVoucherService.addPlayerVoucher(new PlayerVoucherDto(voucherUsedTransaction.getPlayerId(), voucherUsedTransaction.getArtifactId(), -1));
+                    playerVoucherService.addPlayerVoucher(new PlayerVoucherDto(voucherUsedTransaction.getPlayerId(), vouchers.get(rand.nextInt(vouchers.size())).getId(), 1));
+                }
+                // playerItemService.addItemToPlayer(voucherUsedTransaction.getPlayerId(), voucherDto.getArtifactId(), voucherUsedTransaction.getQuantity());
+            } else {
+                playerVoucherService.addPlayerVoucher(new PlayerVoucherDto(voucherUsedTransaction.getPlayerId(), voucherUsedTransaction.getArtifactId(), voucherUsedTransaction.getQuantity() * -1));
+            }
             
             // update player's voucher
-            playerVoucherService.addPlayerVoucher(new PlayerVoucherDto(voucherUsedTransaction.getPlayerId(), voucherUsedTransaction.getArtifactId(), voucherUsedTransaction.getQuantity() * -1));
+            // playerVoucherService.addPlayerVoucher(new PlayerVoucherDto(voucherUsedTransaction.getPlayerId(), voucherUsedTransaction.getArtifactId(), voucherUsedTransaction.getQuantity() * -1));
 
             // save voucher used transaction
             saveTransaction(voucherUsedTransaction);

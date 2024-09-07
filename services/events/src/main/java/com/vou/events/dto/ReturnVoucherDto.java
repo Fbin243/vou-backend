@@ -1,7 +1,5 @@
 package com.vou.events.dto;
 
-import java.time.LocalDateTime;
-
 import com.vou.events.common.VoucherStatus;
 import com.vou.events.common.VoucherUnitValue;
 import lombok.Data;
