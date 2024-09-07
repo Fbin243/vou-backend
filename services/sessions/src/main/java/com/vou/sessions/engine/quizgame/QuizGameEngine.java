@@ -1,10 +1,10 @@
 package com.vou.sessions.engine.quizgame;
 
+import com.amazonaws.services.polly.model.OutputFormat;
 import com.vou.pkg.exception.NotFoundException;
 import com.vou.sessions.client.HQTriviaFeignClient;
-import com.vou.sessions.dto.RecordDto;
 import com.vou.sessions.engine.GameEngine;
-import com.vou.sessions.entity.SessionEntity;
+import com.vou.sessions.entity.RecordEntity;
 import com.vou.sessions.entity.quizgame.QuizRecordEntity;
 import com.vou.sessions.mapper.RecordMapper;
 import com.vou.sessions.repository.SessionsRepository;
@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.io.InputStream;
 import java.util.*;
 
 @Primary
@@ -24,18 +25,15 @@ public class QuizGameEngine extends GameEngine {
 	private static final String QUIZ_RESPONSE_KEY = "QUIZ_RESPONSE";
 	private HQTriviaFeignClient hqTriviaFeignClient;
 	private AmazonPollyService amazonPollyService;
-	private SessionsRepository sessionsRepository;
-	private RecordMapper quizRecordMapper;
 	
 	@Autowired
 	QuizGameEngine(RedisTemplate<String, Object> redisTemplate, HQTriviaFeignClient triviaFeignClient,
-	               AmazonPollyService amazonPollyService, SessionsRepository sessionsRepository,
-	               RecordMapper quizRecordMapper) {
+	               AmazonPollyService amazonPollyService, SessionsRepository sessionsRepository, RecordMapper recordMapper) {
 		this.redisTemplate = redisTemplate;
 		this.hqTriviaFeignClient = triviaFeignClient;
 		this.amazonPollyService = amazonPollyService;
 		this.sessionsRepository = sessionsRepository;
-		this.quizRecordMapper = quizRecordMapper;
+		this.recordMapper = recordMapper;
 	}
 	
 	@PostConstruct
@@ -53,28 +51,28 @@ public class QuizGameEngine extends GameEngine {
 		}
 		
 		// Step 1: Fetch data from OpenTrivia
-		QuizResponse quizResponse = hqTriviaFeignClient.getQuestions(3);
+		QuizResponse quizResponse = hqTriviaFeignClient.getQuestions(4);
 		shuffleCorrectAnswer(quizResponse);
 		
 		// Step 2: Generate audio files from questions by Amazon Polly and save it to
 		// AWS S3
-//		List<QuizQuestion> quizQuestions = quizResponse.getResults();
-//		for (int i = 0; i < quizQuestions.size(); i++) {
-//			String ssmlString = amazonPollyService.convertQuizQuestionToSSML(quizQuestions.get(i), i + 1);
-//			try (InputStream inputStream = amazonPollyService.synthesize(ssmlString, OutputFormat.Mp3)) {
-//				String key = String.format("questions/%s/%d.mp3", sessionId, i + 1);
-//				log.info("S3key: {}", key);
-//				String url = amazonPollyService.uploadToS3(inputStream, key);
-//				log.info("S3url: {}", url);
-//				quizQuestions.get(i).setAudioUrl(url);
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//				throw new RuntimeException("Failed to set up quiz game");
-//			}
-//		}
-//
-//		// Step 3: Save quiz response to Redis and MongoDB
-//		hashOps.put(sessionId, QUIZ_RESPONSE_KEY, quizResponse);
+		List<QuizQuestion> quizQuestions = quizResponse.getResults();
+		for (int i = 0; i < quizQuestions.size(); i++) {
+			String ssmlString = amazonPollyService.convertQuizQuestionToSSML(quizQuestions.get(i), i + 1);
+			try (InputStream inputStream = amazonPollyService.synthesize(ssmlString, OutputFormat.Mp3)) {
+				String key = String.format("questions/%s/%d.mp3", sessionId, i + 1);
+				log.info("S3key: {}", key);
+				String url = amazonPollyService.uploadToS3(inputStream, key);
+				log.info("S3url: {}", url);
+				quizQuestions.get(i).setAudioUrl(url);
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new RuntimeException("Failed to set up quiz game");
+			}
+		}
+		
+		// Step 3: Save quiz response to Redis and MongoDB
+		hashOps.put(sessionId, QUIZ_RESPONSE_KEY, quizResponse);
 	}
 	
 	@Override
@@ -88,7 +86,7 @@ public class QuizGameEngine extends GameEngine {
 				tmpQuizRecord.setStartPlayTime(now);
 				return tmpQuizRecord;
 			});
-		QuizResponse quizResponse = getQuizResponse(sessionId, 10).orElseThrow(
+		QuizResponse quizResponse = getQuizResponse(sessionId).orElseThrow(
 			() -> new RuntimeException("Failed to get quiz response"));
 		quizRecord.setStartPlayTime(now);
 		putQuizRecord(sessionId, playerId, quizRecord);
@@ -105,17 +103,6 @@ public class QuizGameEngine extends GameEngine {
 				String.format("%s, %s", sessionId, playerId)));
 		quizRecord.setTotalScore(newScore);
 		putQuizRecord(sessionId, playerId, quizRecord);
-	}
-	
-	@Override
-	public List<RecordDto> end(String sessionId) {
-		List<QuizRecordEntity> leaderboard = getLeaderboard(sessionId);
-		SessionEntity sessionEntity = sessionsRepository.findSessionById(sessionId).orElseThrow(
-			() -> new NotFoundException("Session", "sessionId", sessionId));
-		
-		sessionEntity.setUsers(new ArrayList<>(leaderboard));
-		sessionsRepository.save(sessionEntity);
-		return new ArrayList<>(quizRecordMapper.toQuizRecordDtoList(leaderboard));
 	}
 	
 	@Override
@@ -137,7 +124,7 @@ public class QuizGameEngine extends GameEngine {
 		putQuizRecord(sessionId, playerId, quizRecord);
 	}
 	
-	private Optional<QuizResponse> getQuizResponse(String sessionId, int amount) {
+	private Optional<QuizResponse> getQuizResponse(String sessionId) {
 		try {
 			QuizResponse quizResponse = objectMapper.convertValue(hashOps.get(sessionId, QUIZ_RESPONSE_KEY),
 				QuizResponse.class);
@@ -172,7 +159,8 @@ public class QuizGameEngine extends GameEngine {
 		}
 	}
 	
-	private List<QuizRecordEntity> getLeaderboard(String sessionId) {
+	@Override
+	protected List<RecordEntity> getLeaderboard(String sessionId) {
 		Map<String, Object> playerRecords = hashOps.entries(sessionId);
 		playerRecords.remove(CONNECTION_KEY);
 		playerRecords.remove(QUIZ_RESPONSE_KEY);
@@ -186,13 +174,17 @@ public class QuizGameEngine extends GameEngine {
 				QuizRecordEntity quizRecordEntity = new QuizRecordEntity();
 				quizRecordEntity.setUserId(key);
 				quizRecordEntity.setTotalScore(quizRecord.getTotalScore());
-				quizRecordEntity.setTotalTime(quizRecord.getTotalTime());
+				if (quizRecord.getStartPlayTime() != -1) {
+					quizRecordEntity.setTotalTime(quizRecord.getTotalTime() + Utils.now() - quizRecord.getStartPlayTime());
+				} else {
+					quizRecordEntity.setTotalTime(quizRecord.getTotalTime());
+				}
 				return quizRecordEntity;
 			})
 			.sorted(Comparator.comparingLong(QuizRecordEntity::getTotalScore).reversed())
 			.toList();
 		
 		log.info("Leaderboard {}", leaderboard);
-		return leaderboard;
+		return new ArrayList<>(leaderboard);
 	}
 }

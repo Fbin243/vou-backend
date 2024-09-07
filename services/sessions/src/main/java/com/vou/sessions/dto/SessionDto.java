@@ -13,6 +13,7 @@ public class SessionDto {
 	private ObjectId id;
 	private String eventId;
 	private String gameId;
+	private String brandId;
 	private LocalDate date;
 	private List<RecordDto> users;
 }

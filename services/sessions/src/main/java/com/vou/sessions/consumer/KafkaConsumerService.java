@@ -18,7 +18,9 @@ import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,9 +33,7 @@ public class KafkaConsumerService {
 	private ISessionsService sessionsService;
 	private SchedulerService schedulerService;
 	private SimpMessagingTemplate messagingTemplate;
-	
 	private QuizGameEngine quizGameEngine;
-	
 	private ShakingGameEngine shakingGameEngine;
 	
 	@KafkaListener(topics = "event-session", groupId = "group_id", containerFactory = "kafkaListenerContainerFactory"
@@ -44,18 +44,21 @@ public class KafkaConsumerService {
 		
 		String gameId = eventSessionInfo.getGameId();
 		String eventId = eventSessionInfo.getEventId();
+		String brandId = eventSessionInfo.getBrandId();
 		String startDate = eventSessionInfo.getStartDate();
 		String endDate = eventSessionInfo.getEndDate();
 		String startTime = eventSessionInfo.getStartTime() + ":00";
-//		String endTime = eventSessionInfo.getEndTime() + ":00";
-		String endTime = "23:59:59";
+		String endTime = eventSessionInfo.getEndTime() + ":00";
 		String gameType = eventSessionInfo.getGameType();
 		
+		log.info("Event id : {}", eventId);
+		log.info("Brand id : {}", brandId);
+		log.info("Game id : {}", gameId);
+		log.info("Game type : {}", gameType);
 		log.info("Start date : {}", startDate);
 		log.info("End date : {}", endDate);
 		log.info("Start time : {}", startTime);
 		log.info("End time : {}", endTime);
-		log.info("Game type : {}", gameType);
 		
 		Runnable setUpGame = () -> {
 			log.info("SET UP GAME");
@@ -64,6 +67,7 @@ public class KafkaConsumerService {
 			SessionDto sessionDto = new SessionDto();
 			sessionDto.setEventId(eventId);
 			sessionDto.setGameId(gameId);
+			sessionDto.setBrandId(brandId);
 			sessionDto.setUsers(new ArrayList<>());
 			sessionDto.setDate(ZonedDateTime.now().toLocalDate());
 			SessionDto createdSessionDto = sessionsService.createSession(sessionDto);
@@ -86,7 +90,7 @@ public class KafkaConsumerService {
 			
 			gameEngine.setUp(sessionId);
 			Runnable endGame = () -> {
-				log.info("END GAME, SAVE TO MONGODB AND DELETE REDIS");
+				log.info("END GAME, SAVE TO MONGODB AND RESET REDIS FOR SESSION_ID: {} ", sessionId);
 				List<RecordDto> leaderboard = gameEngine.end(sessionId);
 				log.info("Leaderboard: {}", leaderboard);
 			};
@@ -98,7 +102,13 @@ public class KafkaConsumerService {
 			schedulerService.createCronJobs(updateTime, startDate, endDate, startTime, endTime, true);
 		};
 		
-		schedulerService.createCronJobs(setUpGame, startDate, endDate, startTime, endTime, false);
+		// Set up game before 5 minutes
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+		LocalTime time = LocalTime.parse(startTime, formatter);
+		LocalTime newStartTime = time.minusMinutes(5);
+		log.info("SET UP GAME BEFORE 5 MINUTES: {}", newStartTime.toString());
+		
+		schedulerService.createCronJobs(setUpGame, startDate, endDate, newStartTime.toString() + ":00", endTime, false);
 		
 		acknowledgment.acknowledge();
 	}

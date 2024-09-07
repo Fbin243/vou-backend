@@ -1,9 +1,8 @@
 package com.vou.sessions.engine.shakinggame;
 
 import com.vou.pkg.exception.NotFoundException;
-import com.vou.sessions.dto.RecordDto;
 import com.vou.sessions.engine.GameEngine;
-import com.vou.sessions.entity.SessionEntity;
+import com.vou.sessions.entity.RecordEntity;
 import com.vou.sessions.entity.shakinggame.ShakingRecordEntity;
 import com.vou.sessions.mapper.RecordMapper;
 import com.vou.sessions.repository.SessionsRepository;
@@ -21,15 +20,12 @@ import java.util.Optional;
 @Component
 public class ShakingGameEngine extends GameEngine {
 	private static final String EVENT_ITEMS_KEY = "EVENT_ITEMS";
-	private SessionsRepository sessionsRepository;
-	private RecordMapper shakingRecordMapper;
 	
 	@Autowired
-	ShakingGameEngine(RedisTemplate<String, Object> redisTemplate, SessionsRepository sessionsRepository,
-	                  RecordMapper shakingRecordMapper) {
+	ShakingGameEngine(RedisTemplate<String, Object> redisTemplate, SessionsRepository sessionsRepository, RecordMapper recordMapper) {
 		this.redisTemplate = redisTemplate;
 		this.sessionsRepository = sessionsRepository;
-		this.shakingRecordMapper = shakingRecordMapper;
+		this.recordMapper = recordMapper;
 	}
 	
 	@PostConstruct
@@ -39,10 +35,10 @@ public class ShakingGameEngine extends GameEngine {
 	
 	@Override
 	public void setUp(String sessionId) {
+		log.info("SET UP SHAKING GAME FOR SESSION_ID: {}", sessionId);
 		// Check if session is existed
 		if (hashOps.hasKey(sessionId, EVENT_ITEMS_KEY)) {
 			log.info("Session has been set up");
-			return;
 		}
 	}
 	
@@ -90,19 +86,20 @@ public class ShakingGameEngine extends GameEngine {
 		shakingRecord.setTurns(newTurns);
 		putShakingRecord(sessionId, playerId, shakingRecord);
 	}
+
+//	@Override
+//	public List<RecordDto> end(String sessionId) {
+//		List<ShakingRecordEntity> leaderboard = getLeaderboard(sessionId);
+//		SessionEntity sessionEntity = sessionsRepository.findSessionById(sessionId).orElseThrow(
+//			() -> new NotFoundException("Session", "sessionId", sessionId));
+//
+//		sessionEntity.setUsers(new ArrayList<>(leaderboard));
+//		sessionsRepository.save(sessionEntity);
+//		return new ArrayList<>(shakingRecordMapper.toShakingRecordDtoList(leaderboard));
+//	}
 	
 	@Override
-	public List<RecordDto> end(String sessionId) {
-		List<ShakingRecordEntity> leaderboard = getLeaderboard(sessionId);
-		SessionEntity sessionEntity = sessionsRepository.findSessionById(sessionId).orElseThrow(
-			() -> new NotFoundException("Session", "sessionId", sessionId));
-		
-		sessionEntity.setUsers(new ArrayList<>(leaderboard));
-		sessionsRepository.save(sessionEntity);
-		return new ArrayList<>(shakingRecordMapper.toShakingRecordDtoList(leaderboard));
-	}
-	
-	private List<ShakingRecordEntity> getLeaderboard(String sessionId) {
+	protected List<RecordEntity> getLeaderboard(String sessionId) {
 		Map<String, Object> playerRecords = hashOps.entries(sessionId);
 		playerRecords.remove(CONNECTION_KEY);
 		playerRecords.remove(EVENT_ITEMS_KEY);
@@ -117,12 +114,17 @@ public class ShakingGameEngine extends GameEngine {
 				shakingRecordEntity.setUserId(key);
 				shakingRecordEntity.setTurns(shakingRecord.getTurns());
 				shakingRecordEntity.setTotalTime(shakingRecord.getTotalTime());
+				if (shakingRecord.getStartPlayTime() != -1) {
+					shakingRecordEntity.setTotalTime(shakingRecord.getTotalTime() + Utils.now() - shakingRecord.getStartPlayTime());
+				} else {
+					shakingRecordEntity.setTotalTime(shakingRecord.getTotalTime());
+				}
 				return shakingRecordEntity;
 			})
 			.toList();
 		
 		log.info("Leaderboard {}", leaderboard);
-		return leaderboard;
+		return new ArrayList<>(leaderboard);
 	}
 	
 	@Override
