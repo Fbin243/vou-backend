@@ -9,16 +9,19 @@ import com.vou.statistics.service.PlayerItemService;
 import com.vou.statistics.service.PlayerVoucherService;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import static com.vou.statistics.common.Constants.TRANSACTION_TYPE_ITEM_RECEIVED;
 
-@NoArgsConstructor
+@Service
+// @NoArgsConstructor
 // @AllArgsConstructor
 public class ItemReceivedTransactionStrategy implements TransactionStrategy {
 	
 	private PlayerItemService playerItemService;
+
+	@Autowired
 	private ItemReceivedTransactionRepository itemReceivedTransactionRepository;
-	
 	
 	@Autowired
 	public ItemReceivedTransactionStrategy(PlayerItemService playerItemService,

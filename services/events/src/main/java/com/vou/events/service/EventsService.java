@@ -698,4 +698,14 @@ public class EventsService implements IEventsService {
 		
 		return true;
 	}
+
+	@Override
+	public int getNumberOfVoucherByEventIdAndVoucherId(String eventId, String voucherId) {
+		EventVoucher eventVoucher = eventVoucherRepository.findByEventAndVoucher(eventId, voucherId);
+		if (eventVoucher != null) {
+			return Math.max(0, eventVoucher.getNumberOfVoucher());
+		}
+
+		return 0;
+	}
 }

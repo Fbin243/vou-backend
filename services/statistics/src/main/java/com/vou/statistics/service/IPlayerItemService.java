@@ -95,4 +95,8 @@ public interface IPlayerItemService {
     default Boolean deletePlayerItems(PlayerItemsDto dto) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
+
+    default Integer getQuantityByPlayerIdAndItemId(String playerId, String itemId) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
 }

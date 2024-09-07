@@ -154,6 +154,12 @@ public class PlayerItemService implements IPlayerItemService {
         return true;
     }
 
+    @Override
+    public Integer getQuantityByPlayerIdAndItemId(String playerId, String itemId) {
+        Optional<PlayerItem> playerItem = playerItemRepository.findByPlayerIdAndItemId(playerId, itemId);
+        return playerItem.map(PlayerItem::getQuantity).orElse(0);
+    }
+
     // check later
     // @Override
     // public Boolean deletePlayerItems(PlayerItemsDto dto) {

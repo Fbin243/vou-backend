@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.data.mongodb.core.aggregation.ArrayOperators.In;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,4 +29,7 @@ public interface EventsServiceClient {
 
     @PutMapping("/events/events_vouchers")
     Boolean addQuantityToEventVoucher(@RequestBody EventVoucherAndAdditionQuantityDto conversionVoucherItems);
+
+    @GetMapping("/quantity/{eventId}/{voucherId}")
+    Integer getEventVoucherQuantity(@PathVariable String eventId, @PathVariable String voucherId);
 }

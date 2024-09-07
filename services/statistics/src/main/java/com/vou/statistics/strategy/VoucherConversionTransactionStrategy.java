@@ -16,9 +16,12 @@ import com.vou.statistics.service.PlayerVoucherService;
 import com.vou.statistics.repository.VoucherConversionTransactionRepository;
 import java.util.logging.Logger;
 
+import org.springframework.stereotype.Service;
+
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+@Service
 @NoArgsConstructor
 @AllArgsConstructor
 public class VoucherConversionTransactionStrategy implements TransactionStrategy {
@@ -41,7 +44,11 @@ public class VoucherConversionTransactionStrategy implements TransactionStrategy
             logger.info("Processing VoucherConversionTransaction: " + voucherItemsConversionTransaction.toString());
             Map<String, Integer> items_quantities = _eventsServiceClient.getItemsQuantitiesByVoucher(voucherItemsConversionTransaction.getArtifactId());
             
-            // check
+            Integer voucherLeftOfTheEvent = _eventsServiceClient.getEventVoucherQuantity(voucherItemsConversionTransaction.getEventId(), voucherItemsConversionTransaction.getArtifactId());
+
+            if (voucherLeftOfTheEvent < voucherItemsConversionTransaction.getQuantity()) {
+                return false;
+            }
 
             logger.info("Items quantities: " + items_quantities.toString());
             for (ItemId_Quantity item_quantity : voucherItemsConversionTransaction.getItems()) {
