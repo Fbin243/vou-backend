@@ -54,4 +54,7 @@ public class Voucher extends Base {
 
     @Column(name = "unit_value")
     private VoucherUnitValue unitValue;
+
+    @Column(name = "voucher_type")
+    private String voucherType;
 }

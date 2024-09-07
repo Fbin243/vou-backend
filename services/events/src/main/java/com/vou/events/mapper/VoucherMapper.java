@@ -28,6 +28,7 @@ public class VoucherMapper {
         if (voucher.getUnitValue() != null) {
             voucherDto.setUnitValue(voucher.getUnitValue());
         }
+        voucherDto.setVoucherType(voucher.getVoucherType());
 
         return voucherDto;
     }
@@ -51,6 +52,7 @@ public class VoucherMapper {
         if (dto.getUnitValue() != null) {
             voucher.setUnitValue(dto.getUnitValue());
         }
+        voucher.setVoucherType(dto.getVoucherType());
 
         return voucher;
     }

@@ -20,6 +20,7 @@ public class SecurityConfig {
             "/brands/public/emails", "/brands/public/email/*",
             "/brands/*", "/players/public/ids",
             "/actuator/*", "/actuator", "/actuator/health/*",
+            "/players/phone/*", "/players/email/*"
     };
 
     private final CustomJwtDecoder customJwtDecoder;

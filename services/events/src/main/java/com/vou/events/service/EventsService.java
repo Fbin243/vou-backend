@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,6 +74,7 @@ public class EventsService implements IEventsService {
 	public List<EventDto> fetchEventsInProgress() {
 		return eventsRepository.findAll().stream()
 			.filter(event -> event.getEndDate().isAfter(LocalDateTime.now()))
+			.sorted(Comparator.comparing(Event::getStartDate))
 			.map(EventMapper::toDto)
 			.collect(Collectors.toList());
 	}
