@@ -3,6 +3,7 @@ package com.vou.statistics.strategy;
 import static com.vou.statistics.common.Constants.TRANSACTION_TYPE_ITEM_SHARED;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.vou.statistics.client.EventsServiceClient;
 import com.vou.statistics.dto.PlayerItemDto;
@@ -14,6 +15,7 @@ import com.vou.statistics.service.PlayerVoucherService;
 
 import lombok.NoArgsConstructor;
 
+@Service
 @NoArgsConstructor
 // @AllArgsConstructor
 public class ItemSharedTransactionStrategy implements TransactionStrategy {
@@ -36,6 +38,12 @@ public class ItemSharedTransactionStrategy implements TransactionStrategy {
         }
 
         try {
+            Integer numberOfItemLeftOfTheSender = playerItemService.getQuantityByPlayerIdAndItemId(transaction.getPlayerId(), transaction.getArtifactId());
+
+            if (numberOfItemLeftOfTheSender < transaction.getQuantity()) {
+                return false;
+            }
+
             playerItemService.addPlayerItem(new PlayerItemDto(transaction.getRecipientId(), transaction.getArtifactId(), transaction.getQuantity()));
             playerItemService.addPlayerItem(new PlayerItemDto(transaction.getPlayerId(), transaction.getArtifactId(), transaction.getQuantity() * -1));
             saveTransaction(transaction);

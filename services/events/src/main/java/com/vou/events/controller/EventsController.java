@@ -88,6 +88,12 @@ public class EventsController {
         return ResponseEntity.ok(itemDtos);
     }
 
+    @GetMapping("/quantity/{eventId}/{voucherId}")
+    public ResponseEntity<Integer> getEventVoucherQuantity(@PathVariable String eventId, @PathVariable String voucherId) {
+        int quantity = eventService.getNumberOfVoucherByEventIdAndVoucherId(eventId, voucherId);
+        return ResponseEntity.ok(quantity);
+    }
+
     @PostMapping
     public ResponseEntity<EventDto> createEvent(@RequestBody EventDto eventDto) {
         EventDto createdEvent = eventService.createEvent(eventDto);

@@ -273,7 +273,17 @@ public interface IEventsService {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
+    /**
+     * Updates an event with session info.
+     *
+     * @param eventRegistrationInfoDto the DTO of the event registration info
+     * @return true if the event was updated successfully, false otherwise
+     */
     default boolean updateEventVoucher(String eventId, String voucherId, int additionalQuantity) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    default int getNumberOfVoucherByEventIdAndVoucherId(String eventId, String voucherId) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 }
