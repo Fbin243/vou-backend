@@ -43,6 +43,7 @@ public class ItemSharedTransactionStrategy implements TransactionStrategy {
 
         try {
             ItemSharedTransaction itemSharedTransaction = (ItemSharedTransaction) transaction;
+
             Integer numberOfItemLeftOfTheSender = playerItemService.getQuantityByPlayerIdAndItemIdAndGameId(transaction.getPlayerId(), transaction.getArtifactId(), itemSharedTransaction.getGameId());
 
             if (numberOfItemLeftOfTheSender < transaction.getQuantity()) {

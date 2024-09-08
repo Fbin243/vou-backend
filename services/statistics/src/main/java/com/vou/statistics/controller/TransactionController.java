@@ -255,25 +255,14 @@ public class TransactionController {
 
             if (createdTransaction.getTransactionType().equalsIgnoreCase("voucher_conversion")) {
                 if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, eventsServiceClient, null) == false) {
-                    System.out.println("Transaction processed not successfully but still working right!");
-
-                    voucherConversionTransactionRepository.save((VoucherConversionTransaction) createdTransaction);
-
-                    NotificationInfo notificationInfo = new NotificationInfo("You have new voucher " + artifactName + " successfully!", "Check your inventory for updates", artifactImage);
-                    NotificationData notificationData = new NotificationData(notificationInfo, Collections.singletonList(_transaction.getRecipientId()));
-                    String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(notificationInfo, Collections.singletonList(_transaction.getRecipientId())));
-                    
-                    System.out.println("Notification IDDD: " + notificationId);
-    
-                    // notificationsServiceClient.sendNotification(notificationData);
-                    kafkaTemplateNotificationInfo.send("event-notification", notificationData);
-
                     return ResponseEntity.ok(false);
                 }
 
-                System.out.println("Transaction processed successfully");
+                // System.out.println("Transaction processed not successfully but still working right!");
 
-                NotificationInfo notificationInfo = new NotificationInfo("You have new voucher " + artifactName + " successfully!", "Check your inventory for updates", artifactImage);
+                voucherConversionTransactionRepository.save((VoucherConversionTransaction) createdTransaction);
+
+                NotificationInfo notificationInfo = new NotificationInfo("You have new voucher " + artifactName + " successfully!", "Check your inventory for updates", "fa-check");
                 NotificationData notificationData = new NotificationData(notificationInfo, Collections.singletonList(_transaction.getRecipientId()));
                 String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(notificationInfo, Collections.singletonList(_transaction.getRecipientId())));
                 
@@ -287,7 +276,7 @@ public class TransactionController {
                 }
                 System.out.println("Transaction processed successfully");
 
-                NotificationInfo notificationInfo = new NotificationInfo("You've used voucher " + artifactName + " successfully!", "Check your inventory for updates", artifactImage);
+                NotificationInfo notificationInfo = new NotificationInfo("You've used voucher " + artifactName + " successfully!", "Check your inventory for updates", "fa-check");
                 NotificationData notificationData = new NotificationData(notificationInfo, Collections.singletonList(_transaction.getRecipientId()));
                 String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(notificationInfo, Collections.singletonList(_transaction.getRecipientId())));
                 
@@ -299,6 +288,23 @@ public class TransactionController {
                 if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, eventsServiceClient, null) == false) {
                     return ResponseEntity.ok(false);
                 }
+
+                System.out.println("Transaction processed successfully");
+
+                NotificationInfo notificationInfoReceiver = new NotificationInfo("You've received " + artifactName + "!", "Check your inventory for updates", "fa-check");
+                NotificationInfo notificationInfoSender = new NotificationInfo("You've sent " + artifactName + " successfully!", "Check your inventory for updates", "fa-check");
+                NotificationData notificationDataReceiver = new NotificationData(notificationInfoReceiver, Collections.singletonList(_transaction.getRecipientId()));
+                NotificationData notificationDataSender = new NotificationData(notificationInfoSender, Collections.singletonList(_transaction.getPlayerId()));
+
+                String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(notificationInfoReceiver, Collections.singletonList(_transaction.getRecipientId())));
+                String notificationId2 = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(notificationInfoSender, Collections.singletonList(_transaction.getPlayerId())));
+                
+                System.out.println("Notification IDDD: " + notificationId);
+                System.out.println("Notification IDDD: " + notificationId2);
+
+                // notificationsServiceClient.sendNotification(notificationData);
+                kafkaTemplateNotificationInfo.send("event-notification", notificationDataSender);
+                kafkaTemplateNotificationInfo.send("event-notification", notificationDataReceiver);
             }
 
             // save transactions
