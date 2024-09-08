@@ -446,6 +446,7 @@ services:
         condition: service_healthy
     environment:
       DISCOVERY_SERVER_URI: "http://discovery-server:8761"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9093
     extends:
       file: common-config.yml
       service: discovery-config
