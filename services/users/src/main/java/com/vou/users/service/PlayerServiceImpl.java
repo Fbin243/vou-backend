@@ -50,8 +50,46 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     @Transactional
-    public void updatePlayer(Player thePlayer) {
-        playerRepository.save(thePlayer);
+    public void updatePlayer(Player player) {
+        Player existingPlayer = playerRepository.findById(player.getId())
+                .orElseThrow(() -> new RuntimeException("Player not found with id: " + player.getId()));
+
+        // Update only fields that are provided
+        if (player.getFullName() != null && !player.getFullName().isEmpty()) {
+            existingPlayer.setFullName(player.getFullName());
+        }
+        if (player.getUsername() != null && !player.getUsername().isEmpty()) {
+            existingPlayer.setUsername(player.getUsername());
+        }
+        if (player.getAccountId() != null && !player.getAccountId().isEmpty()) {
+            existingPlayer.setAccountId(player.getAccountId());
+        }
+        if (player.getEmail() != null && !player.getEmail().isEmpty()) {
+            existingPlayer.setEmail(player.getEmail());
+        }
+        if (player.getPhone() != null && !player.getPhone().isEmpty()) {
+            existingPlayer.setPhone(player.getPhone());
+        }
+        if (player.getRole() != null) {
+            existingPlayer.setRole(player.getRole());
+        }
+        if (player.isStatus()) {
+            existingPlayer.setStatus(player.isStatus());
+        }
+        if (player.getGender() != null && !player.getGender().isEmpty()) {
+            existingPlayer.setGender(player.getGender());
+        }
+        if (player.getFacebookAccount() != null && !player.getFacebookAccount().isEmpty()) {
+            existingPlayer.setFacebookAccount(player.getFacebookAccount());
+        }
+        if (player.getDateOfBirth() != null && !player.getDateOfBirth().isEmpty()) {
+            existingPlayer.setDateOfBirth(player.getDateOfBirth());
+        }
+        if (player.getAvatar() != null && !player.getAvatar().isEmpty()) {
+            existingPlayer.setAvatar(player.getAvatar());
+        }
+        existingPlayer.setTurns(player.getTurns());
+        playerRepository.save(existingPlayer);
     }
 
     @Override
@@ -61,8 +99,8 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    public Player findPlayerByPhoneNumber(String phoneNumber) {
-        return playerRepository.findByPhone(phoneNumber);
+    public Player findPlayerByPhone(String phone) {
+        return playerRepository.findByPhone(phone);
     }
 
     @Override

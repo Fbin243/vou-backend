@@ -27,11 +27,11 @@ public class SmsService {
         try {
             // Generate a 6-digit OTP
             String otp = generateOTP();
-            String otpMessage = String.format("[VOU] Your verification code is %s.", otp); // Include brand name
+            String otpMessage = String.format("[VOU] Your verification number is %s.", otp); // Include brand name
 
             // Send the SMS using SpeedSMS API
             String response =
-                    speedSMSAPI.sendSMS(otpRequest.getPhoneNumber(), otpMessage, 5, "2df220516fa5771d"); // sms_type = 5
+                    speedSMSAPI.sendSMS(otpRequest.getPhone(), otpMessage, 5, "2df220516fa5771d"); // sms_type = 5
 
             // Process the response
             otpResponseDto = processResponse(response);

@@ -1,5 +1,7 @@
 package com.vou.users.service;
 
+import com.vou.users.entity.Brand;
+import com.vou.users.entity.Player;
 import com.vou.users.entity.User;
 import com.vou.users.entity.UserRole;
 import com.vou.users.dao.UserRepository;
@@ -71,13 +73,62 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User updateUser(User user) {
-        if (user.getId() == null || user.getId().isEmpty()) {
-            throw new AppException(ErrorCode.INVALID_KEY); 
+        User existingUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        if (user.getFullName() != null) {
+            existingUser.setFullName(user.getFullName());
         }
-        if (!userRepository.existsById(user.getId())) {
-            throw new AppException(ErrorCode.USER_NOT_EXISTED); 
+        if (user.getUsername() != null) {
+            existingUser.setUsername(user.getUsername());
         }
-        return userRepository.save(user);
+        if (user.getAccountId() != null) {
+            existingUser.setAccountId(user.getAccountId());
+        }
+        if (user.getEmail() != null) {
+            existingUser.setEmail(user.getEmail());
+        }
+        if (user.getPhone() != null) {
+            existingUser.setPhone(user.getPhone());
+        }
+        if (user.getRole() != null) {
+            existingUser.setRole(user.getRole());
+        }
+        existingUser.setStatus(user.isStatus());
+
+        if (user instanceof Player) {
+            Player existingPlayer = (Player) existingUser;
+            Player player = (Player) user;
+            if (player.getGender() != null) {
+                existingPlayer.setGender(player.getGender());
+            }
+            if (player.getFacebookAccount() != null) {
+                existingPlayer.setFacebookAccount(player.getFacebookAccount());
+            }
+            if (player.getDateOfBirth() != null) {
+                existingPlayer.setDateOfBirth(player.getDateOfBirth());
+            }
+            if (player.getAvatar() != null) {
+                existingPlayer.setAvatar(player.getAvatar());
+            }
+            existingPlayer.setTurns(player.getTurns());
+        } else if (user instanceof Brand) {
+            Brand existingBrand = (Brand) existingUser;
+            Brand brand = (Brand) user;
+            if (brand.getBrandName() != null) {
+                existingBrand.setBrandName(brand.getBrandName());
+            }
+            if (brand.getField() != null) {
+                existingBrand.setField(brand.getField());
+            }
+            if (brand.getAddress() != null) {
+                existingBrand.setAddress(brand.getAddress());
+            }
+            existingBrand.setLatitude(brand.getLatitude());
+            existingBrand.setLongitude(brand.getLongitude());
+        }
+
+        return userRepository.save(existingUser);
     }
 
     @Override

@@ -23,7 +23,8 @@ jwt:
 
 app:
   services:
-    users: http://localhost:8081/users
+#    users: http://localhost:8081/users
+     users: http://users:8081/users
 
 eureka:
   client:

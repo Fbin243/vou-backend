@@ -1,6 +1,7 @@
 package com.vou.users.controller;
 
 import com.vou.users.entity.Player;
+import com.vou.users.entity.User;
 import com.vou.users.service.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -35,10 +36,14 @@ public class PlayerController {
         return thePlayer;
     }
 
-    @PatchMapping
-    public Player updatePlayer(@RequestBody Player thePlayer) {
-        playerService.updatePlayer(thePlayer);
-        return thePlayer;
+    @PatchMapping("/{id}")
+    public Player updatePlayer(@PathVariable String id, @RequestBody Player player) {
+        if (playerService.findPlayerById(id) == null) {
+            throw new RuntimeException("Player not found with id: " + id);
+        }
+        player.setId(id);
+        playerService.savePlayer(player);
+        return player;
     }
 
     @DeleteMapping("/{playerId}")
@@ -47,9 +52,9 @@ public class PlayerController {
         return "Deleted player id - " + playerId;
     }
 
-    @GetMapping("/phone/{phoneNumber}")
-    public Player getPlayerByPhoneNumber(@PathVariable String phoneNumber) {
-        return playerService.findPlayerByPhoneNumber(phoneNumber);
+    @GetMapping("/phone/{phone}")
+    public Player getPlayerByPhone(@PathVariable String phone) {
+        return playerService.findPlayerByPhone(phone);
     }
 
     @GetMapping("/email/{email}")

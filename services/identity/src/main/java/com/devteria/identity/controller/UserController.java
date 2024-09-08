@@ -29,7 +29,7 @@ public class UserController {
     ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
         if (request.getRoles() != null && request.getRoles().contains("player")) {
             // Trigger OTP sending process
-            userService.sendOtp(request.getUsername(), request.getPhoneNumber());
+            userService.sendOtp(request.getUsername(), request.getPhone());
             return ApiResponse.<UserResponse>builder()
                     .result(null) // No user created yet
                     .message("OTP has been sent to your phone number")

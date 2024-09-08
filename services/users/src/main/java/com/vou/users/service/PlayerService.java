@@ -9,7 +9,7 @@ public interface PlayerService {
     List<Player> findAllPlayers();
     void updatePlayer(Player thePlayer);
     void deletePlayerById(String theId);
-    Player findPlayerByPhoneNumber(String phoneNumber);
+    Player findPlayerByPhone(String phone);
     Player findByEmail(String email);
 
     List<Player> findManyPlayersByManyIds(List<String> ids);

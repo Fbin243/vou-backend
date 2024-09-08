@@ -1,13 +1,13 @@
 #!/bin/bash
 images=(
-  "discovery-server"
+#  "discovery-server"
   "api-gateway"
   "identity"
   "users"
-  "games"
-  "events"
-  "sessions"
-  "notifications"
+#  "games"
+#  "events"
+#  "sessions"
+#  "notifications"
 ) # Adjust this list base on purpose
 
 # Stop/Remove all containers
@@ -27,5 +27,5 @@ for img in "${images[@]}"; do
 done
 
 # Run all of containers
-cd docker-compose; docker compose up -d; cd ..
+#cd docker-compose; docker compose up -d; cd ..
 

@@ -21,7 +21,7 @@ public class UserCreationRequest {
 
     List<String> roles;
 
-    String phoneNumber;
+    String phone;
 
     String otp;
 }

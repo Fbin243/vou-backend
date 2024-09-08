@@ -30,30 +30,60 @@ public class UserDeserializer extends JsonDeserializer<User> {
                 throw new IllegalArgumentException("Unknown role: " + role);
         }
 
-        // Manually set fields to avoid recursive deserialization
-        user.setFullName(node.get("fullName").asText());
-        user.setUsername(node.get("username").asText());
-        user.setAccountId(node.get("accountId").asText());
-        user.setEmail(node.get("email").asText());
-        user.setPhone(node.get("phone").asText());
-        user.setStatus(node.get("status").asBoolean());
+        if (node.has("fullName")) {
+            user.setFullName(node.get("fullName").asText());
+        }
+        if (node.has("username")) {
+            user.setUsername(node.get("username").asText());
+        }
+        if (node.has("accountId")) {
+            user.setAccountId(node.get("accountId").asText());
+        }
+        if (node.has("email")) {
+            user.setEmail(node.get("email").asText());
+        }
+        if (node.has("phone")) {
+            user.setPhone(node.get("phone").asText());
+        }
+        if (node.has("status")) {
+            user.setStatus(node.get("status").asBoolean());
+        }
         user.setRole(UserRole.valueOf(role));
 
-        // Set specific fields for each user type
         if (user instanceof Player) {
             Player player = (Player) user;
-            player.setGender(node.get("gender").asText());
-            player.setFacebookAccount(node.get("facebookAccount").asText());
-            player.setDateOfBirth(node.get("dateOfBirth").asText());
-            player.setAvatar(node.get("avatar").asText());
-            player.setTurns(node.get("turns").asInt());
+            if (node.has("gender")) {
+                player.setGender(node.get("gender").asText());
+            }
+            if (node.has("facebookAccount")) {
+                player.setFacebookAccount(node.get("facebookAccount").asText());
+            }
+            if (node.has("dateOfBirth")) {
+                player.setDateOfBirth(node.get("dateOfBirth").asText());
+            }
+            if (node.has("avatar")) {
+                player.setAvatar(node.get("avatar").asText());
+            }
+            if (node.has("turns")) {
+                player.setTurns(node.get("turns").asInt());
+            }
         } else if (user instanceof Brand) {
             Brand brand = (Brand) user;
-            brand.setBrandName(node.get("brandName").asText());
-            brand.setField(node.get("field").asText());
-            brand.setAddress(node.get("address").asText());
-            brand.setLatitude(node.get("latitude").asDouble());
-            brand.setLongitude(node.get("longitude").asDouble());
+            if (node.has("brandName")) {
+                brand.setBrandName(node.get("brandName").asText());
+            }
+            if (node.has("field")) {
+                brand.setField(node.get("field").asText());
+            }
+            if (node.has("address")) {
+                brand.setAddress(node.get("address").asText());
+            }
+            if (node.has("latitude")) {
+                brand.setLatitude(node.get("latitude").asDouble());
+            }
+            if (node.has("longitude")) {
+                brand.setLongitude(node.get("longitude").asDouble());
+            }
         }
 
         return user;

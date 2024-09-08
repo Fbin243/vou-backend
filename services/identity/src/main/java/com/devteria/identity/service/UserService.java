@@ -47,6 +47,7 @@ public class UserService {
 
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPhone(request.getPhone());
 
         Set<Role> roles = new HashSet<>();
         if (request.getRoles() != null && !request.getRoles().isEmpty()) {
@@ -64,10 +65,10 @@ public class UserService {
         return userMapper.toUserResponse(user);
     }
 
-    public void sendOtp(String username, String phoneNumber) {
+    public void sendOtp(String username, String phone) {
         OtpRequest otpRequest = new OtpRequest();
         otpRequest.setUsername(username);
-        otpRequest.setPhoneNumber(phoneNumber);
+        otpRequest.setPhone(phone);
         OtpResponseDto response = smsService.sendSMS(otpRequest); // Call the updated sendSMS method
 
         if (response.getStatus() == OtpStatus.FAILED) {
