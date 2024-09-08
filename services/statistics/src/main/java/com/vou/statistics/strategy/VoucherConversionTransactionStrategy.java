@@ -50,7 +50,7 @@ public class VoucherConversionTransactionStrategy implements TransactionStrategy
             logger.info("Processing VoucherConversionTransaction: " + voucherItemsConversionTransaction.toString());
 
             // get Voucher By Id
-            VoucherDto currentVoucher = eventsServiceClient.getVouchersByIds(Collections.singletonList(voucherItemsConversionTransaction.getArtifactId())).get(0);
+            VoucherDto currentVoucher = _eventsServiceClient.getVouchersByIds(Collections.singletonList(voucherItemsConversionTransaction.getArtifactId())).get(0);
 
             if (currentVoucher == null) {
                 System.out.println("Voucher not found in database!");
@@ -59,7 +59,7 @@ public class VoucherConversionTransactionStrategy implements TransactionStrategy
 
             Map<String, Integer> items_quantities = _eventsServiceClient.getItemsQuantitiesByVoucher(voucherItemsConversionTransaction.getArtifactId());
             
-            Integer voucherLeftOfTheEvent = _eventsServiceClient.getEventVoucherQuantity(voucherItemsConversionTransaction.getEventId(), voucherItemsConversionTransaction.getArtifactId());
+            int voucherLeftOfTheEvent = _eventsServiceClient.getEventVoucherQuantity(voucherItemsConversionTransaction.getEventId(), voucherItemsConversionTransaction.getArtifactId());
 
             if (voucherLeftOfTheEvent < voucherItemsConversionTransaction.getQuantity()) {
                 return false;
@@ -82,7 +82,7 @@ public class VoucherConversionTransactionStrategy implements TransactionStrategy
                 itemIds.add(item_quantity.getItemId());
             }
 
-            List<ItemDto> currentItems = eventsServiceClient.getItemsByIds(itemIds);
+            List<ItemDto> currentItems = _eventsServiceClient.getItemsByIds(itemIds);
             int _count = 0;
             
             for (ItemId_Quantity item_quantity : voucherItemsConversionTransaction.getItems()) {
@@ -97,7 +97,7 @@ public class VoucherConversionTransactionStrategy implements TransactionStrategy
             saveTransaction(voucherItemsConversionTransaction, transactionRepository);
 
             // update events_vouchers table
-            if (eventsServiceClient.addQuantityToEventVoucher(new EventVoucherAndAdditionQuantityDto(voucherItemsConversionTransaction.getEventId(), voucherItemsConversionTransaction.getArtifactId(), voucherItemsConversionTransaction.getQuantity() * -1))) {
+            if (_eventsServiceClient.addQuantityToEventVoucher(new EventVoucherAndAdditionQuantityDto(voucherItemsConversionTransaction.getEventId(), voucherItemsConversionTransaction.getArtifactId(), voucherItemsConversionTransaction.getQuantity() * -1))) {
                 logger.info("EventVoucher updated successfully");
             }
             else {
