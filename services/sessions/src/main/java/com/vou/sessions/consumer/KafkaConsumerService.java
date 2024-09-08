@@ -6,8 +6,6 @@ import com.vou.sessions.engine.GameEngine;
 import com.vou.sessions.engine.quizgame.QuizGameEngine;
 import com.vou.sessions.engine.shakinggame.ShakingGameEngine;
 import com.vou.sessions.model.EventSessionInfo;
-import com.vou.sessions.model.NotificationData;
-import com.vou.sessions.model.NotificationInfo;
 import com.vou.sessions.schedule.SchedulerService;
 import com.vou.sessions.service.ISessionsService;
 import com.vou.sessions.utils.Utils;
@@ -76,7 +74,7 @@ public class KafkaConsumerService {
 		};
 		
 		Runnable setUpGame = () -> {
-			log.info("SET UP GAME");
+			log.info("CRON SET UP GAME");
 			// Save data to MongoDB and get sessionId
 			// Assume this game is quiz game
 			SessionDto sessionDto = new SessionDto();
@@ -86,7 +84,7 @@ public class KafkaConsumerService {
 			sessionDto.setUsers(new ArrayList<>());
 			sessionDto.setDate(ZonedDateTime.now().toLocalDate());
 			SessionDto createdSessionDto = sessionsService.createSession(sessionDto);
-			String newEndTime = endTime.replace(":00", ":30");
+			String newEndTime = endTime.substring(0, endTime.length() - 3) + ":30";
 			
 			log.info("New session entity: {}", createdSessionDto);
 			String sessionId;
@@ -125,7 +123,7 @@ public class KafkaConsumerService {
 			schedulerService.createCronJobs(getLeaderBoard, startDate, endDate, endTime, endTime, false);
 			
 			// Reset session and save to mongodb after 10 seconds
-			log.info("Clear up redis and save to mongodb after 10 seconds: {}", newEndTime);
+//			log.info("Clear up redis and save to mongodb after 10 seconds: {}", newEndTime);
 			schedulerService.createCronJobs(endAndReset, startDate, endDate, newEndTime, newEndTime, false);
 		};
 		
