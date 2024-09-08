@@ -15,6 +15,14 @@ import com.vou.events.dto.EventId_GameIdsDto;
 import com.vou.events.dto.EventId_ItemIdsDto;
 import com.vou.events.dto.EventId_VoucherIdsDto;
 import com.vou.events.dto.EventRegistrationInfoDto;
+import com.vou.events.dto.EventVoucherAndAdditionQuantityDto;
+import com.vou.events.dto.EventWithBrandActiveStatusDto;
+import com.vou.events.dto.GameDto;
+import com.vou.events.dto.ItemDto;
+import com.vou.events.dto.ReturnGameDto;
+import com.vou.events.dto.ReturnItemDto;
+import com.vou.events.dto.ReturnVoucherDto;
+import com.vou.events.entity.Item;
 import com.vou.events.service.IEventsService;
 
 import lombok.AllArgsConstructor;
@@ -56,11 +64,40 @@ public class EventsController {
         return ResponseEntity.ok(eventDto);
     }
 
+    @GetMapping("/ids")
+    public ResponseEntity<List<EventDto>> getEventsByIds(@PathVariable List<String> ids) {
+        List<EventDto> eventDtos = eventService.fetchEventsByIds(ids);
+        return ResponseEntity.ok(eventDtos);
+    }
+
+    @GetMapping("/games/event/{eventId}")
+    public ResponseEntity<List<ReturnGameDto>> getGamesByEvent(@PathVariable String eventId) {
+        List<ReturnGameDto> gameDtos = eventService.fetchGamesByEvent(eventId);
+        return ResponseEntity.ok(gameDtos);
+    }
+
+    @GetMapping("/vouchers/event/{eventId}")
+    public ResponseEntity<List<ReturnVoucherDto>> getVouchersByEvent(@PathVariable String eventId) {
+        List<ReturnVoucherDto> voucherDtos = eventService.fetchVouchersByEvent(eventId);
+        return ResponseEntity.ok(voucherDtos);
+    }
+
+    @GetMapping("/items/event/{eventId}")
+    public ResponseEntity<List<ItemDto>> getItemsByEvent(@PathVariable String eventId) {
+        List<ItemDto> itemDtos = eventService.fetchItemsByEvent(eventId);
+        return ResponseEntity.ok(itemDtos);
+    }
+
+    @GetMapping("/quantity/{eventId}/{voucherId}")
+    public ResponseEntity<Integer> getEventVoucherQuantity(@PathVariable String eventId, @PathVariable String voucherId) {
+        int quantity = eventService.getNumberOfVoucherByEventIdAndVoucherId(eventId, voucherId);
+        return ResponseEntity.ok(quantity);
+    }
+
     @PostMapping
-    public ResponseEntity<ResponseDto> createEvent(@RequestBody EventDto eventDto) {
-        eventService.createEvent(eventDto);
-        ResponseDto res = new ResponseDto(HttpStatus.CREATED, "Event created successfully.");
-        return ResponseEntity.status(HttpStatus.CREATED).body(res);
+    public ResponseEntity<EventDto> createEvent(@RequestBody EventDto eventDto) {
+        EventDto createdEvent = eventService.createEvent(eventDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdEvent);
     }
 
     @PostMapping("/create")
@@ -82,7 +119,25 @@ public class EventsController {
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
+    @GetMapping("/brands/{brandId}")
+    public ResponseEntity<List<EventWithBrandActiveStatusDto>> getEventsByBrand(@PathVariable String brandId) {
+        List<EventWithBrandActiveStatusDto> eventDtos = eventService.fetchEventsByBrand(brandId);
+        return ResponseEntity.ok(eventDtos);
+    }
+
+    // @GetMapping("/brands")
+    // public ResponseEntity<List<BrandWithEventActiveStatusDto>> getBrandsByEvent(@RequestParam("eventId") String eventId) {
+    //     List<BrandWithEventActiveStatusDto> eventDtos = eventService.fetchBrandsByEvent(eventId);
+    //     return ResponseEntity.ok(eventDtos);
+    // }
+
     @PostMapping("/brands")
+    public ResponseEntity<List<EventWithBrandActiveStatusDto>> getEventsByBrands(@RequestBody List<String> brandIds) {
+        List<EventWithBrandActiveStatusDto> eventDtos = eventService.fetchEventsByBrands(brandIds);
+        return ResponseEntity.ok(eventDtos);
+    }
+
+    @PostMapping("/events_brands/brands")
     public ResponseEntity<ResponseDto> addBrandsToEvent(@RequestBody AddBrandsRequestDto addBrandsRequestDto) {
         eventService.addBrandsToEvent(addBrandsRequestDto.getEventId(), addBrandsRequestDto.getBrandIds());
         ResponseDto res = new ResponseDto(HttpStatus.CREATED, "Brands added to event successfully.");
@@ -135,6 +190,14 @@ public class EventsController {
     public ResponseEntity<ResponseDto> removeGamesFromEvent(@RequestBody EventId_GameIdsDto eventId_GameIds) {
         eventService.removeGamesFromEvent(eventId_GameIds.getEventId(), eventId_GameIds.getGameIds());
         ResponseDto res = new ResponseDto(HttpStatus.OK, "Games removed from event successfully.");
+        return ResponseEntity.status(HttpStatus.OK).body(res);
+    }
+
+    // update events_vouchers table
+    @PutMapping("/events_vouchers")
+    public ResponseEntity<ResponseDto> addQuantityToEventVoucher(@RequestBody EventVoucherAndAdditionQuantityDto eventVoucherAndAdditionQuantityDto) {
+        eventService.updateEventVoucher(eventVoucherAndAdditionQuantityDto.getEventId(), eventVoucherAndAdditionQuantityDto.getVoucherId(), eventVoucherAndAdditionQuantityDto.getAdditionalQuantity());
+        ResponseDto res = new ResponseDto(HttpStatus.OK, "Event voucher updated successfully.");
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 }

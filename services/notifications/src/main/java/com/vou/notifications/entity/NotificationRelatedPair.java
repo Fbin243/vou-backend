@@ -13,7 +13,6 @@ import com.vou.notifications.model.NotificationRelatedPairId;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "notifications_relatedair")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

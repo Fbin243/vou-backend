@@ -16,7 +16,8 @@ public class EventBrandMapper {
 
         EventBrandDto eventBrandDto = new EventBrandDto();
         eventBrandDto.setEvent(EventMapper.toDto(eventBrand.getEvent()));
-        eventBrandDto.setBrand(BrandMapper.toDto(eventBrand.getBrand()));
+        eventBrandDto.setBrand_id(eventBrand.getBrand_id());
+        eventBrandDto.setActiveStatus(eventBrand.getActiveStatus());
 
         return eventBrandDto;
     }
@@ -29,7 +30,8 @@ public class EventBrandMapper {
 
         EventBrand eventBrand = new EventBrand();
         eventBrand.setEvent(EventMapper.toEntity(dto.getEvent()));
-        eventBrand.setBrand(BrandMapper.toEntity(dto.getBrand()));
+        eventBrand.setBrand_id(dto.getBrand_id());
+        eventBrand.setActiveStatus(dto.getActiveStatus());
 
         return eventBrand;
     }

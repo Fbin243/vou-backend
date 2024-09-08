@@ -1,5 +1,6 @@
 package com.vou.events.mapper;
 
+import com.vou.events.common.VoucherUnitValue;
 import com.vou.events.dto.VoucherDto;
 import com.vou.events.entity.Voucher;
 
@@ -16,7 +17,7 @@ public class VoucherMapper {
 
         VoucherDto voucherDto = new VoucherDto();
         voucherDto.setId(voucher.getId());
-        voucherDto.setBrand(BrandMapper.toDto(voucher.getBrand()));
+        voucherDto.setBrand_id(voucher.getBrand_id());
         voucherDto.setVoucherCode(voucher.getVoucherCode());
         voucherDto.setQrCode(voucher.getQrCode());
         voucherDto.setImage(voucher.getImage());
@@ -24,6 +25,10 @@ public class VoucherMapper {
         voucherDto.setDescription(voucher.getDescription());
         voucherDto.setExpiredDate(voucher.getExpiredDate());
         voucherDto.setStatus(voucher.getStatus());
+        if (voucher.getUnitValue() != null) {
+            voucherDto.setUnitValue(voucher.getUnitValue());
+        }
+        voucherDto.setVoucherType(voucher.getVoucherType());
 
         return voucherDto;
     }
@@ -36,7 +41,7 @@ public class VoucherMapper {
 
         Voucher voucher = new Voucher();
         voucher.setId(dto.getId());
-        voucher.setBrand(BrandMapper.toEntity(dto.getBrand()));
+        voucher.setBrand_id(dto.getBrand_id());
         voucher.setVoucherCode(dto.getVoucherCode());
         voucher.setQrCode(dto.getQrCode());
         voucher.setImage(dto.getImage());
@@ -44,6 +49,10 @@ public class VoucherMapper {
         voucher.setDescription(dto.getDescription());
         voucher.setExpiredDate(dto.getExpiredDate());
         voucher.setStatus(dto.getStatus());
+        if (dto.getUnitValue() != null) {
+            voucher.setUnitValue(dto.getUnitValue());
+        }
+        voucher.setVoucherType(dto.getVoucherType());
 
         return voucher;
     }

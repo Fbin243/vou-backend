@@ -13,7 +13,7 @@ images=(
 # Stop/Remove all containers
 cd docker-compose; docker compose down; cd ..
 
-mvn clean
+#mvn clean
 
 for img in "${images[@]}"; do
   # Remove the old images

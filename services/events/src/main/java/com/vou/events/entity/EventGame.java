@@ -27,10 +27,14 @@ public class EventGame implements Serializable {
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
+    // @Id
+    // @ManyToOne(cascade = CascadeType.MERGE)
+    // @JoinColumn(name = "game_id", nullable = false)
+    // private Game game;
+
     @Id
-    @ManyToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "game_id", nullable = false)
-    private Game game;
+    @Column(name = "game_id", nullable = false)
+    private Long game_id;
 
     @Column(name = "start_time")
     private LocalTime startTime;

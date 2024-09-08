@@ -16,7 +16,7 @@ import lombok.Setter;
 public class EventBrandDto {
     private EventDto event;
     
-    private BrandDto brand;
+    private String brand_id;
 
     private EventIntermediateTableStatus activeStatus;
 }

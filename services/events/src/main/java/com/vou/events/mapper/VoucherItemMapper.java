@@ -17,6 +17,8 @@ public class VoucherItemMapper {
         VoucherItemDto voucherItemDto = new VoucherItemDto();
         voucherItemDto.setVoucher(VoucherMapper.toDto(voucherItem.getVoucher()));
         voucherItemDto.setItem(ItemMapper.toDto(voucherItem.getItem()));
+        voucherItemDto.setNumberOfItem(voucherItem.getNumberOfItem());
+        voucherItemDto.setActiveStatus(voucherItem.getActiveStatus());
 
         return voucherItemDto;
     }
@@ -30,6 +32,8 @@ public class VoucherItemMapper {
         VoucherItem voucherItem = new VoucherItem();
         voucherItem.setVoucher(VoucherMapper.toEntity(dto.getVoucher()));
         voucherItem.setItem(ItemMapper.toEntity(dto.getItem()));
+        voucherItem.setNumberOfItem(dto.getNumberOfItem());
+        voucherItem.setActiveStatus(dto.getActiveStatus());
 
         return voucherItem;
     }

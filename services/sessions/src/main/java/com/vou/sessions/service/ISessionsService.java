@@ -2,6 +2,10 @@ package com.vou.sessions.service;
 
 import com.vou.sessions.dto.SessionDto;
 
+import java.time.LocalDate;
+
 public interface ISessionsService {
-    SessionDto findSessionByEventIdAndGameId(String eventId, String gameId);
+	public SessionDto findSessionByEventIdAndGameIdAndDate(String eventId, String gameId, LocalDate date);
+	
+	SessionDto createSession(SessionDto sessionDto);
 }

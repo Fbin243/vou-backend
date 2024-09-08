@@ -7,6 +7,9 @@ import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 
+import java.util.List;
+
+import com.vou.events.common.EventIntermediateTableStatus;
 
 public class EventVoucherRepositoryImpl implements EventVoucherRepositoryCustom {
 
@@ -27,5 +30,16 @@ public class EventVoucherRepositoryImpl implements EventVoucherRepositoryCustom 
         } catch (NoResultException e) {
             return null;
         }
+    }
+
+    @Override
+    public List<EventVoucher> findByEvent(String eventId) {
+        TypedQuery<EventVoucher> query = entityManager.createQuery(
+                "SELECT ev FROM EventVoucher ev WHERE ev.event.id = :eventId AND ev.activeStatus = :activeStatus",
+                EventVoucher.class
+        );
+        query.setParameter("eventId", eventId);
+        query.setParameter("activeStatus", EventIntermediateTableStatus.ACTIVE);
+        return query.getResultList();
     }
 }

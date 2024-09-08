@@ -1,6 +1,7 @@
 package com.vou.events.entity;
 
 import com.vou.events.common.VoucherStatus;
+import com.vou.events.common.VoucherUnitValue;
 import com.vou.pkg.entity.Base;
 
 import lombok.Getter;
@@ -23,9 +24,12 @@ public class Voucher extends Base {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @ManyToOne
-    @JoinColumn(name = "brand_id", nullable = false)
-    private Brand brand;
+    // @ManyToOne
+    // @JoinColumn(name = "brand_id", nullable = false)
+    // private Brand brand;
+
+    @Column(name = "brand_id")
+    private String brand_id;
 
     @Column(name = "voucher_code")
     private String voucherCode;
@@ -47,4 +51,10 @@ public class Voucher extends Base {
 
     @Column(name = "status")
     private VoucherStatus status;
+
+    @Column(name = "unit_value")
+    private VoucherUnitValue unitValue;
+
+    @Column(name = "voucher_type")
+    private String voucherType;
 }

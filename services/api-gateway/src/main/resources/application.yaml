@@ -43,6 +43,10 @@ spring:
           uri: lb://notifications
           predicates:
             - Path=${app.api-prefix}/notifications/**
+        - id: statistics
+          uri: lb://statistics
+          predicates:
+            - Path=${app.api-prefix}/statistics/**
       default-filters:
         - StripPrefix=2
         - name: CircuitBreaker

@@ -17,7 +17,7 @@ public class ItemMapper {
 
         ItemDto itemDto = new ItemDto();
         itemDto.setId(item.getId());
-        itemDto.setBrand(BrandMapper.toDto(item.getBrand()));
+        itemDto.setBrand_id(item.getBrand_id());
         itemDto.setName(item.getName());
         itemDto.setIcon(item.getIcon());
         itemDto.setDescription(item.getDescription());
@@ -33,7 +33,7 @@ public class ItemMapper {
 
         Item item = new Item();
         item.setId(dto.getId());
-        item.setBrand(BrandMapper.toEntity(dto.getBrand()));
+        item.setBrand_id(dto.getBrand_id());
         item.setName(dto.getName());
         item.setIcon(dto.getIcon());
         item.setDescription(dto.getDescription());
