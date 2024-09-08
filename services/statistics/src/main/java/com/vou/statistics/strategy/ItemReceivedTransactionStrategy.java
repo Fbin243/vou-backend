@@ -19,7 +19,7 @@ import static com.vou.statistics.common.Constants.TRANSACTION_TYPE_ITEM_RECEIVED
 public class ItemReceivedTransactionStrategy implements TransactionStrategy {
 	
 	private PlayerItemService playerItemService;
-
+	
 	@Autowired
 	private ItemReceivedTransactionRepository itemReceivedTransactionRepository;
 	

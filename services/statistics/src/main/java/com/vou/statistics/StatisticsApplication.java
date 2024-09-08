@@ -10,9 +10,9 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @EnableMongoRepositories
 @EnableFeignClients
 public class StatisticsApplication {
-
+	
 	public static void main(String[] args) {
 		SpringApplication.run(StatisticsApplication.class, args);
 	}
-
+	
 }

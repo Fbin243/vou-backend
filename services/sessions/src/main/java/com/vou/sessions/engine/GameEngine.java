@@ -55,9 +55,13 @@ public abstract class GameEngine {
 		return value == null ? 1 : value;
 	}
 	
-	public List<RecordDto> end(String sessionId) {
+	public List<RecordDto> getLeaderBoardForGivingItem(String sessionId) {
 		List<RecordEntity> leaderboard = getLeaderboard(sessionId);
-		
+		return new ArrayList<>(recordMapper.mapRecordEntityListToRecordDtoList(leaderboard));
+	}
+	
+	public void end(String sessionId) {
+		List<RecordEntity> leaderboard = getLeaderboard(sessionId);
 		// Save leaderboard to mongodb
 		SessionEntity sessionEntity = sessionsRepository.findSessionById(sessionId).orElseThrow(
 			() -> new NotFoundException("Session", "sessionId", sessionId));
@@ -69,8 +73,6 @@ public abstract class GameEngine {
 		// Reset redis for this session
 		redisTemplate.delete(sessionId);
 		log.info("2. RESET REDIS FOR SESSION: {}", sessionId);
-		
-		return new ArrayList<>(recordMapper.mapRecordEntityListToRecordDtoList(leaderboard));
 	}
 	
 	public abstract void setUp(String sessionId);

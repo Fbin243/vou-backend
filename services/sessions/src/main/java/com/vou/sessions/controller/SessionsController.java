@@ -96,10 +96,6 @@ public class SessionsController {
 				
 				kafkaTemplateTransactionData.send("session-transaction", itemReceivedTransactionData);
 				break;
-			case END:
-				log.info("End game ...");
-				messagingTemplate.convertAndSend("/topic/end/" + sessionId, gameEngine.end(sessionId));
-				break;
 			default:
 				log.info("Invalid message type");
 				break;
