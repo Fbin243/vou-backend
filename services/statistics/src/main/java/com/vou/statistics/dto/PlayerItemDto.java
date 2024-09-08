@@ -16,5 +16,9 @@ public class PlayerItemDto {
 
     private String itemId;
 
+    private String brandId;
+
+    private String itemName;
+
     private int quantity;
 }

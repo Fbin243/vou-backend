@@ -23,7 +23,7 @@ public class Player_VoucherQuantitiesDto {
     public List<PlayerVoucherDto> getPlayerVouchers () {
         List<PlayerVoucherDto> playerVouchers = new ArrayList<PlayerVoucherDto>();
         for (VoucherId_Quantity voucher_quantity : vouchers_quantities) {
-            PlayerVoucherDto playerVoucher = new PlayerVoucherDto(playerId, voucher_quantity.getVoucherId(), voucher_quantity.getQuantity());
+            PlayerVoucherDto playerVoucher = new PlayerVoucherDto(playerId, voucher_quantity.getVoucherId(), "", "", voucher_quantity.getQuantity());
             playerVouchers.add(playerVoucher);
         }
         return playerVouchers;

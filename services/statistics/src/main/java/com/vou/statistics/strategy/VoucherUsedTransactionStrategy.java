@@ -56,12 +56,13 @@ public class VoucherUsedTransactionStrategy implements TransactionStrategy {
                 List<ReturnVoucherDto> vouchers = eventsServiceClient.getVouchersByEvent(voucherUsedTransaction.getEventId());
                 Random rand = new Random();
                 for (int i = 0; i < voucherUsedTransaction.getQuantity(); ++i) {
-                    playerVoucherService.addPlayerVoucher(new PlayerVoucherDto(voucherUsedTransaction.getPlayerId(), voucherUsedTransaction.getArtifactId(), -1));
-                    playerVoucherService.addPlayerVoucher(new PlayerVoucherDto(voucherUsedTransaction.getPlayerId(), vouchers.get(rand.nextInt(vouchers.size())).getId(), 1));
+                    int index = rand.nextInt(vouchers.size());
+                    playerVoucherService.addPlayerVoucher(new PlayerVoucherDto(voucherUsedTransaction.getPlayerId(), voucherUsedTransaction.getArtifactId(), currentVoucher.getBrand_id(), currentVoucher.getVoucherCode(), -1));
+                    playerVoucherService.addPlayerVoucher(new PlayerVoucherDto(voucherUsedTransaction.getPlayerId(), vouchers.get(index).getId(), vouchers.get(index).getBrand_id(), currentVoucher.getVoucherCode(), 1));
                 }
                 // playerItemService.addItemToPlayer(voucherUsedTransaction.getPlayerId(), voucherDto.getArtifactId(), voucherUsedTransaction.getQuantity());
             } else {
-                playerVoucherService.addPlayerVoucher(new PlayerVoucherDto(voucherUsedTransaction.getPlayerId(), voucherUsedTransaction.getArtifactId(), voucherUsedTransaction.getQuantity() * -1));
+                playerVoucherService.addPlayerVoucher(new PlayerVoucherDto(voucherUsedTransaction.getPlayerId(), voucherUsedTransaction.getArtifactId(), currentVoucher.getBrand_id(), currentVoucher.getVoucherCode(), voucherUsedTransaction.getQuantity() * -1));
             }
             
             // update player's voucher
