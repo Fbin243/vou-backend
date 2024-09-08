@@ -9,12 +9,15 @@ import com.vou.statistics.creator.TransactionFactoryCreator;
 import com.vou.statistics.factory.TransactionFactory;
 import com.vou.statistics.mapper.TransactionMapper;
 import com.vou.statistics.dto.AddUsersRequestDto;
+import com.vou.statistics.dto.EventDto;
 import com.vou.statistics.dto.ItemDto;
 import com.vou.statistics.dto.TransactionDto;
 import com.vou.statistics.dto.VoucherDto;
+import com.vou.statistics.model.Like;
 import com.vou.statistics.model.NotificationData;
 import com.vou.statistics.model.NotificationInfo;
 import com.vou.statistics.model.Transaction;
+import com.vou.statistics.repository.LikeRepository;
 import com.vou.statistics.service.PlayerItemService;
 import com.vou.statistics.service.PlayerVoucherService;
 import com.vou.statistics.strategy.TransactionStrategy;
@@ -41,11 +44,15 @@ public class StatisticsConsumerService {
     private PlayerItemService               playerItemService;
     private NotificationsServiceClient      notificationsServiceClient;
     private EventsServiceClient             eventsServiceClient;
+    private LikeRepository                  likeRepository;
 
     private static final Logger logger = Logger.getLogger(StatisticsConsumerService.class.getName());
 
     @Autowired
 	private KafkaTemplate<String, NotificationData> kafkaTemplateNotificationInfo;
+
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplateEventId;
 
     @KafkaListener(topics = "session-transaction", groupId = "group_id", containerFactory = "kafkaListenerContainerFactory")
     public void listenSessionTransaction(ConsumerRecord<String, TransactionDto> record, Acknowledgment acknowledgment) {
@@ -78,6 +85,29 @@ public class StatisticsConsumerService {
         }
         catch (Exception e) {
             e.getStackTrace();
+        }
+    }
+
+    @KafkaListener(topics = "upcoming-event", groupId = "group_id", containerFactory = "kafkaListenerContainerFactory")
+    public void listenUpcomingEvent(String eventId, Acknowledgment acknowledgment) {
+        try {
+            System.out.println("Event ID receive from Kafka: " + eventId);
+            EventDto upcomingEvent = eventsServiceClient.getEventById(eventId);
+            List<Like> likes = likeRepository.findByLikeableIdAndLikeableType(eventId, "event");
+            List<String> userIds = new ArrayList<>();
+            for (Like like : likes) {
+                userIds.add(like.getUserId());
+            }
+
+            NotificationInfo notificationInfo = new NotificationInfo("Upcoming event!", upcomingEvent.getName() + " event is coming.", "fa-check");
+            NotificationData notificationData = new NotificationData(notificationInfo, userIds);
+            String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(notificationInfo, userIds));
+            kafkaTemplateNotificationInfo.send("event-notification", notificationData);
+
+            acknowledgment.acknowledge();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -117,7 +147,7 @@ public class StatisticsConsumerService {
                     artifactImage = items.get(0).getIcon();
                 }
 
-                if (transactionContext.executeStrategy(_transaction, playerVoucherService, playerItemService, null)) {
+                if (transactionContext.executeStrategy(_transaction, playerVoucherService, playerItemService, eventsServiceClient)) {
                     System.out.println("Transaction processed successfully");
 
                     NotificationInfo notificationInfo = new NotificationInfo("You've received item " + artifactName, "Check your inventory for updates", artifactImage);

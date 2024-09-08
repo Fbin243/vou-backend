@@ -39,7 +39,7 @@ public class KafkaConsumerService {
 	private SimpMessagingTemplate messagingTemplate;
 	private QuizGameEngine quizGameEngine;
 	private ShakingGameEngine shakingGameEngine;
-	private KafkaTemplate<String, NotificationData> kafkaTemplateNotificationInfo;
+	private KafkaTemplate<String, String> kafkaTemplateEventId;
 	
 	
 	@KafkaListener(topics = "event-session", groupId = "group_id", containerFactory = "kafkaListenerContainerFactory"
@@ -68,11 +68,11 @@ public class KafkaConsumerService {
 		
 		Runnable sendUpComingEventNotification = () -> {
 			log.info("SEND UPCOMING NOTIFICATION FOR EVENT_ID: {}", eventId);
-			NotificationInfo notificationInfo =
-				new NotificationInfo("You've been invited to " + eventId + " event!", brandId + " " + "invited you to join!", "fa-check");
-			NotificationData notificationData = new NotificationData(notificationInfo, new ArrayList<>());
+			// NotificationInfo notificationInfo =
+			// 	new NotificationInfo("You've been invited to " + eventId + " event!", brandId + " " + "invited you to join!", "fa-check");
+			// NotificationData notificationData = new NotificationData(notificationInfo, new ArrayList<>());
 			
-			kafkaTemplateNotificationInfo.send("event-notification", notificationData);
+			kafkaTemplateEventId.send("upcoming-event", eventId);
 		};
 		
 		Runnable setUpGame = () -> {
