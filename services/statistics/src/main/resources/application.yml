@@ -13,12 +13,43 @@ spring:
   
   kafka:
     bootstrap-servers: localhost:9092
+    # consumer:
+    #   group-id: group_id
+    #   auto-offset-reset: earliest
+    #   key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    #   value-deserializer: org.apache.kafka.common.serialization.JsonDeserializer
+    #   enable-auto-commit: false
+    #   properties:
+    #     spring:
+    #       json:
+    #         trusted:
+    #           packages: "*"   # Allows deserialization of any class
+    # listener:
+    #   concurrency: 3  # Number of consumers for the same topic in the group
     consumer:
-      group-id: group_id
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       enable-auto-commit: false
+      auto-offset-reset: earliest
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "*"
+    
+    consumers:
+      stringConsumer:
+        group-id: group_id
+        concurrency: 3
+        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value-deserializer: com.vou.statistics.kafka.deserializer.TransactionDeserializer
+        topic: session-transaction
+
+      notificationConsumer:
+        group-id: group_id
+        concurrency: 3
+        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value-deserializer: com.vou.statistics.kafka.deserializer.EventIdDeserializer
+        topic: upcoming-event
+        
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
