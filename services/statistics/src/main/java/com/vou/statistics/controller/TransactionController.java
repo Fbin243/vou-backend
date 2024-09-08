@@ -257,6 +257,8 @@ public class TransactionController {
                 if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, eventsServiceClient, null) == false) {
                     System.out.println("Transaction processed not successfully but still working right!");
 
+                    voucherConversionTransactionRepository.save((VoucherConversionTransaction) createdTransaction);
+
                     NotificationInfo notificationInfo = new NotificationInfo("You have new voucher " + artifactName + " successfully!", "Check your inventory for updates", artifactImage);
                     NotificationData notificationData = new NotificationData(notificationInfo, Collections.singletonList(_transaction.getRecipientId()));
                     String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(notificationInfo, Collections.singletonList(_transaction.getRecipientId())));
