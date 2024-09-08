@@ -19,6 +19,7 @@ public class WebClientConfiguration {
     WebClient webClient(){
         return WebClient.builder()
                 .baseUrl("http://identity:8071/identity")
+//                .baseUrl("http://localhost:8071/identity")
                 .build();
     }
 

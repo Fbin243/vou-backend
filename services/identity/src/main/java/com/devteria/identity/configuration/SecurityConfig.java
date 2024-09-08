@@ -19,6 +19,7 @@ public class SecurityConfig {
 
     private static final String[] PUBLIC_ENDPOINTS = {
         "/users/registration",
+        "/users/verify-otp",
         "/auth/token",
         "/auth/introspect",
         "/auth/logout",

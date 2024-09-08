@@ -1,8 +1,7 @@
 package com.devteria.identity.entity;
 
-import java.util.Set;
-
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -14,16 +13,9 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-public class User {
+public class Otp {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
-
     String username;
-    String password;
 
-    String phone;
-
-    @ManyToMany
-    Set<Role> roles;
+    String otp;
 }

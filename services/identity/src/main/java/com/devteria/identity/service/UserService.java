@@ -1,16 +1,16 @@
 package com.devteria.identity.service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.devteria.identity.dto.request.UserCreationRequest;
-import com.devteria.identity.dto.request.UserUpdateRequest;
+import com.devteria.identity.dto.OtpStatus;
+import com.devteria.identity.dto.request.*;
+import com.devteria.identity.dto.response.OtpDataResponse;
+import com.devteria.identity.dto.response.OtpResponseDto;
 import com.devteria.identity.dto.response.UserResponse;
 import com.devteria.identity.entity.Role;
 import com.devteria.identity.entity.User;
@@ -37,16 +37,20 @@ public class UserService {
     PasswordEncoder passwordEncoder;
     //    ProfileClient profileClient;
 
+    SmsService smsService; // Inject SmsService
+
+    private final Map<String, String> otpMap = new HashMap<>(); // Store OTPs
+    private OtpService otpService;
+
     public UserResponse createUser(UserCreationRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) throw new AppException(ErrorCode.USER_EXISTED);
 
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPhone(request.getPhone());
 
-        // set roles for user based on request.getRoles()
-
+        Set<Role> roles = new HashSet<>();
         if (request.getRoles() != null && !request.getRoles().isEmpty()) {
-            Set<Role> roles = new HashSet<>();
             for (String roleName : request.getRoles()) {
                 Role existingRole =
                         roleRepository.findByName(roleName).orElseThrow(() -> new AppException(ErrorCode.INVALID_ROLE));
@@ -58,13 +62,35 @@ public class UserService {
         }
 
         user = userRepository.save(user);
-
-        //        var profileRequest = profileMapper.toProfileCreationRequest(request);
-        //        profileRequest.setUserId(user.getId());
-        //
-        //        profileClient.createProfile(profileRequest);
-
         return userMapper.toUserResponse(user);
+    }
+
+    public void sendOtp(String username, String phone) {
+        OtpRequest otpRequest = new OtpRequest();
+        otpRequest.setUsername(username);
+        otpRequest.setPhone(phone);
+        OtpResponseDto response = smsService.sendSMS(otpRequest); // Call the updated sendSMS method
+
+        if (response.getStatus() == OtpStatus.FAILED) {
+            throw new AppException(ErrorCode.OTP_SEND_FAILED); // Handle failed OTP sending
+        }
+    }
+
+    public UserResponse verifyOtp(UserCreationRequest request) {
+        OtpDataResponse otpEntity = otpService.getOtpByUsername(request.getUsername()); // Fetch OTP by username
+        if (otpEntity != null
+                && otpEntity.getOtp() != null
+                && otpEntity.getOtp().equals(request.getOtp())) { // Check if OTP is valid
+            otpService.deleteOtpByUsername(request.getUsername()); // Delete OTP after verification
+            // Proceed to create user if OTP is valid
+            //            UserCreationRequest request = new UserCreationRequest(); // Create a new request object
+            //            request.setUsername(username);
+
+            // You may need to fetch other user details if necessary
+            return createUser(request); // Create the user
+        } else {
+            throw new AppException(ErrorCode.INVALID_OTP); // Handle invalid OTP
+        }
     }
 
     public UserResponse getMyInfo() {

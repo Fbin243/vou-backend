@@ -27,9 +27,24 @@ public class UserController {
 
     @PostMapping("/registration")
     ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
-        return ApiResponse.<UserResponse>builder()
-                .result(userService.createUser(request))
-                .build();
+        if (request.getRoles() != null && request.getRoles().contains("player")) {
+            // Trigger OTP sending process
+            userService.sendOtp(request.getUsername(), request.getPhone());
+            return ApiResponse.<UserResponse>builder()
+                    .result(null) // No user created yet
+                    .message("OTP has been sent to your phone number")
+                    .build();
+        } else {
+            return ApiResponse.<UserResponse>builder()
+                    .result(userService.createUser(request))
+                    .build();
+        }
+    }
+
+    @PostMapping("/verify-otp")
+    ApiResponse<UserResponse> verifyOtp(@RequestBody @Valid UserCreationRequest request) {
+        UserResponse userResponse = userService.verifyOtp(request);
+        return ApiResponse.<UserResponse>builder().result(userResponse).build();
     }
 
     @GetMapping

@@ -20,4 +20,8 @@ public class UserCreationRequest {
     String password;
 
     List<String> roles;
+
+    String phone;
+
+    String otp;
 }

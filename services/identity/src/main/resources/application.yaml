@@ -23,7 +23,8 @@ jwt:
 
 app:
   services:
-    users: http://localhost:8081/users
+#    users: http://localhost:8081/users
+     users: http://users:8081/users
 
 eureka:
   client:
@@ -51,3 +52,6 @@ management:
       enabled: true
     tags:
       application: ${spring.application.name}
+
+speedsms:
+  apiAccessToken: A72mXM8yQbOcjYOZ-2FDcbVQ9psP6WKY
