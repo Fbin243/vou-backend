@@ -90,7 +90,7 @@ public class StatisticsConsumerService {
         }
     }
 
-    @KafkaListener(topics = "upcoming-event", groupId = "group_id", containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = "upcoming-event", groupId = "group_id", containerFactory = "eventKafkaListenerContainerFactory")
     public void listenUpcomingEvent(ConsumerRecord<String, EventIdDto> record, Acknowledgment acknowledgment) {
         try {
             EventIdDto eventIdDto = record.value();

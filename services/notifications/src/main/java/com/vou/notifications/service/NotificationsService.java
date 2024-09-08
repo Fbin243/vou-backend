@@ -120,7 +120,7 @@ public class NotificationsService implements INotificationsService {
             userNotificationData.put("is_read ", false);
             userNotificationData.put("active_status", ActiveStatus.ACTIVE);
 
-            notificationUsers.document(notificationId).set(userNotificationData);
+            notificationUsers.document(notificationId.substring(0, 18) + userId.substring(0, 18)).set(userNotificationData);
         }
         catch (Exception e) {
             e.printStackTrace();
