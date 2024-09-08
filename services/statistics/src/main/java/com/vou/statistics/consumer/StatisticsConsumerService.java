@@ -101,7 +101,11 @@ public class StatisticsConsumerService {
 
             NotificationInfo notificationInfo = new NotificationInfo("Upcoming event!", upcomingEvent.getName() + " event is coming.", "fa-check");
             NotificationData notificationData = new NotificationData(notificationInfo, userIds);
+
+            System.out.println("Users: " + userIds);
             String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(notificationInfo, userIds));
+
+            System.out.println("Notification IDDD: " + notificationId);
             kafkaTemplateNotificationInfo.send("event-notification", notificationData);
 
             acknowledgment.acknowledge();
