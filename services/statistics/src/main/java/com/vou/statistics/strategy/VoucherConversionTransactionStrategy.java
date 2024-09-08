@@ -87,7 +87,7 @@ public class VoucherConversionTransactionStrategy implements TransactionStrategy
             
             for (ItemId_Quantity item_quantity : voucherItemsConversionTransaction.getItems()) {
                 // ItemDto currentItem = eventsServiceClient.getItemsByIds(Collections.singletonList(item_quantity.getItemId())).get(0);
-                playerItemService.addPlayerItem(new PlayerItemDto(voucherItemsConversionTransaction.getPlayerId(), item_quantity.getItemId(), currentVoucher.getBrand_id(), currentItems.get(_count).getName(), items_quantities.get(item_quantity.getItemId()) * voucherItemsConversionTransaction.getQuantity() * -1));
+                playerItemService.addPlayerItem(new PlayerItemDto(voucherItemsConversionTransaction.getPlayerId(), item_quantity.getItemId(), currentVoucher.getBrand_id(), currentItems.get(_count).getName(), 2L, items_quantities.get(item_quantity.getItemId()) * voucherItemsConversionTransaction.getQuantity() * -1));
                 _count++;
             }
 
@@ -97,7 +97,13 @@ public class VoucherConversionTransactionStrategy implements TransactionStrategy
             saveTransaction(voucherItemsConversionTransaction, transactionRepository);
 
             // update events_vouchers table
-            eventsServiceClient.addQuantityToEventVoucher(new EventVoucherAndAdditionQuantityDto(voucherItemsConversionTransaction.getEventId(), voucherItemsConversionTransaction.getArtifactId(), voucherItemsConversionTransaction.getQuantity() * -1));
+            if (eventsServiceClient.addQuantityToEventVoucher(new EventVoucherAndAdditionQuantityDto(voucherItemsConversionTransaction.getEventId(), voucherItemsConversionTransaction.getArtifactId(), voucherItemsConversionTransaction.getQuantity() * -1))) {
+                logger.info("EventVoucher updated successfully");
+            }
+            else {
+                logger.info("EventVoucher update failed");
+                return false;
+            }
 
         }
         catch (Exception e) {

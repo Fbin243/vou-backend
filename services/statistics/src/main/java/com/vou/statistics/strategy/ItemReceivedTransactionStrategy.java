@@ -42,7 +42,8 @@ public class ItemReceivedTransactionStrategy implements TransactionStrategy {
 		}
 		
 		try {
-			            // get item by id
+			ItemReceivedTransaction itemReceivedTransaction = (ItemReceivedTransaction) transaction;
+			// get item by id
             ItemDto currentItem = eventsServiceClient.getItemsByIds(Collections.singletonList(transaction.getArtifactId())).get(0);
 
             if (currentItem == null) {
@@ -50,12 +51,12 @@ public class ItemReceivedTransactionStrategy implements TransactionStrategy {
                 return false;
             }
 
-			// System.out.println("ItemReceivedTransactionStrategy.processTransaction " + _playerItemService);
-			_playerItemService.addPlayerItem(new PlayerItemDto(transaction.getRecipientId(), transaction.getArtifactId(), currentItem.getBrand_id(), currentItem.getName(), transaction.getQuantity()));
+			System.out.println("ItemReceivedTransactionStrategy.processTransaction " + _playerItemService);
+			_playerItemService.addPlayerItem(new PlayerItemDto(transaction.getRecipientId(), transaction.getArtifactId(), currentItem.getBrand_id(), currentItem.getName(), itemReceivedTransaction.getGameId(), transaction.getQuantity()));
 			// playerItemService.deletePlayerItem(new PlayerItemDto(transaction.getPlayerId(), transaction.getArtifactId(), transaction.getQuantity()));
-			// System.out.println("Passed addPlayerItem");
+			System.out.println("Passed addPlayerItem");
 			saveTransaction(transaction, transactionRepository);
-			// System.out.println("ItemReceivedTransactionStrategy.processTransaction " + transaction);
+			System.out.println("ItemReceivedTransactionStrategy.processTransaction " + transaction);
 		} catch (Exception e) {
 			e.getStackTrace();
 			e.printStackTrace();

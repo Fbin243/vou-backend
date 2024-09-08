@@ -114,7 +114,7 @@ public class PlayerItemService implements IPlayerItemService {
     @Override
     public PlayerItem addPlayerItem(PlayerItemDto dto) {
         // playerItemRepository = new PlayerItemRepository();
-        Optional<PlayerItem> existingPlayerItem = playerItemRepository.findByPlayerIdAndItemId(dto.getPlayerId(), dto.getItemId());
+        Optional<PlayerItem> existingPlayerItem = playerItemRepository.findByPlayerIdAndItemIdAndGameId(dto.getPlayerId(), dto.getItemId(), dto.getGameId());
         if (existingPlayerItem.isPresent()) {
             // If the record exists, update the quantity
             PlayerItem playerItem = existingPlayerItem.get();
@@ -128,6 +128,7 @@ public class PlayerItemService implements IPlayerItemService {
             newPlayerItem.setQuantity(dto.getQuantity());
             newPlayerItem.setBrandId(dto.getBrandId());
             newPlayerItem.setItemName(dto.getItemName());
+            newPlayerItem.setGameId(dto.getGameId());
             return playerItemRepository.save(newPlayerItem);
         }
     }
@@ -141,7 +142,7 @@ public class PlayerItemService implements IPlayerItemService {
     public Boolean deletePlayerItem(PlayerItemDto dto) {
         try {
             // set quantity to 0
-            Optional<PlayerItem> existingPlayerItem = playerItemRepository.findByPlayerIdAndItemId(dto.getPlayerId(), dto.getItemId());
+            Optional<PlayerItem> existingPlayerItem = playerItemRepository.findByPlayerIdAndItemIdAndGameId(dto.getPlayerId(), dto.getItemId(), dto.getGameId());
             if (existingPlayerItem.isPresent()) {
                 PlayerItem playerItem = existingPlayerItem.get();
                 playerItem.setQuantity(0);
@@ -157,8 +158,8 @@ public class PlayerItemService implements IPlayerItemService {
     }
 
     @Override
-    public Integer getQuantityByPlayerIdAndItemId(String playerId, String itemId) {
-        Optional<PlayerItem> playerItem = playerItemRepository.findByPlayerIdAndItemId(playerId, itemId);
+    public Integer getQuantityByPlayerIdAndItemIdAndGameId(String playerId, String itemId, Long gameId) {
+        Optional<PlayerItem> playerItem = playerItemRepository.findByPlayerIdAndItemIdAndGameId(playerId, itemId, gameId);
         return playerItem.map(PlayerItem::getQuantity).orElse(0);
     }
 

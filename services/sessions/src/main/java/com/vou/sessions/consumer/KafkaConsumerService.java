@@ -5,6 +5,7 @@ import com.vou.sessions.dto.SessionDto;
 import com.vou.sessions.engine.GameEngine;
 import com.vou.sessions.engine.quizgame.QuizGameEngine;
 import com.vou.sessions.engine.shakinggame.ShakingGameEngine;
+import com.vou.sessions.model.EventId;
 import com.vou.sessions.model.EventSessionInfo;
 import com.vou.sessions.schedule.SchedulerService;
 import com.vou.sessions.service.ISessionsService;
@@ -37,7 +38,7 @@ public class KafkaConsumerService {
 	private SimpMessagingTemplate messagingTemplate;
 	private QuizGameEngine quizGameEngine;
 	private ShakingGameEngine shakingGameEngine;
-	private KafkaTemplate<String, String> kafkaTemplateEventId;
+	private KafkaTemplate<String, EventId> kafkaTemplateEventId;
 	
 	
 	@KafkaListener(topics = "event-session", groupId = "group_id", containerFactory = "kafkaListenerContainerFactory"
@@ -70,7 +71,7 @@ public class KafkaConsumerService {
 			// 	new NotificationInfo("You've been invited to " + eventId + " event!", brandId + " " + "invited you to join!", "fa-check");
 			// NotificationData notificationData = new NotificationData(notificationInfo, new ArrayList<>());
 			
-			kafkaTemplateEventId.send("upcoming-event", eventId);
+			kafkaTemplateEventId.send("upcoming-event", new EventId(eventId));
 		};
 		
 		Runnable setUpGame = () -> {

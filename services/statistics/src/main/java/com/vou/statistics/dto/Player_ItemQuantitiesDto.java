@@ -26,7 +26,7 @@ public class Player_ItemQuantitiesDto {
     public List<PlayerItemDto> getPlayerItems () {
         List<PlayerItemDto> playerItems = new ArrayList<PlayerItemDto>();
         for (ItemId_Quantity item_quantity : items_quantities) {
-            PlayerItemDto playerItem = new PlayerItemDto(playerId, item_quantity.getItemId(), "", "", item_quantity.getQuantity());
+            PlayerItemDto playerItem = new PlayerItemDto(playerId, item_quantity.getItemId(), "", "", 1L, item_quantity.getQuantity());
             playerItems.add(playerItem);
         }
         return playerItems;

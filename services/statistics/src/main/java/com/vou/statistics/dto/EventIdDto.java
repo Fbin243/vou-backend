@@ -11,16 +11,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class PlayerItemDto {
-    private String playerId;
-
-    private String itemId;
-
-    private String brandId;
-
-    private String itemName;
-
-    private Long gameId;
-
-    private int quantity;
+public class EventIdDto {
+    private String id;
 }

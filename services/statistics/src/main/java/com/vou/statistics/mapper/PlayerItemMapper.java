@@ -19,6 +19,7 @@ public class PlayerItemMapper {
         playerItemDto.setItemId(playerItem.getItemId());
         playerItemDto.setBrandId(playerItem.getBrandId());
         playerItemDto.setItemName(playerItem.getItemName());
+        playerItemDto.setGameId(playerItem.getGameId());
         playerItemDto.setQuantity(playerItem.getQuantity());
 
         return playerItemDto;
@@ -35,6 +36,7 @@ public class PlayerItemMapper {
         playerItem.setItemId(dto.getItemId());
         playerItem.setBrandId(dto.getBrandId());
         playerItem.setItemName(dto.getItemName());
+        playerItem.setGameId(dto.getGameId());
         playerItem.setQuantity(dto.getQuantity());
 
         return playerItem;

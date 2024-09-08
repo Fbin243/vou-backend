@@ -7,9 +7,11 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.vou.statistics.dto.EventIdDto;
+
 import org.apache.kafka.common.serialization.Deserializer;
 
-public class EventIdDeserializer implements Deserializer<String> {
+public class EventIdDeserializer implements Deserializer<EventIdDto> {
 	
 	private final ObjectMapper objectMapper;
 	
@@ -23,14 +25,14 @@ public class EventIdDeserializer implements Deserializer<String> {
 	}
 	
 	@Override
-	public String deserialize(String topic, byte[] data) {
+	public EventIdDto deserialize(String topic, byte[] data) {
 		try {
 			if (data == null) {
 				return null;
 			}
-			return objectMapper.readValue(data, String.class);
+			return objectMapper.readValue(data, EventIdDto.class);
 		} catch (Exception e) {
-			throw new RuntimeException("Error deserializing String", e);
+			throw new RuntimeException("Error deserializing EventIdDto", e);
 		}
 	}
 	
