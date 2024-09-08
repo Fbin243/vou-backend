@@ -14,6 +14,6 @@ public interface PlayerItemRepository extends MongoRepository<PlayerItem, Object
 {
     List<PlayerItem> findByPlayerId(String playerId);
     List<PlayerItem> findByItemId(String itemId);
-    Optional<PlayerItem> findByPlayerIdAndItemId(String playerId, String itemId);
+    Optional<PlayerItem> findByPlayerIdAndItemIdAndGameId(String playerId, String itemId, Long gameId);
     // List<PlayerItem> findByPlayerIdAndItemIds(String playerId, List<String> itemIds);
 }

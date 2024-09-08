@@ -255,7 +255,7 @@ public class TransactionController {
 
             if (createdTransaction.getTransactionType().equalsIgnoreCase("voucher_conversion")) {
                 if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, eventsServiceClient, null) == false) {
-                    System.out.println("Transaction processed successfully");
+                    System.out.println("Transaction processed not successfully but still working right!");
 
                     NotificationInfo notificationInfo = new NotificationInfo("You have new voucher " + artifactName + " successfully!", "Check your inventory for updates", artifactImage);
                     NotificationData notificationData = new NotificationData(notificationInfo, Collections.singletonList(_transaction.getRecipientId()));
@@ -268,6 +268,17 @@ public class TransactionController {
 
                     return ResponseEntity.ok(false);
                 }
+
+                System.out.println("Transaction processed successfully");
+
+                NotificationInfo notificationInfo = new NotificationInfo("You have new voucher " + artifactName + " successfully!", "Check your inventory for updates", artifactImage);
+                NotificationData notificationData = new NotificationData(notificationInfo, Collections.singletonList(_transaction.getRecipientId()));
+                String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(notificationInfo, Collections.singletonList(_transaction.getRecipientId())));
+                
+                System.out.println("Notification IDDD: " + notificationId);
+
+                // notificationsServiceClient.sendNotification(notificationData);
+                kafkaTemplateNotificationInfo.send("event-notification", notificationData);
             } else if (createdTransaction.getTransactionType().equalsIgnoreCase("voucher_used")) {
                 if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, eventsServiceClient, null) == false) {
                     return ResponseEntity.ok(false);

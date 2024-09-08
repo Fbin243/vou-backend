@@ -10,9 +10,11 @@ import com.vou.statistics.factory.TransactionFactory;
 import com.vou.statistics.mapper.TransactionMapper;
 import com.vou.statistics.dto.AddUsersRequestDto;
 import com.vou.statistics.dto.EventDto;
+import com.vou.statistics.dto.EventIdDto;
 import com.vou.statistics.dto.ItemDto;
 import com.vou.statistics.dto.TransactionDto;
 import com.vou.statistics.dto.VoucherDto;
+import com.vou.statistics.entity.ItemReceivedTransaction;
 import com.vou.statistics.entity.ItemSharedTransaction;
 import com.vou.statistics.model.Like;
 import com.vou.statistics.model.NotificationData;
@@ -47,6 +49,7 @@ public class StatisticsConsumerService {
     private NotificationsServiceClient      notificationsServiceClient;
     private EventsServiceClient             eventsServiceClient;
     private LikeRepository                  likeRepository;
+    private TransactionRepository<ItemReceivedTransaction>      itemReceivedTransactionRepository;
 
     private static final Logger logger = Logger.getLogger(StatisticsConsumerService.class.getName());
 
@@ -88,11 +91,12 @@ public class StatisticsConsumerService {
     }
 
     @KafkaListener(topics = "upcoming-event", groupId = "group_id", containerFactory = "kafkaListenerContainerFactory")
-    public void listenUpcomingEvent(String eventId, Acknowledgment acknowledgment) {
+    public void listenUpcomingEvent(ConsumerRecord<String, EventIdDto> record, Acknowledgment acknowledgment) {
         try {
-            System.out.println("Event ID receive from Kafka: " + eventId);
-            EventDto upcomingEvent = eventsServiceClient.getEventById(eventId);
-            List<Like> likes = likeRepository.findByLikeableIdAndLikeableType(eventId, "event");
+            EventIdDto eventIdDto = record.value();
+            System.out.println("Event ID receive from Kafka: " + eventIdDto.getId());
+            EventDto upcomingEvent = eventsServiceClient.getEventById(eventIdDto.getId());
+            List<Like> likes = likeRepository.findByLikeableIdAndLikeableType(eventIdDto.getId(), "event");
             List<String> userIds = new ArrayList<>();
             for (Like like : likes) {
                 userIds.add(like.getUserId());
@@ -164,6 +168,8 @@ public class StatisticsConsumerService {
                 } else {
                     System.out.println("Transaction processing failed");
                 }
+
+                itemReceivedTransactionRepository.save((ItemReceivedTransaction) createdTransaction);
 
             } catch (Exception e) {
                 e.printStackTrace();

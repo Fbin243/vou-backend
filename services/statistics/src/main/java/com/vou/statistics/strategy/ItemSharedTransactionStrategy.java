@@ -42,7 +42,8 @@ public class ItemSharedTransactionStrategy implements TransactionStrategy {
         }
 
         try {
-            Integer numberOfItemLeftOfTheSender = playerItemService.getQuantityByPlayerIdAndItemId(transaction.getPlayerId(), transaction.getArtifactId());
+            ItemSharedTransaction itemSharedTransaction = (ItemSharedTransaction) transaction;
+            Integer numberOfItemLeftOfTheSender = playerItemService.getQuantityByPlayerIdAndItemIdAndGameId(transaction.getPlayerId(), transaction.getArtifactId(), itemSharedTransaction.getGameId());
 
             if (numberOfItemLeftOfTheSender < transaction.getQuantity()) {
                 return false;
@@ -56,8 +57,9 @@ public class ItemSharedTransactionStrategy implements TransactionStrategy {
                 return false;
             }
 
-            playerItemService.addPlayerItem(new PlayerItemDto(transaction.getRecipientId(), transaction.getArtifactId(), currentItem.getBrand_id(), currentItem.getName(), transaction.getQuantity()));
-            playerItemService.addPlayerItem(new PlayerItemDto(transaction.getPlayerId(), transaction.getArtifactId(), currentItem.getBrand_id(), currentItem.getName(), transaction.getQuantity() * -1));
+            playerItemService.addPlayerItem(new PlayerItemDto(transaction.getRecipientId(), transaction.getArtifactId(), currentItem.getBrand_id(), currentItem.getName(), itemSharedTransaction.getGameId(), transaction.getQuantity()));
+            playerItemService.addPlayerItem(new PlayerItemDto(transaction.getPlayerId(), transaction.getArtifactId(), currentItem.getBrand_id(), currentItem.getName(), itemSharedTransaction.getGameId(), transaction.getQuantity() * -1));
+            
             saveTransaction(transaction, transactionRepository);
         }
         catch (Exception e) {

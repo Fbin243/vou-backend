@@ -195,9 +195,8 @@ public class EventsController {
 
     // update events_vouchers table
     @PutMapping("/events_vouchers")
-    public ResponseEntity<ResponseDto> addQuantityToEventVoucher(@RequestBody EventVoucherAndAdditionQuantityDto eventVoucherAndAdditionQuantityDto) {
-        eventService.updateEventVoucher(eventVoucherAndAdditionQuantityDto.getEventId(), eventVoucherAndAdditionQuantityDto.getVoucherId(), eventVoucherAndAdditionQuantityDto.getAdditionalQuantity());
-        ResponseDto res = new ResponseDto(HttpStatus.OK, "Event voucher updated successfully.");
-        return ResponseEntity.status(HttpStatus.OK).body(res);
+    public ResponseEntity<Boolean> addQuantityToEventVoucher(@RequestBody EventVoucherAndAdditionQuantityDto eventVoucherAndAdditionQuantityDto) {
+        boolean isUpdated = eventService.updateEventVoucher(eventVoucherAndAdditionQuantityDto.getEventId(), eventVoucherAndAdditionQuantityDto.getVoucherId(), eventVoucherAndAdditionQuantityDto.getAdditionalQuantity());
+        return ResponseEntity.ok(isUpdated);
     }
 }

@@ -28,6 +28,9 @@ public class PlayerItem {
     @Field(value = "item_name")
     private String itemName;
 
+    @Field(value = "game_id")
+    private Long gameId;
+
     @Field(value = "quantity")
     private int quantity;
 }
