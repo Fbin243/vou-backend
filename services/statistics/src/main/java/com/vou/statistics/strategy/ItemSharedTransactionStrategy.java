@@ -13,6 +13,7 @@ import com.vou.statistics.dto.PlayerItemDto;
 import com.vou.statistics.entity.ItemSharedTransaction;
 import com.vou.statistics.model.Transaction;
 import com.vou.statistics.repository.ItemSharedTransactionRepository;
+import com.vou.statistics.repository.TransactionRepository;
 import com.vou.statistics.service.PlayerItemService;
 import com.vou.statistics.service.PlayerVoucherService;
 
@@ -35,7 +36,7 @@ public class ItemSharedTransactionStrategy implements TransactionStrategy {
     }
 
     @Override
-    public boolean processTransaction(Transaction transaction, PlayerVoucherService playerVoucherService, PlayerItemService playerItemService, EventsServiceClient eventsServiceClient) {
+    public boolean processTransaction(Transaction transaction, PlayerVoucherService playerVoucherService, PlayerItemService playerItemService, EventsServiceClient eventsServiceClient, TransactionRepository<Transaction> transactionRepository) {
         if (!transaction.getTransactionType().equalsIgnoreCase(TRANSACTION_TYPE_ITEM_SHARED)) {
             throw new IllegalArgumentException("Invalid transaction type for ItemSharedTransactionStrategy");
         }
@@ -57,7 +58,7 @@ public class ItemSharedTransactionStrategy implements TransactionStrategy {
 
             playerItemService.addPlayerItem(new PlayerItemDto(transaction.getRecipientId(), transaction.getArtifactId(), currentItem.getBrand_id(), currentItem.getName(), transaction.getQuantity()));
             playerItemService.addPlayerItem(new PlayerItemDto(transaction.getPlayerId(), transaction.getArtifactId(), currentItem.getBrand_id(), currentItem.getName(), transaction.getQuantity() * -1));
-            saveTransaction(transaction);
+            saveTransaction(transaction, transactionRepository);
         }
         catch (Exception e) {
             e.getStackTrace();
@@ -68,14 +69,14 @@ public class ItemSharedTransactionStrategy implements TransactionStrategy {
     }
 
     @Override
-    public boolean saveTransaction(Transaction transaction) {
+    public boolean saveTransaction(Transaction transaction, TransactionRepository<Transaction> transactionRepository) {
         if (!transaction.getTransactionType().equalsIgnoreCase(TRANSACTION_TYPE_ITEM_SHARED)) {
             throw new IllegalArgumentException("Invalid transaction type for ItemSharedTransactionStrategy");
         }
 
         try {
             ItemSharedTransaction itemSharedTransaction = (ItemSharedTransaction) transaction;
-            itemSharedTransactionRepository.save(itemSharedTransaction);
+            transactionRepository.save(itemSharedTransaction);
         }
         catch (Exception e) {
             e.getStackTrace();

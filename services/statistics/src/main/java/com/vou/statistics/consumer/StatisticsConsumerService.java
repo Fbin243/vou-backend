@@ -13,11 +13,13 @@ import com.vou.statistics.dto.EventDto;
 import com.vou.statistics.dto.ItemDto;
 import com.vou.statistics.dto.TransactionDto;
 import com.vou.statistics.dto.VoucherDto;
+import com.vou.statistics.entity.ItemSharedTransaction;
 import com.vou.statistics.model.Like;
 import com.vou.statistics.model.NotificationData;
 import com.vou.statistics.model.NotificationInfo;
 import com.vou.statistics.model.Transaction;
 import com.vou.statistics.repository.LikeRepository;
+import com.vou.statistics.repository.TransactionRepository;
 import com.vou.statistics.service.PlayerItemService;
 import com.vou.statistics.service.PlayerVoucherService;
 import com.vou.statistics.strategy.TransactionStrategy;
@@ -148,7 +150,7 @@ public class StatisticsConsumerService {
                     artifactImage = items.get(0).getIcon();
                 }
 
-                if (transactionContext.executeStrategy(_transaction, playerVoucherService, playerItemService, eventsServiceClient)) {
+                if (transactionContext.executeStrategy(_transaction, playerVoucherService, playerItemService, eventsServiceClient, null)) {
                     System.out.println("Transaction processed successfully");
 
                     NotificationInfo notificationInfo = new NotificationInfo("You've received item " + artifactName, "Check your inventory for updates", artifactImage);

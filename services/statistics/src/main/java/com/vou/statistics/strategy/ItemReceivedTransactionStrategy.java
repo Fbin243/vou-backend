@@ -6,6 +6,7 @@ import com.vou.statistics.dto.PlayerItemDto;
 import com.vou.statistics.entity.ItemReceivedTransaction;
 import com.vou.statistics.model.Transaction;
 import com.vou.statistics.repository.ItemReceivedTransactionRepository;
+import com.vou.statistics.repository.TransactionRepository;
 import com.vou.statistics.service.PlayerItemService;
 import com.vou.statistics.service.PlayerVoucherService;
 import lombok.NoArgsConstructor;
@@ -35,7 +36,7 @@ public class ItemReceivedTransactionStrategy implements TransactionStrategy {
 	
 	@Override
 	public boolean processTransaction(Transaction transaction, PlayerVoucherService playerVoucherService,
-	                                  PlayerItemService _playerItemService, EventsServiceClient eventsServiceClient) {
+	                                  PlayerItemService _playerItemService, EventsServiceClient eventsServiceClient, TransactionRepository<Transaction> transactionRepository) {
 		if (!transaction.getTransactionType().equalsIgnoreCase(TRANSACTION_TYPE_ITEM_RECEIVED)) {
 			throw new IllegalArgumentException("Invalid transaction type for ItemReceivedTransactionStrategy");
 		}
@@ -53,7 +54,7 @@ public class ItemReceivedTransactionStrategy implements TransactionStrategy {
 			_playerItemService.addPlayerItem(new PlayerItemDto(transaction.getRecipientId(), transaction.getArtifactId(), currentItem.getBrand_id(), currentItem.getName(), transaction.getQuantity()));
 			// playerItemService.deletePlayerItem(new PlayerItemDto(transaction.getPlayerId(), transaction.getArtifactId(), transaction.getQuantity()));
 			// System.out.println("Passed addPlayerItem");
-			saveTransaction(transaction);
+			saveTransaction(transaction, transactionRepository);
 			// System.out.println("ItemReceivedTransactionStrategy.processTransaction " + transaction);
 		} catch (Exception e) {
 			e.getStackTrace();
@@ -65,7 +66,7 @@ public class ItemReceivedTransactionStrategy implements TransactionStrategy {
 	}
 	
 	@Override
-	public boolean saveTransaction(Transaction transaction) {
+	public boolean saveTransaction(Transaction transaction, TransactionRepository<Transaction> transactionRepository) {
 		if (!transaction.getTransactionType().equalsIgnoreCase(TRANSACTION_TYPE_ITEM_RECEIVED)) {
 			throw new IllegalArgumentException("Invalid transaction type for ItemReceivedTransactionStrategy");
 		}

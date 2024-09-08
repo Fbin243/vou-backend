@@ -18,6 +18,7 @@ import com.vou.statistics.entity.VoucherConversionTransaction;
 import com.vou.statistics.model.Transaction;
 import com.vou.statistics.service.PlayerItemService;
 import com.vou.statistics.service.PlayerVoucherService;
+import com.vou.statistics.repository.TransactionRepository;
 import com.vou.statistics.repository.VoucherConversionTransactionRepository;
 import java.util.logging.Logger;
 
@@ -39,7 +40,7 @@ public class VoucherConversionTransactionStrategy implements TransactionStrategy
     private static final Logger logger = Logger.getLogger(VoucherConversionTransactionStrategy.class.getName());
 
     @Override
-    public boolean processTransaction(Transaction transaction, PlayerVoucherService playerVoucherService, PlayerItemService playerItemService, EventsServiceClient _eventsServiceClient) {
+    public boolean processTransaction(Transaction transaction, PlayerVoucherService playerVoucherService, PlayerItemService playerItemService, EventsServiceClient _eventsServiceClient, TransactionRepository<Transaction> transactionRepository) {
         if (!transaction.getTransactionType().equalsIgnoreCase(TRANSACTION_TYPE_VOUCHER_CONVERSION)) {
             throw new IllegalArgumentException("Invalid transaction type for VoucherConversionTransactionStrategy");
         }
@@ -93,7 +94,7 @@ public class VoucherConversionTransactionStrategy implements TransactionStrategy
             logger.info("VoucherConversionTransaction processed successfully");
 
             // save voucher transactions
-            saveTransaction(voucherItemsConversionTransaction);
+            saveTransaction(voucherItemsConversionTransaction, transactionRepository);
 
             // update events_vouchers table
             eventsServiceClient.addQuantityToEventVoucher(new EventVoucherAndAdditionQuantityDto(voucherItemsConversionTransaction.getEventId(), voucherItemsConversionTransaction.getArtifactId(), voucherItemsConversionTransaction.getQuantity() * -1));
@@ -108,7 +109,7 @@ public class VoucherConversionTransactionStrategy implements TransactionStrategy
     }
     
     @Override
-    public boolean saveTransaction(Transaction transaction) {
+    public boolean saveTransaction(Transaction transaction, TransactionRepository<Transaction> transactionRepository) {
         if (!transaction.getTransactionType().equalsIgnoreCase(TRANSACTION_TYPE_VOUCHER_CONVERSION)) {
             throw new IllegalArgumentException("Invalid transaction type for VoucherConversionTransactionStrategy");
         }

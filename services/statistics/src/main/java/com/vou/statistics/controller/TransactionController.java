@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import com.vou.statistics.model.NotificationData;
 import com.vou.statistics.model.NotificationInfo;
 import com.vou.statistics.model.Transaction;
+import com.vou.statistics.repository.TransactionRepository;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,10 @@ public class TransactionController {
     private PlayerItemService                                   playerItemService;
     private EventsServiceClient                                 eventsServiceClient;
     private NotificationsServiceClient                          notificationsServiceClient;
+    private TransactionRepository<ItemSharedTransaction>        itemSharedTransactionRepository;
+    private TransactionRepository<ItemReceivedTransaction>      itemReceivedTransactionRepository;
+    private TransactionRepository<VoucherUsedTransaction>       voucherUsedTransactionRepository;
+    private TransactionRepository<VoucherConversionTransaction> voucherConversionTransactionRepository;
 
     @Autowired
 	private KafkaTemplate<String, NotificationData> kafkaTemplateNotificationInfo;
@@ -249,7 +254,7 @@ public class TransactionController {
 
 
             if (createdTransaction.getTransactionType().equalsIgnoreCase("voucher_conversion")) {
-                if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, eventsServiceClient) == false) {
+                if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, eventsServiceClient, null) == false) {
                     System.out.println("Transaction processed successfully");
 
                     NotificationInfo notificationInfo = new NotificationInfo("You have new voucher " + artifactName + " successfully!", "Check your inventory for updates", artifactImage);
@@ -264,7 +269,7 @@ public class TransactionController {
                     return ResponseEntity.ok(false);
                 }
             } else if (createdTransaction.getTransactionType().equalsIgnoreCase("voucher_used")) {
-                if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, eventsServiceClient) == false) {
+                if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, eventsServiceClient, null) == false) {
                     return ResponseEntity.ok(false);
                 }
                 System.out.println("Transaction processed successfully");
@@ -278,11 +283,21 @@ public class TransactionController {
                 // notificationsServiceClient.sendNotification(notificationData);
                 kafkaTemplateNotificationInfo.send("event-notification", notificationData);
             } else {
-                if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, eventsServiceClient) == false) {
+                if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, eventsServiceClient, null) == false) {
                     return ResponseEntity.ok(false);
                 }
             }
 
+            // save transactions
+            if (createdTransaction.getTransactionType().equalsIgnoreCase("item_shared")) {
+                itemSharedTransactionRepository.save((ItemSharedTransaction) createdTransaction);
+            } else if (createdTransaction.getTransactionType().equalsIgnoreCase("item_received")) {
+                itemReceivedTransactionRepository.save((ItemReceivedTransaction) createdTransaction);
+            } else if (createdTransaction.getTransactionType().equalsIgnoreCase("voucher_used")) {
+                voucherUsedTransactionRepository.save((VoucherUsedTransaction) createdTransaction);
+            } else if (createdTransaction.getTransactionType().equalsIgnoreCase("voucher_conversion")) {
+                voucherConversionTransactionRepository.save((VoucherConversionTransaction) createdTransaction);
+            }
         }
 
         return ResponseEntity.ok(true);

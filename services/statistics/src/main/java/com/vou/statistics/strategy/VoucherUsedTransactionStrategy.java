@@ -20,6 +20,7 @@ import com.vou.statistics.service.PlayerVoucherService;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+import com.vou.statistics.repository.TransactionRepository;
 import com.vou.statistics.repository.VoucherUsedTransactionRepository;
 
 @Service
@@ -31,7 +32,7 @@ public class VoucherUsedTransactionStrategy implements TransactionStrategy {
     private VoucherUsedTransactionRepository    voucherUsedTransactionRepository;
 
     @Override
-    public boolean processTransaction(Transaction transaction, PlayerVoucherService playerVoucherService, PlayerItemService playerItemService, EventsServiceClient eventsServiceClient) {
+    public boolean processTransaction(Transaction transaction, PlayerVoucherService playerVoucherService, PlayerItemService playerItemService, EventsServiceClient eventsServiceClient, TransactionRepository<Transaction> transactionRepository) {
         if (!transaction.getTransactionType().equalsIgnoreCase(TRANSACTION_TYPE_VOUCHER_USED)) {
             throw new IllegalArgumentException("Invalid transaction type for VoucherUsedTransactionStrategy");
         }
@@ -69,7 +70,7 @@ public class VoucherUsedTransactionStrategy implements TransactionStrategy {
             // playerVoucherService.addPlayerVoucher(new PlayerVoucherDto(voucherUsedTransaction.getPlayerId(), voucherUsedTransaction.getArtifactId(), voucherUsedTransaction.getQuantity() * -1));
 
             // save voucher used transaction
-            saveTransaction(voucherUsedTransaction);
+            saveTransaction(voucherUsedTransaction, transactionRepository);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -80,7 +81,7 @@ public class VoucherUsedTransactionStrategy implements TransactionStrategy {
     }
 
     @Override
-    public boolean saveTransaction(Transaction transaction) {
+    public boolean saveTransaction(Transaction transaction, TransactionRepository<Transaction> transactionRepository) {
         if (!transaction.getTransactionType().equalsIgnoreCase(TRANSACTION_TYPE_VOUCHER_USED)) {
             throw new IllegalArgumentException("Invalid transaction type for VoucherUsedTransactionStrategy");
         }
