@@ -126,6 +126,8 @@ public class PlayerItemService implements IPlayerItemService {
             newPlayerItem.setPlayerId(dto.getPlayerId());
             newPlayerItem.setItemId(dto.getItemId());
             newPlayerItem.setQuantity(dto.getQuantity());
+            newPlayerItem.setBrandId(dto.getBrandId());
+            newPlayerItem.setItemName(dto.getItemName());
             return playerItemRepository.save(newPlayerItem);
         }
     }

@@ -74,6 +74,8 @@ public class PlayerVoucherService implements IPlayerVoucherService {
             newPlayerVoucher.setPlayerId(dto.getPlayerId());
             newPlayerVoucher.setVoucherId(dto.getVoucherId());
             newPlayerVoucher.setQuantity(dto.getQuantity());
+            newPlayerVoucher.setBrandId(dto.getBrandId());
+            newPlayerVoucher.setVoucherName(dto.getVoucherName());
             return playerVoucherRepository.save(newPlayerVoucher);
         }
     }
