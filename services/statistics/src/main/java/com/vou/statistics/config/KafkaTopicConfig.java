@@ -27,8 +27,8 @@ public class KafkaTopicConfig {
         return new NewTopic("event-notification", 3, (short) 1);
     }
 
-    // @Bean
-    // public NewTopic transactionNotification() {
-    //     return new NewTopic("transaction-notification", 3, (short) 1);
-    // }
+    @Bean
+    public NewTopic upcommingEvent() {
+        return new NewTopic("upcoming-event", 3, (short) 1);
+    }
 }

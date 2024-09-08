@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.vou.statistics.dto.EventDto;
 import com.vou.statistics.dto.EventVoucherAndAdditionQuantityDto;
 import com.vou.statistics.dto.ItemDto;
 import com.vou.statistics.dto.ReturnVoucherDto;
@@ -37,4 +38,7 @@ public interface EventsServiceClient {
 
     @GetMapping("/events/vouchers/event/{eventId}")
     List<ReturnVoucherDto> getVouchersByEvent(@PathVariable String eventId);
+
+    @GetMapping("/events/id/{id}")
+    EventDto getEventById(@PathVariable String id);
 }
