@@ -36,5 +36,5 @@ public interface EventsServiceClient {
     Integer getEventVoucherQuantity(@PathVariable String eventId, @PathVariable String voucherId);
 
     @GetMapping("/events/vouchers/event/{eventId}")
-    public List<ReturnVoucherDto> getVouchersByEvent(@PathVariable String eventId);
+    List<ReturnVoucherDto> getVouchersByEvent(@PathVariable String eventId);
 }

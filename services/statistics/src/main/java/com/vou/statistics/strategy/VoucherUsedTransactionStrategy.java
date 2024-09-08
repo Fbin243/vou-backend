@@ -71,7 +71,7 @@ public class VoucherUsedTransactionStrategy implements TransactionStrategy {
             saveTransaction(voucherUsedTransaction);
         }
         catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             return false;
         }
 
