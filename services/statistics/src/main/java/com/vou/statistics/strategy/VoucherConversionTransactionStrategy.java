@@ -2,13 +2,18 @@ package com.vou.statistics.strategy;
 
 import static com.vou.statistics.common.Constants.TRANSACTION_TYPE_VOUCHER_CONVERSION;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import com.vou.statistics.client.EventsServiceClient;
 import com.vou.statistics.dto.EventVoucherAndAdditionQuantityDto;
+import com.vou.statistics.dto.ItemDto;
 import com.vou.statistics.dto.ItemId_Quantity;
 import com.vou.statistics.dto.PlayerItemDto;
 import com.vou.statistics.dto.PlayerVoucherDto;
+import com.vou.statistics.dto.VoucherDto;
 import com.vou.statistics.entity.VoucherConversionTransaction;
 import com.vou.statistics.model.Transaction;
 import com.vou.statistics.service.PlayerItemService;
@@ -42,6 +47,15 @@ public class VoucherConversionTransactionStrategy implements TransactionStrategy
         try {
             VoucherConversionTransaction voucherItemsConversionTransaction = (VoucherConversionTransaction) transaction;
             logger.info("Processing VoucherConversionTransaction: " + voucherItemsConversionTransaction.toString());
+
+            // get Voucher By Id
+            VoucherDto currentVoucher = eventsServiceClient.getVouchersByIds(Collections.singletonList(voucherItemsConversionTransaction.getArtifactId())).get(0);
+
+            if (currentVoucher == null) {
+                System.out.println("Voucher not found in database!");
+                return false;
+            }
+
             Map<String, Integer> items_quantities = _eventsServiceClient.getItemsQuantitiesByVoucher(voucherItemsConversionTransaction.getArtifactId());
             
             Integer voucherLeftOfTheEvent = _eventsServiceClient.getEventVoucherQuantity(voucherItemsConversionTransaction.getEventId(), voucherItemsConversionTransaction.getArtifactId());
@@ -59,9 +73,21 @@ public class VoucherConversionTransactionStrategy implements TransactionStrategy
             logger.info("Items quantities are enough for conversion");
 
             // enough conditions to trade items for voucher
-            playerVoucherService.addPlayerVoucher(new PlayerVoucherDto(voucherItemsConversionTransaction.getPlayerId(), voucherItemsConversionTransaction.getArtifactId(), voucherItemsConversionTransaction.getQuantity()));
+            playerVoucherService.addPlayerVoucher(new PlayerVoucherDto(voucherItemsConversionTransaction.getPlayerId(), voucherItemsConversionTransaction.getArtifactId(), currentVoucher.getBrand_id(), currentVoucher.getVoucherCode(), voucherItemsConversionTransaction.getQuantity()));
+            
+            List<String> itemIds = new ArrayList<>();
+
             for (ItemId_Quantity item_quantity : voucherItemsConversionTransaction.getItems()) {
-                playerItemService.addPlayerItem(new PlayerItemDto(voucherItemsConversionTransaction.getPlayerId(), item_quantity.getItemId(), items_quantities.get(item_quantity.getItemId()) * voucherItemsConversionTransaction.getQuantity() * -1));
+                itemIds.add(item_quantity.getItemId());
+            }
+
+            List<ItemDto> currentItems = eventsServiceClient.getItemsByIds(itemIds);
+            int _count = 0;
+            
+            for (ItemId_Quantity item_quantity : voucherItemsConversionTransaction.getItems()) {
+                // ItemDto currentItem = eventsServiceClient.getItemsByIds(Collections.singletonList(item_quantity.getItemId())).get(0);
+                playerItemService.addPlayerItem(new PlayerItemDto(voucherItemsConversionTransaction.getPlayerId(), item_quantity.getItemId(), currentVoucher.getBrand_id(), currentItems.get(_count).getName(), items_quantities.get(item_quantity.getItemId()) * voucherItemsConversionTransaction.getQuantity() * -1));
+                _count++;
             }
 
             logger.info("VoucherConversionTransaction processed successfully");

@@ -2,10 +2,13 @@ package com.vou.statistics.strategy;
 
 import static com.vou.statistics.common.Constants.TRANSACTION_TYPE_ITEM_SHARED;
 
+import java.util.Collections;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.vou.statistics.client.EventsServiceClient;
+import com.vou.statistics.dto.ItemDto;
 import com.vou.statistics.dto.PlayerItemDto;
 import com.vou.statistics.entity.ItemSharedTransaction;
 import com.vou.statistics.model.Transaction;
@@ -44,8 +47,16 @@ public class ItemSharedTransactionStrategy implements TransactionStrategy {
                 return false;
             }
 
-            playerItemService.addPlayerItem(new PlayerItemDto(transaction.getRecipientId(), transaction.getArtifactId(), transaction.getQuantity()));
-            playerItemService.addPlayerItem(new PlayerItemDto(transaction.getPlayerId(), transaction.getArtifactId(), transaction.getQuantity() * -1));
+            // get item by id
+            ItemDto currentItem = eventsServiceClient.getItemsByIds(Collections.singletonList(transaction.getArtifactId())).get(0);
+
+            if (currentItem == null) {
+                System.out.println("Item not found in database!");
+                return false;
+            }
+
+            playerItemService.addPlayerItem(new PlayerItemDto(transaction.getRecipientId(), transaction.getArtifactId(), currentItem.getBrand_id(), currentItem.getName(), transaction.getQuantity()));
+            playerItemService.addPlayerItem(new PlayerItemDto(transaction.getPlayerId(), transaction.getArtifactId(), currentItem.getBrand_id(), currentItem.getName(), transaction.getQuantity() * -1));
             saveTransaction(transaction);
         }
         catch (Exception e) {

@@ -17,6 +17,8 @@ public class PlayerVoucherMapper {
         PlayerVoucherDto playerVoucherDto = new PlayerVoucherDto();
         playerVoucherDto.setPlayerId(playerVoucher.getPlayerId());
         playerVoucherDto.setVoucherId(playerVoucher.getVoucherId());
+        playerVoucherDto.setBrandId(playerVoucher.getBrandId());
+        playerVoucherDto.setVoucherName(playerVoucher.getVoucherName());
         playerVoucherDto.setQuantity(playerVoucher.getQuantity());
 
         return playerVoucherDto;
@@ -31,6 +33,8 @@ public class PlayerVoucherMapper {
         PlayerVoucher playerVoucher = new PlayerVoucher();
         playerVoucher.setPlayerId(dto.getPlayerId());
         playerVoucher.setVoucherId(dto.getVoucherId());
+        playerVoucher.setBrandId(dto.getBrandId());
+        playerVoucher.setVoucherName(dto.getVoucherName());
         playerVoucher.setQuantity(dto.getQuantity());
 
         return playerVoucher;

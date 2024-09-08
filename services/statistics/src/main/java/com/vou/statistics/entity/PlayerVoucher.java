@@ -22,6 +22,12 @@ public class PlayerVoucher {
     @Field(value = "voucher_id")
     private String voucherId;
 
+    @Field(value = "brand_id")
+    private String brandId;
+
+    @Field(value = "voucher_name")
+    private String voucherName;
+
     @Field(value = "quantity")
     private int quantity;
 }

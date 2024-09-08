@@ -22,6 +22,12 @@ public class PlayerItem {
     @Field(value = "item_id")
     private String itemId;
 
+    @Field(value = "brand_id")
+    private String brandId;
+
+    @Field(value = "item_name")
+    private String itemName;
+
     @Field(value = "quantity")
     private int quantity;
 }

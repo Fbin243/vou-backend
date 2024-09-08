@@ -16,5 +16,9 @@ public class PlayerVoucherDto {
 
     private String voucherId;
 
+    private String brandId;
+
+    private String voucherName;
+
     private int quantity;
 }
