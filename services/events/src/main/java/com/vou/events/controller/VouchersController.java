@@ -40,6 +40,7 @@ public class VouchersController {
     @PostMapping("/ids")
     public ResponseEntity<List<VoucherDto>> getVouchersByIds(@RequestBody List<String> ids) {
         List<VoucherDto> voucherDtos = voucherService.fetchVouchersByIds(ids);
+        System.out.println("Check voucherDtos " + voucherDtos);
         return ResponseEntity.ok(voucherDtos);
     }
 

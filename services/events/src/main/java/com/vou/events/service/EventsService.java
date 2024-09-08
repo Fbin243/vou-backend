@@ -184,6 +184,10 @@ public class EventsService implements IEventsService {
 		
 		for (EventVoucher eventVoucher : eventVouchers) {
 			VoucherDto voucherDto = voucherService.fetchVoucherById(eventVoucher.getVoucher().getId());
+			if (voucherDto.getVoucherType().equalsIgnoreCase("online")) {
+				continue;
+			}
+
 			String formatExpiredDateTime = voucherDto.getExpiredDate().format(format);
 			returnVoucherDtos.add(new ReturnVoucherDto(voucherDto.getId(),
 				voucherDto.getBrand_id(),

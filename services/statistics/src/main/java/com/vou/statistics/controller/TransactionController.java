@@ -264,7 +264,7 @@ public class TransactionController {
                     return ResponseEntity.ok(false);
                 }
             } else if (createdTransaction.getTransactionType().equalsIgnoreCase("voucher_used")) {
-                if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, null) == false) {
+                if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, eventsServiceClient) == false) {
                     return ResponseEntity.ok(false);
                 }
                 System.out.println("Transaction processed successfully");
@@ -278,7 +278,7 @@ public class TransactionController {
                 // notificationsServiceClient.sendNotification(notificationData);
                 kafkaTemplateNotificationInfo.send("event-notification", notificationData);
             } else {
-                if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, null) == false) {
+                if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, eventsServiceClient) == false) {
                     return ResponseEntity.ok(false);
                 }
             }
