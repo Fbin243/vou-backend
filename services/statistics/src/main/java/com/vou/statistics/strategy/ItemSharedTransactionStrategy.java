@@ -27,7 +27,6 @@ public class ItemSharedTransactionStrategy implements TransactionStrategy {
     private PlayerItemService                   playerItemService;
     private ItemSharedTransactionRepository     itemSharedTransactionRepository;
 
-
     @Autowired
     public ItemSharedTransactionStrategy(PlayerItemService playerItemService, 
                                          ItemSharedTransactionRepository itemSharedTransactionRepository) {
@@ -46,6 +45,8 @@ public class ItemSharedTransactionStrategy implements TransactionStrategy {
 
             Integer numberOfItemLeftOfTheSender = playerItemService.getQuantityByPlayerIdAndItemIdAndGameId(transaction.getPlayerId(), transaction.getArtifactId(), itemSharedTransaction.getGameId());
 
+            int gameIdForThisTransaction = ((int) (Math.random() * 2) + 1) % 3;
+
             if (numberOfItemLeftOfTheSender < transaction.getQuantity()) {
                 return false;
             }
@@ -58,8 +59,8 @@ public class ItemSharedTransactionStrategy implements TransactionStrategy {
                 return false;
             }
 
-            playerItemService.addPlayerItem(new PlayerItemDto(transaction.getRecipientId(), transaction.getArtifactId(), currentItem.getBrand_id(), currentItem.getName(), itemSharedTransaction.getGameId(), transaction.getQuantity()));
-            playerItemService.addPlayerItem(new PlayerItemDto(transaction.getPlayerId(), transaction.getArtifactId(), currentItem.getBrand_id(), currentItem.getName(), itemSharedTransaction.getGameId(), transaction.getQuantity() * -1));
+            playerItemService.addPlayerItem(new PlayerItemDto(transaction.getRecipientId(), transaction.getArtifactId(), currentItem.getBrand_id(), currentItem.getName(), (long) gameIdForThisTransaction, transaction.getQuantity()));
+            playerItemService.addPlayerItem(new PlayerItemDto(transaction.getPlayerId(), transaction.getArtifactId(), currentItem.getBrand_id(), currentItem.getName(), (long) gameIdForThisTransaction, transaction.getQuantity() * -1));
             
             saveTransaction(transaction, transactionRepository);
         }

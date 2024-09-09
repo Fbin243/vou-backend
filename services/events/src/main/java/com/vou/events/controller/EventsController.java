@@ -17,12 +17,9 @@ import com.vou.events.dto.EventId_VoucherIdsDto;
 import com.vou.events.dto.EventRegistrationInfoDto;
 import com.vou.events.dto.EventVoucherAndAdditionQuantityDto;
 import com.vou.events.dto.EventWithBrandActiveStatusDto;
-import com.vou.events.dto.GameDto;
 import com.vou.events.dto.ItemDto;
 import com.vou.events.dto.ReturnGameDto;
-import com.vou.events.dto.ReturnItemDto;
 import com.vou.events.dto.ReturnVoucherDto;
-import com.vou.events.entity.Item;
 import com.vou.events.service.IEventsService;
 
 import lombok.AllArgsConstructor;

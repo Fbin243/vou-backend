@@ -3,7 +3,6 @@ package com.vou.events.service;
 import com.vou.events.dto.BrandDto;
 import com.vou.events.dto.VoucherDto;
 import com.vou.events.entity.*;
-import com.vou.events.mapper.BrandMapper;
 import com.vou.events.mapper.VoucherMapper;
 import com.vou.events.repository.*;
 import com.vou.events.client.UsersServiceClient;
@@ -110,6 +109,11 @@ public class VouchersService implements IVouchersService {
                     () -> new NotFoundException("Voucher", "id", voucherId)
             );
 
+            if (!this.updateActiveStatusForVouchersConversion(voucherId, EventIntermediateTableStatus.INACTIVE)) {
+                System.out.println("Can't update the active status of VoucherItemConversion table!");
+                return false;
+            }
+
             for (ItemId_Quantity itemIds_quantity : itemIds_quantities) {
                 Item item = itemRepository.findById(itemIds_quantity.getItemId()).orElseThrow(
                         () -> new NotFoundException("Item", "id", itemIds_quantity.getItemId())
@@ -131,6 +135,23 @@ public class VouchersService implements IVouchersService {
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean updateActiveStatusForVouchersConversion(String voucherId, EventIntermediateTableStatus activeStatus) {
+        try {
+            List<VoucherItem> voucherItems = voucherItemRepository.findByVoucher(voucherId);
+            for (VoucherItem voucherItem : voucherItems) {
+                voucherItem.setActiveStatus(activeStatus);
+                voucherItemRepository.save(voucherItem);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
 

@@ -296,6 +296,9 @@ public class TransactionController {
                 NotificationData notificationDataReceiver = new NotificationData(notificationInfoReceiver, Collections.singletonList(_transaction.getRecipientId()));
                 NotificationData notificationDataSender = new NotificationData(notificationInfoSender, Collections.singletonList(_transaction.getPlayerId()));
 
+                kafkaTemplateNotificationInfo.send("event-notification", notificationDataSender);
+                kafkaTemplateNotificationInfo.send("event-notification", notificationDataReceiver);
+                
                 String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(notificationInfoReceiver, Collections.singletonList(_transaction.getRecipientId())));
                 String notificationId2 = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(notificationInfoSender, Collections.singletonList(_transaction.getPlayerId())));
                 
@@ -303,8 +306,6 @@ public class TransactionController {
                 System.out.println("Notification IDDD: " + notificationId2);
 
                 // notificationsServiceClient.sendNotification(notificationData);
-                kafkaTemplateNotificationInfo.send("event-notification", notificationDataSender);
-                kafkaTemplateNotificationInfo.send("event-notification", notificationDataReceiver);
             }
 
             // save transactions
