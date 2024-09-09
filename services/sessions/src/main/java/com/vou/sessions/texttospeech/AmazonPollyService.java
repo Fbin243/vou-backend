@@ -111,8 +111,9 @@ public class AmazonPollyService {
 	public String convertQuizQuestionToSSML(QuizQuestion quizQuestion, int quizNumber) {
 		StringBuilder ssmlBuilder = new StringBuilder("<speak>");
 		ssmlBuilder.append("<p>");
-		ssmlBuilder.append("<s>Question number ").append(quizNumber).append("<break time=\"500ms\"/></s>");
-		ssmlBuilder.append("<s>").append(escapeSSMLText(quizQuestion.getQuestion())).append("<break time=\"1s\"/></s>");
+		ssmlBuilder.append("<s>Question number ").append(quizNumber).append("<break time=\"200ms\"/></s>");
+		ssmlBuilder.append("<s>").append(escapeSSMLText(quizQuestion.getQuestion())).append("<break " +
+			"time=\"500ms\"/></s>");
 		
 		List<String> answers = new ArrayList<>();
 		int correctAnswerIndex = quizQuestion.getCorrectAnswerIndex();

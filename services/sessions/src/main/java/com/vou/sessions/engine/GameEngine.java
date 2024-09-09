@@ -38,7 +38,7 @@ public abstract class GameEngine {
 			hashOps.put(sessionId, CONNECTION_KEY, value);
 		}
 		
-		log.info("Connection: {}", value);
+		log.info("--> CHECK Connection: {}", value);
 		
 		return value == null ? 1 : value;
 	}
