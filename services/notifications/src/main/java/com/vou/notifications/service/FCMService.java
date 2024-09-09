@@ -4,7 +4,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
-import com.vou.notifications.dto.NotificationDto;
 import com.vou.notifications.model.NotificationInfo;
 
 import java.util.Map;
