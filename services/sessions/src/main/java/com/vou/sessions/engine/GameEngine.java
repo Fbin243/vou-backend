@@ -31,7 +31,7 @@ public abstract class GameEngine {
 	
 	public Object connect(String sessionId) {
 		Integer value = (Integer) hashOps.get(sessionId, CONNECTION_KEY);
-		if (value == null) {
+		if (value == null || value == 0) {
 			hashOps.put(sessionId, CONNECTION_KEY, 1);
 		} else {
 			value = value + 1;
