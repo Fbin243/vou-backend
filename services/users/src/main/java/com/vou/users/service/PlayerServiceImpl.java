@@ -124,7 +124,7 @@ public class PlayerServiceImpl implements PlayerService {
 
         String message = player1.getFullName() + " has just sent a request asking for " + turns + " game turns from you.";
         String kafkaMessage = String.format("{\"id1\":\"%s\", \"turns\":%d, \"message\":\"%s\"}", id, turns, message);
-        kafkaTemplate.send("turnsRequestTopic", player2.getId(), kafkaMessage);
+//        kafkaTemplate.send("turnsRequestTopic", player2.getId(), kafkaMessage);
 
         return "Request sent to " + player2.getFullName();
     }
