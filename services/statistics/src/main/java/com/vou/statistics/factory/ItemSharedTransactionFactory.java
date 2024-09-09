@@ -10,3 +10,4 @@ public class ItemSharedTransactionFactory implements TransactionFactory {
         return TransactionMapper.toEntity(transactionDto);
     }
 }
+

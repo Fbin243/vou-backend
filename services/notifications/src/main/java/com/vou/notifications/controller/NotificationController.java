@@ -3,6 +3,8 @@ package com.vou.notifications.controller;
 import com.vou.notifications.dto.AddUsersRequestDto;
 import com.vou.notifications.dto.NotificationDto;
 import com.vou.notifications.model.Notifcation_Event_Created_Data;
+import com.vou.notifications.model.NotificationRelatedPairId;
+import com.vou.notifications.model.NotificationRelatedPairId2;
 import com.vou.notifications.service.NotificationsService;
 import com.vou.notifications.service.TokenService;
 
@@ -94,6 +96,20 @@ public class NotificationController {
             notificationId = notificationDto.getNotificationInfo().getId();
 
             log.info("Notification sent to all users.");
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return notificationId;
+    }
+
+    @PostMapping("/addMoreData")
+    public String addMoreData(@RequestBody List<NotificationRelatedPairId2> relatedPairs) {
+        log.info("Adding more data to notification: " + relatedPairs.get(0).getNotificationId());
+        String notificationId = null;
+        try {
+            notificationId = notificationsService.addMoreInfo(relatedPairs);
         }
         catch (Exception e) {
             e.printStackTrace();

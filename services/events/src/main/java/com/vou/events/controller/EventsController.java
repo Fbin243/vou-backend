@@ -17,12 +17,9 @@ import com.vou.events.dto.EventId_VoucherIdsDto;
 import com.vou.events.dto.EventRegistrationInfoDto;
 import com.vou.events.dto.EventVoucherAndAdditionQuantityDto;
 import com.vou.events.dto.EventWithBrandActiveStatusDto;
-import com.vou.events.dto.GameDto;
 import com.vou.events.dto.ItemDto;
 import com.vou.events.dto.ReturnGameDto;
-import com.vou.events.dto.ReturnItemDto;
 import com.vou.events.dto.ReturnVoucherDto;
-import com.vou.events.entity.Item;
 import com.vou.events.service.IEventsService;
 
 import lombok.AllArgsConstructor;
@@ -195,9 +192,8 @@ public class EventsController {
 
     // update events_vouchers table
     @PutMapping("/events_vouchers")
-    public ResponseEntity<ResponseDto> addQuantityToEventVoucher(@RequestBody EventVoucherAndAdditionQuantityDto eventVoucherAndAdditionQuantityDto) {
-        eventService.updateEventVoucher(eventVoucherAndAdditionQuantityDto.getEventId(), eventVoucherAndAdditionQuantityDto.getVoucherId(), eventVoucherAndAdditionQuantityDto.getAdditionalQuantity());
-        ResponseDto res = new ResponseDto(HttpStatus.OK, "Event voucher updated successfully.");
-        return ResponseEntity.status(HttpStatus.OK).body(res);
+    public ResponseEntity<Boolean> addQuantityToEventVoucher(@RequestBody EventVoucherAndAdditionQuantityDto eventVoucherAndAdditionQuantityDto) {
+        boolean isUpdated = eventService.updateEventVoucher(eventVoucherAndAdditionQuantityDto.getEventId(), eventVoucherAndAdditionQuantityDto.getVoucherId(), eventVoucherAndAdditionQuantityDto.getAdditionalQuantity());
+        return ResponseEntity.ok(isUpdated);
     }
 }

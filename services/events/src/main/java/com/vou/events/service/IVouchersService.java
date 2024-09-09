@@ -2,6 +2,7 @@ package com.vou.events.service;
 
 import com.vou.events.common.ItemId_Quantity;
 import com.vou.events.dto.VoucherDto;
+import com.vou.events.common.EventIntermediateTableStatus;
 
 import java.util.List;
 
@@ -105,6 +106,10 @@ public interface IVouchersService {
      * @return true if the items were added successfully, false otherwise
      */
     default boolean addVoucherItemConversion(String voucherId, List<ItemId_Quantity> itemIds) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    default boolean updateActiveStatusForVouchersConversion(String voucherId, EventIntermediateTableStatus activeStatus) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 }

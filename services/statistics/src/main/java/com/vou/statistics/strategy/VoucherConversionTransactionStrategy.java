@@ -18,6 +18,7 @@ import com.vou.statistics.entity.VoucherConversionTransaction;
 import com.vou.statistics.model.Transaction;
 import com.vou.statistics.service.PlayerItemService;
 import com.vou.statistics.service.PlayerVoucherService;
+import com.vou.statistics.repository.TransactionRepository;
 import com.vou.statistics.repository.VoucherConversionTransactionRepository;
 import java.util.logging.Logger;
 
@@ -39,7 +40,7 @@ public class VoucherConversionTransactionStrategy implements TransactionStrategy
     private static final Logger logger = Logger.getLogger(VoucherConversionTransactionStrategy.class.getName());
 
     @Override
-    public boolean processTransaction(Transaction transaction, PlayerVoucherService playerVoucherService, PlayerItemService playerItemService, EventsServiceClient _eventsServiceClient) {
+    public boolean processTransaction(Transaction transaction, PlayerVoucherService playerVoucherService, PlayerItemService playerItemService, EventsServiceClient _eventsServiceClient, TransactionRepository<Transaction> transactionRepository) {
         if (!transaction.getTransactionType().equalsIgnoreCase(TRANSACTION_TYPE_VOUCHER_CONVERSION)) {
             throw new IllegalArgumentException("Invalid transaction type for VoucherConversionTransactionStrategy");
         }
@@ -49,7 +50,7 @@ public class VoucherConversionTransactionStrategy implements TransactionStrategy
             logger.info("Processing VoucherConversionTransaction: " + voucherItemsConversionTransaction.toString());
 
             // get Voucher By Id
-            VoucherDto currentVoucher = eventsServiceClient.getVouchersByIds(Collections.singletonList(voucherItemsConversionTransaction.getArtifactId())).get(0);
+            VoucherDto currentVoucher = _eventsServiceClient.getVouchersByIds(Collections.singletonList(voucherItemsConversionTransaction.getArtifactId())).get(0);
 
             if (currentVoucher == null) {
                 System.out.println("Voucher not found in database!");
@@ -58,7 +59,7 @@ public class VoucherConversionTransactionStrategy implements TransactionStrategy
 
             Map<String, Integer> items_quantities = _eventsServiceClient.getItemsQuantitiesByVoucher(voucherItemsConversionTransaction.getArtifactId());
             
-            Integer voucherLeftOfTheEvent = _eventsServiceClient.getEventVoucherQuantity(voucherItemsConversionTransaction.getEventId(), voucherItemsConversionTransaction.getArtifactId());
+            int voucherLeftOfTheEvent = _eventsServiceClient.getEventVoucherQuantity(voucherItemsConversionTransaction.getEventId(), voucherItemsConversionTransaction.getArtifactId());
 
             if (voucherLeftOfTheEvent < voucherItemsConversionTransaction.getQuantity()) {
                 return false;
@@ -81,22 +82,28 @@ public class VoucherConversionTransactionStrategy implements TransactionStrategy
                 itemIds.add(item_quantity.getItemId());
             }
 
-            List<ItemDto> currentItems = eventsServiceClient.getItemsByIds(itemIds);
+            List<ItemDto> currentItems = _eventsServiceClient.getItemsByIds(itemIds);
             int _count = 0;
             
             for (ItemId_Quantity item_quantity : voucherItemsConversionTransaction.getItems()) {
                 // ItemDto currentItem = eventsServiceClient.getItemsByIds(Collections.singletonList(item_quantity.getItemId())).get(0);
-                playerItemService.addPlayerItem(new PlayerItemDto(voucherItemsConversionTransaction.getPlayerId(), item_quantity.getItemId(), currentVoucher.getBrand_id(), currentItems.get(_count).getName(), items_quantities.get(item_quantity.getItemId()) * voucherItemsConversionTransaction.getQuantity() * -1));
+                playerItemService.addPlayerItem(new PlayerItemDto(voucherItemsConversionTransaction.getPlayerId(), item_quantity.getItemId(), currentVoucher.getBrand_id(), currentItems.get(_count).getName(), 2L, items_quantities.get(item_quantity.getItemId()) * voucherItemsConversionTransaction.getQuantity() * -1));
                 _count++;
             }
 
             logger.info("VoucherConversionTransaction processed successfully");
 
             // save voucher transactions
-            saveTransaction(voucherItemsConversionTransaction);
+            saveTransaction(voucherItemsConversionTransaction, transactionRepository);
 
             // update events_vouchers table
-            eventsServiceClient.addQuantityToEventVoucher(new EventVoucherAndAdditionQuantityDto(voucherItemsConversionTransaction.getEventId(), voucherItemsConversionTransaction.getArtifactId(), voucherItemsConversionTransaction.getQuantity() * -1));
+            if (_eventsServiceClient.addQuantityToEventVoucher(new EventVoucherAndAdditionQuantityDto(voucherItemsConversionTransaction.getEventId(), voucherItemsConversionTransaction.getArtifactId(), voucherItemsConversionTransaction.getQuantity() * -1))) {
+                logger.info("EventVoucher updated successfully");
+            }
+            else {
+                logger.info("EventVoucher update failed");
+                return false;
+            }
 
         }
         catch (Exception e) {
@@ -108,7 +115,7 @@ public class VoucherConversionTransactionStrategy implements TransactionStrategy
     }
     
     @Override
-    public boolean saveTransaction(Transaction transaction) {
+    public boolean saveTransaction(Transaction transaction, TransactionRepository<Transaction> transactionRepository) {
         if (!transaction.getTransactionType().equalsIgnoreCase(TRANSACTION_TYPE_VOUCHER_CONVERSION)) {
             throw new IllegalArgumentException("Invalid transaction type for VoucherConversionTransactionStrategy");
         }

@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import com.vou.statistics.model.NotificationData;
 import com.vou.statistics.model.NotificationInfo;
 import com.vou.statistics.model.Transaction;
+import com.vou.statistics.repository.TransactionRepository;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,10 @@ public class TransactionController {
     private PlayerItemService                                   playerItemService;
     private EventsServiceClient                                 eventsServiceClient;
     private NotificationsServiceClient                          notificationsServiceClient;
+    private TransactionRepository<ItemSharedTransaction>        itemSharedTransactionRepository;
+    private TransactionRepository<ItemReceivedTransaction>      itemReceivedTransactionRepository;
+    private TransactionRepository<VoucherUsedTransaction>       voucherUsedTransactionRepository;
+    private TransactionRepository<VoucherConversionTransaction> voucherConversionTransactionRepository;
 
     @Autowired
 	private KafkaTemplate<String, NotificationData> kafkaTemplateNotificationInfo;
@@ -249,27 +254,30 @@ public class TransactionController {
 
 
             if (createdTransaction.getTransactionType().equalsIgnoreCase("voucher_conversion")) {
-                if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, eventsServiceClient) == false) {
-                    System.out.println("Transaction processed successfully");
-
-                    NotificationInfo notificationInfo = new NotificationInfo("You have new voucher " + artifactName + " successfully!", "Check your inventory for updates", artifactImage);
-                    NotificationData notificationData = new NotificationData(notificationInfo, Collections.singletonList(_transaction.getRecipientId()));
-                    String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(notificationInfo, Collections.singletonList(_transaction.getRecipientId())));
-                    
-                    System.out.println("Notification IDDD: " + notificationId);
-    
-                    // notificationsServiceClient.sendNotification(notificationData);
-                    kafkaTemplateNotificationInfo.send("event-notification", notificationData);
-
+                if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, eventsServiceClient, null) == false) {
                     return ResponseEntity.ok(false);
                 }
+
+                // System.out.println("Transaction processed not successfully but still working right!");
+
+                voucherConversionTransactionRepository.save((VoucherConversionTransaction) createdTransaction);
+
+                NotificationInfo notificationInfo = new NotificationInfo("You have new voucher " + artifactName + " successfully!", "Check your inventory for updates", "fa-check");
+                NotificationData notificationData = new NotificationData(notificationInfo, Collections.singletonList(_transaction.getRecipientId()));
+                String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(notificationInfo, Collections.singletonList(_transaction.getRecipientId())));
+                
+
+                System.out.println("Notification IDDD: " + notificationId);
+
+                // notificationsServiceClient.sendNotification(notificationData);
+                kafkaTemplateNotificationInfo.send("event-notification", notificationData);
             } else if (createdTransaction.getTransactionType().equalsIgnoreCase("voucher_used")) {
-                if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, eventsServiceClient) == false) {
+                if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, eventsServiceClient, null) == false) {
                     return ResponseEntity.ok(false);
                 }
                 System.out.println("Transaction processed successfully");
 
-                NotificationInfo notificationInfo = new NotificationInfo("You've used voucher " + artifactName + " successfully!", "Check your inventory for updates", artifactImage);
+                NotificationInfo notificationInfo = new NotificationInfo("You've used voucher " + artifactName + " successfully!", "Check your inventory for updates", "fa-check");
                 NotificationData notificationData = new NotificationData(notificationInfo, Collections.singletonList(_transaction.getRecipientId()));
                 String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(notificationInfo, Collections.singletonList(_transaction.getRecipientId())));
                 
@@ -278,11 +286,41 @@ public class TransactionController {
                 // notificationsServiceClient.sendNotification(notificationData);
                 kafkaTemplateNotificationInfo.send("event-notification", notificationData);
             } else {
-                if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, eventsServiceClient) == false) {
+                if (transactionContext.executeStrategy(createdTransaction, playerVoucherService, playerItemService, eventsServiceClient, null) == false) {
                     return ResponseEntity.ok(false);
                 }
+
+                System.out.println("Transaction processed successfully");
+
+                NotificationInfo notificationInfoReceiver = new NotificationInfo("You've received " + artifactName + "!", "Check your inventory for updates", "fa-check");
+                NotificationInfo notificationInfoSender = new NotificationInfo("You've sent " + artifactName + " successfully!", "Check your inventory for updates", "fa-check");
+                NotificationData notificationDataReceiver = new NotificationData(notificationInfoReceiver, Collections.singletonList(_transaction.getRecipientId()));
+                NotificationData notificationDataSender = new NotificationData(notificationInfoSender, Collections.singletonList(_transaction.getPlayerId()));
+
+                kafkaTemplateNotificationInfo.send("event-notification", notificationDataSender);
+                kafkaTemplateNotificationInfo.send("event-notification", notificationDataReceiver);
+                
+                String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(notificationInfoReceiver, Collections.singletonList(_transaction.getRecipientId())));
+                String notificationId2 = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(notificationInfoSender, Collections.singletonList(_transaction.getPlayerId())));
+                
+                // String notificationId3 = notificationsServiceClient.saveAdditionalInfo(new AddUsersRequestDto(notificationInfoReceiver, Collections.singletonList(_transaction.getPlayerId())));
+
+                System.out.println("Notification IDDD: " + notificationId);
+                System.out.println("Notification IDDD: " + notificationId2);
+
+                // notificationsServiceClient.sendNotification(notificationData);
             }
 
+            // save transactions
+            if (createdTransaction.getTransactionType().equalsIgnoreCase("item_shared")) {
+                itemSharedTransactionRepository.save((ItemSharedTransaction) createdTransaction);
+            } else if (createdTransaction.getTransactionType().equalsIgnoreCase("item_received")) {
+                itemReceivedTransactionRepository.save((ItemReceivedTransaction) createdTransaction);
+            } else if (createdTransaction.getTransactionType().equalsIgnoreCase("voucher_used")) {
+                voucherUsedTransactionRepository.save((VoucherUsedTransaction) createdTransaction);
+            } else if (createdTransaction.getTransactionType().equalsIgnoreCase("voucher_conversion")) {
+                voucherConversionTransactionRepository.save((VoucherConversionTransaction) createdTransaction);
+            }
         }
 
         return ResponseEntity.ok(true);

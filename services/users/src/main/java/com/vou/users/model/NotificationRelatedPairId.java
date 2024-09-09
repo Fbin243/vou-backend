@@ -1,4 +1,4 @@
-package com.vou.notifications.model;
+package com.vou.users.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,7 +7,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
-import com.vou.notifications.common.ActiveStatus;
+import com.vou.users.common.ActiveStatus;
 
 import jakarta.persistence.*;
 
@@ -26,6 +26,6 @@ public class NotificationRelatedPairId implements Serializable {
     @Column(name = "related_id", nullable = false)
     private String relatedId;
 
-    // @Column(name = "active_status", nullable = false)
-    // private ActiveStatus activeStatus;
+    @Column(name = "active_status", nullable = false)
+    private ActiveStatus activeStatus;
 }

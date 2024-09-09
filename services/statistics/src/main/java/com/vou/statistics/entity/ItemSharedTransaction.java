@@ -30,80 +30,58 @@ import lombok.Setter;
 public class ItemSharedTransaction implements Transaction {
     @Id
     private ObjectId id;
-
     @Field(value = "player_id")
     private String playerId;
-
     @Field(value = "recipient_id")
     private String recipientId;
-
     @Field(value = "item_id")
     private String artifactId;
-
     @Field(value = "game_id")
     private Long gameId;
-
     @Field(value = "transaction_date")
     private LocalDateTime transactionDate;
-
     @Field(value = "quantity")
     private int quantity;
-
     @Field(value = "transaction_type")
     private String transactionType = TRANSACTION_TYPE_ITEM_SHARED;
-
-
     @Field(value = "created_at")
     private Date createdAt;
-
     @Field(value = "updated_at")
     private Date updatedAt;
-
     public String getPlayerId() {
         return playerId;
     }
-
     public String getRecipientId() {
         return recipientId;
     }
-
     public String getArtifactId() {
         return artifactId;
     }
-
     public int getQuantity() {
         return quantity;
     }
-
     public String getTransactionType() {
         return transactionType;
     }
-
     public Date getCreatedAt() {
         return createdAt;
     }
-
     public void setArtifactId(String _artifactId) {
         this.artifactId = _artifactId;
     }
-
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
-
     public Date getUpdatedAt() {
         return updatedAt;
     }
-
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
-
     @PrePersist
     public void onCreate() {
         Transaction.super.onCreate();
     }
-
     @PreUpdate
     public void onUpdate() {
         Transaction.super.onUpdate();

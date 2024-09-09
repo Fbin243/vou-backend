@@ -13,6 +13,7 @@ import com.vou.statistics.dto.PlayerItemDto;
 import com.vou.statistics.entity.ItemSharedTransaction;
 import com.vou.statistics.model.Transaction;
 import com.vou.statistics.repository.ItemSharedTransactionRepository;
+import com.vou.statistics.repository.TransactionRepository;
 import com.vou.statistics.service.PlayerItemService;
 import com.vou.statistics.service.PlayerVoucherService;
 
@@ -26,7 +27,6 @@ public class ItemSharedTransactionStrategy implements TransactionStrategy {
     private PlayerItemService                   playerItemService;
     private ItemSharedTransactionRepository     itemSharedTransactionRepository;
 
-
     @Autowired
     public ItemSharedTransactionStrategy(PlayerItemService playerItemService, 
                                          ItemSharedTransactionRepository itemSharedTransactionRepository) {
@@ -35,13 +35,17 @@ public class ItemSharedTransactionStrategy implements TransactionStrategy {
     }
 
     @Override
-    public boolean processTransaction(Transaction transaction, PlayerVoucherService playerVoucherService, PlayerItemService playerItemService, EventsServiceClient eventsServiceClient) {
+    public boolean processTransaction(Transaction transaction, PlayerVoucherService playerVoucherService, PlayerItemService playerItemService, EventsServiceClient eventsServiceClient, TransactionRepository<Transaction> transactionRepository) {
         if (!transaction.getTransactionType().equalsIgnoreCase(TRANSACTION_TYPE_ITEM_SHARED)) {
             throw new IllegalArgumentException("Invalid transaction type for ItemSharedTransactionStrategy");
         }
 
         try {
-            Integer numberOfItemLeftOfTheSender = playerItemService.getQuantityByPlayerIdAndItemId(transaction.getPlayerId(), transaction.getArtifactId());
+            ItemSharedTransaction itemSharedTransaction = (ItemSharedTransaction) transaction;
+
+            Integer numberOfItemLeftOfTheSender = playerItemService.getQuantityByPlayerIdAndItemIdAndGameId(transaction.getPlayerId(), transaction.getArtifactId(), 1L) + playerItemService.getQuantityByPlayerIdAndItemIdAndGameId(transaction.getPlayerId(), transaction.getArtifactId(), 2L);
+
+            int gameIdForThisTransaction = ((int) (Math.random() * 2) + 1) % 3;
 
             if (numberOfItemLeftOfTheSender < transaction.getQuantity()) {
                 return false;
@@ -55,9 +59,10 @@ public class ItemSharedTransactionStrategy implements TransactionStrategy {
                 return false;
             }
 
-            playerItemService.addPlayerItem(new PlayerItemDto(transaction.getRecipientId(), transaction.getArtifactId(), currentItem.getBrand_id(), currentItem.getName(), transaction.getQuantity()));
-            playerItemService.addPlayerItem(new PlayerItemDto(transaction.getPlayerId(), transaction.getArtifactId(), currentItem.getBrand_id(), currentItem.getName(), transaction.getQuantity() * -1));
-            saveTransaction(transaction);
+            playerItemService.addPlayerItem(new PlayerItemDto(transaction.getRecipientId(), transaction.getArtifactId(), currentItem.getBrand_id(), currentItem.getName(), (long) gameIdForThisTransaction, transaction.getQuantity()));
+            playerItemService.addPlayerItem(new PlayerItemDto(transaction.getPlayerId(), transaction.getArtifactId(), currentItem.getBrand_id(), currentItem.getName(), (long) gameIdForThisTransaction, transaction.getQuantity() * -1));
+            
+            saveTransaction(transaction, transactionRepository);
         }
         catch (Exception e) {
             e.getStackTrace();
@@ -68,14 +73,14 @@ public class ItemSharedTransactionStrategy implements TransactionStrategy {
     }
 
     @Override
-    public boolean saveTransaction(Transaction transaction) {
+    public boolean saveTransaction(Transaction transaction, TransactionRepository<Transaction> transactionRepository) {
         if (!transaction.getTransactionType().equalsIgnoreCase(TRANSACTION_TYPE_ITEM_SHARED)) {
             throw new IllegalArgumentException("Invalid transaction type for ItemSharedTransactionStrategy");
         }
 
         try {
             ItemSharedTransaction itemSharedTransaction = (ItemSharedTransaction) transaction;
-            itemSharedTransactionRepository.save(itemSharedTransaction);
+            transactionRepository.save(itemSharedTransaction);
         }
         catch (Exception e) {
             e.getStackTrace();

@@ -12,6 +12,7 @@ import org.springframework.kafka.core.ProducerFactory;
 import com.vou.sessions.kafka.serializer.EventIdSerializer;
 import com.vou.sessions.kafka.serializer.NotificationDataSerializer;
 import com.vou.sessions.kafka.serializer.TransactionDataSerializer;
+import com.vou.sessions.model.EventId;
 import com.vou.sessions.model.NotificationData;
 import com.vou.sessions.model.TransactionData;
 
@@ -52,7 +53,7 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public ProducerFactory<String, String> eventIdProducerFactory() {
+    public ProducerFactory<String, EventId> eventIdProducerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -76,7 +77,7 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, String> kafkaTemplateEventId() {
+    public KafkaTemplate<String, EventId> kafkaTemplateEventId() {
         return new KafkaTemplate<>(eventIdProducerFactory());
     }
 }

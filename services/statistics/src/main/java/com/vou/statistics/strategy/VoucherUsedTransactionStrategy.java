@@ -20,6 +20,7 @@ import com.vou.statistics.service.PlayerVoucherService;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+import com.vou.statistics.repository.TransactionRepository;
 import com.vou.statistics.repository.VoucherUsedTransactionRepository;
 
 @Service
@@ -31,7 +32,7 @@ public class VoucherUsedTransactionStrategy implements TransactionStrategy {
     private VoucherUsedTransactionRepository    voucherUsedTransactionRepository;
 
     @Override
-    public boolean processTransaction(Transaction transaction, PlayerVoucherService playerVoucherService, PlayerItemService playerItemService, EventsServiceClient eventsServiceClient) {
+    public boolean processTransaction(Transaction transaction, PlayerVoucherService playerVoucherService, PlayerItemService playerItemService, EventsServiceClient eventsServiceClient, TransactionRepository<Transaction> transactionRepository) {
         if (!transaction.getTransactionType().equalsIgnoreCase(TRANSACTION_TYPE_VOUCHER_USED)) {
             throw new IllegalArgumentException("Invalid transaction type for VoucherUsedTransactionStrategy");
         }
@@ -58,7 +59,7 @@ public class VoucherUsedTransactionStrategy implements TransactionStrategy {
                 for (int i = 0; i < voucherUsedTransaction.getQuantity(); ++i) {
                     int index = rand.nextInt(vouchers.size());
                     playerVoucherService.addPlayerVoucher(new PlayerVoucherDto(voucherUsedTransaction.getPlayerId(), voucherUsedTransaction.getArtifactId(), currentVoucher.getBrand_id(), currentVoucher.getVoucherCode(), -1));
-                    playerVoucherService.addPlayerVoucher(new PlayerVoucherDto(voucherUsedTransaction.getPlayerId(), vouchers.get(index).getId(), vouchers.get(index).getBrand_id(), currentVoucher.getVoucherCode(), 1));
+                    playerVoucherService.addPlayerVoucher(new PlayerVoucherDto(voucherUsedTransaction.getPlayerId(), vouchers.get(index).getId(), vouchers.get(index).getBrand_id(), vouchers.get(index).getVoucherCode(), 1));
                 }
                 // playerItemService.addItemToPlayer(voucherUsedTransaction.getPlayerId(), voucherDto.getArtifactId(), voucherUsedTransaction.getQuantity());
             } else {
@@ -69,7 +70,7 @@ public class VoucherUsedTransactionStrategy implements TransactionStrategy {
             // playerVoucherService.addPlayerVoucher(new PlayerVoucherDto(voucherUsedTransaction.getPlayerId(), voucherUsedTransaction.getArtifactId(), voucherUsedTransaction.getQuantity() * -1));
 
             // save voucher used transaction
-            saveTransaction(voucherUsedTransaction);
+            saveTransaction(voucherUsedTransaction, transactionRepository);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -80,7 +81,7 @@ public class VoucherUsedTransactionStrategy implements TransactionStrategy {
     }
 
     @Override
-    public boolean saveTransaction(Transaction transaction) {
+    public boolean saveTransaction(Transaction transaction, TransactionRepository<Transaction> transactionRepository) {
         if (!transaction.getTransactionType().equalsIgnoreCase(TRANSACTION_TYPE_VOUCHER_USED)) {
             throw new IllegalArgumentException("Invalid transaction type for VoucherUsedTransactionStrategy");
         }

@@ -96,7 +96,7 @@ public interface IPlayerItemService {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
-    default Integer getQuantityByPlayerIdAndItemId(String playerId, String itemId) {
+    default Integer getQuantityByPlayerIdAndItemIdAndGameId(String playerId, String itemId, Long gameId) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 }
