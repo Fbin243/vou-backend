@@ -12,10 +12,13 @@ import com.vou.events.mapper.GameMapper;
 import com.vou.events.model.EventSessionInfo;
 import com.vou.events.model.Notifcation_Event_Created_Data;
 import com.vou.events.model.NotificationInfo;
+import com.vou.events.model.NotificationRelatedPairId;
 import com.vou.events.repository.*;
 import com.vou.pkg.dto.ResponseDto;
 import com.vou.pkg.exception.NotFoundException;
 import lombok.AllArgsConstructor;
+
+import org.hibernate.mapping.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Collections;
 
 @Service
 @AllArgsConstructor
@@ -659,6 +663,12 @@ public class EventsService implements IEventsService {
 					Notifcation_Event_Created_Data notification_Event_Created_Data = new Notifcation_Event_Created_Data(notificationInfo, brandIds);
 					String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(notificationInfo, brandIds));
 					System.out.println("NotificationId: " + notificationId);
+					// create List of NotificationRelatedPairId
+					// List<NotificationRelatedPairId> notificationRelatedPairIds = new ArrayList<>();
+					// for (int i = 0; i < 1; ++i) {
+					// 	notificationRelatedPairIds.add(new NotificationRelatedPairId(notificationId, "event", eventId, EventIntermediateTableStatus.ACTIVE));
+					// }
+					// notificationsServiceClient.addMoreDataToNotification(Collections.singletonList(new NotificationRelatedPairId(notificationId, "event", eventId, EventIntermediateTableStatus.ACTIVE)));
 					kafkaTemplateNotificationInfo.send("event-notification", notification_Event_Created_Data);
 				} catch (Exception e) {
 					e.printStackTrace();

@@ -22,6 +22,8 @@ import com.vou.notifications.common.ActiveStatus;
 import com.vou.notifications.dto.NotificationDto;
 import com.vou.notifications.entity.NotificationRelatedPair;
 import com.vou.notifications.model.NotificationInfo;
+import com.vou.notifications.model.NotificationRelatedPairId;
+import com.vou.notifications.model.NotificationRelatedPairId2;
 import com.vou.notifications.repository.NotificationRelatedPairRepository;
 import com.vou.notifications.repository.NotificationRepository;
 import com.vou.notifications.repository.NotificationUserRepository;
@@ -127,5 +129,40 @@ public class NotificationsService implements INotificationsService {
         catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public String addMoreInfo(List<NotificationRelatedPairId2> relatedPairs) {
+        try {
+            CollectionReference notificationUsers = firestore.collection("notifications_relatedPair");
+
+            // should run 1 time
+            for (NotificationRelatedPairId2 relatedPair : relatedPairs) {
+                Map<String, Object> userRelatedNotificationData = new HashMap<>();
+                userRelatedNotificationData.put("notification_id", relatedPair.getNotificationId());
+                userRelatedNotificationData.put("related_key", relatedPair.getRelatedKey());
+                userRelatedNotificationData.put("related_id ", relatedPair.getRelatedId());
+                userRelatedNotificationData.put("active_status", ActiveStatus.ACTIVE);
+
+                notificationUsers.document(relatedPair.getNotificationId()).set(userRelatedNotificationData);
+            }
+
+            // Map<String, Object> userRelatedNotificationData = new HashMap<>();
+            // userRelatedNotificationData.put("notification_id", relatedPairs.get);
+            // userRelatedNotificationData.put("related_key", notificationId);
+            // userRelatedNotificationData.put("related_id ", false);
+            // userRelatedNotificationData.put("active_status", ActiveStatus.ACTIVE);
+
+            // notificationUsers.document(notificationId).set(userRelatedNotificationData);
+
+            // NotificationRelatedPairId id = new NotificationRelatedPairId(notificationId, relatedKey, relatedId);
+            // NotificationRelatedPair relatedPair = new NotificationRelatedPair(id, ActiveStatus.ACTIVE);
+            // notificationRelatedPairRepository.save(relatedPair);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return relatedPairs.get(0).getNotificationId();
     }
 }
