@@ -67,10 +67,6 @@ public class KafkaConsumerService {
 		
 		Runnable sendUpComingEventNotification = () -> {
 			log.info("SEND UPCOMING NOTIFICATION FOR EVENT_ID: {}", eventId);
-			// NotificationInfo notificationInfo =
-			// 	new NotificationInfo("You've been invited to " + eventId + " event!", brandId + " " + "invited you to join!", "fa-check");
-			// NotificationData notificationData = new NotificationData(notificationInfo, new ArrayList<>());
-			
 			kafkaTemplateEventId.send("upcoming-event", new EventId(eventId));
 		};
 		

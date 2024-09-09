@@ -71,8 +71,8 @@ public class SessionsController {
 				messagingTemplate.convertAndSend("/topic/connection/" + sessionId, gameEngine.connect(sessionId));
 				break;
 			case DISCONNECT:
-				log.info("Disconnect game ...");
-				gameEngine.disconnect(sessionId, playerId);
+				log.info("Disconnect game ... ");
+//				gameEngine.disconnect(sessionId, playerId);
 				break;
 			case START:
 				log.info("Start game ...");
