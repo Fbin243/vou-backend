@@ -66,7 +66,7 @@ public class NotificationConsumerService {
             acknowledgment.acknowledge();
         }
         catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
         }
     }
 
