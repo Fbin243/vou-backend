@@ -4,6 +4,7 @@ import com.vou.users.entity.Player;
 import com.vou.users.entity.User;
 import com.vou.users.service.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -72,5 +73,17 @@ public class PlayerController {
             throw new RuntimeException("No player found with ids: " + ids);
         }
         return result;
+    }
+
+    @PostMapping("/request-turns")
+    public ResponseEntity<String> requestTurns(@RequestParam String id, @RequestParam String phone, @RequestParam int turns) {
+        String message = playerService.requestTurns(id, phone, turns);
+        return ResponseEntity.ok(message);
+    }
+
+    @PostMapping("/accept-turns")
+    public ResponseEntity<String> acceptTurns(@RequestParam String id1, @RequestParam String id2, @RequestParam int turns) {
+        String message = playerService.acceptTurns(id1, id2, turns);
+        return ResponseEntity.ok(message);
     }
 }

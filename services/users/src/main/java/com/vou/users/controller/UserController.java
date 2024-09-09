@@ -22,6 +22,7 @@ public class UserController {
         if (user.getRole() == null) {
             throw new BadRequestException("Role is required");
         }
+        user.setId(user.getAccountId());
         user.setRole(UserRole.valueOf(user.getRole().name()));
         User savedUser = userService.saveUser(user);
         return ResponseEntity.ok(savedUser);
@@ -73,4 +74,6 @@ public class UserController {
 
         return ResponseEntity.ok().build();
     }
+
+
 }

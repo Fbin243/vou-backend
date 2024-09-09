@@ -10,7 +10,6 @@ import jakarta.persistence.*;
 @JsonDeserialize(using = UserDeserializer.class)
 public abstract class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @Column(name = "fullname")

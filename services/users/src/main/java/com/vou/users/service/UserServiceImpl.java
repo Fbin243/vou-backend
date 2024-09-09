@@ -33,6 +33,9 @@ public class UserServiceImpl implements UserService {
         if (user.getRole() == null) {
             throw new AppException(ErrorCode.INVALID_KEY); 
         }
+        if (userRepository.existsById(user.getAccountId())) {
+            throw new AppException(ErrorCode.USER_EXISTED);
+        }
         return userRepository.save(user);
     }
 
@@ -140,4 +143,6 @@ public class UserServiceImpl implements UserService {
         }
         userRepository.deleteById(id);
     }
+
+
 }

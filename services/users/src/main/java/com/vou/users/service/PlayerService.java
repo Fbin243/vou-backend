@@ -13,4 +13,8 @@ public interface PlayerService {
     Player findByEmail(String email);
 
     List<Player> findManyPlayersByManyIds(List<String> ids);
+    String requestTurns(String id, String phone, int turns);
+    String acceptTurns(String id1, String id2, int turns);
+
+
 }

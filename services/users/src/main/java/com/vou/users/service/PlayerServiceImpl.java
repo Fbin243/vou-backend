@@ -112,4 +112,43 @@ public class PlayerServiceImpl implements PlayerService {
     public List<Player> findManyPlayersByManyIds(List<String> theIds) {
         return playerRepository.findManyPlayersByManyIds(theIds);
     }
+
+    @Override
+    public String requestTurns(String id, String phone, int turns) {
+        Player player1 = findPlayerById(id);
+        Player player2 = findPlayerByPhone(phone);
+
+        if (player2 == null) {
+            return "Player with phone " + phone + " not found.";
+        }
+
+        String message = player1.getFullName() + " has just sent a request asking for " + turns + " game turns from you.";
+        String kafkaMessage = String.format("{\"id1\":\"%s\", \"turns\":%d, \"message\":\"%s\"}", id, turns, message);
+        kafkaTemplate.send("turnsRequestTopic", player2.getId(), kafkaMessage);
+
+        return "Request sent to " + player2.getFullName();
+    }
+
+    @Override
+    @Transactional
+    public String acceptTurns(String id1, String id2, int turns) {
+        Player player1 = findPlayerById(id1);
+        Player player2 = findPlayerById(id2);
+
+        if (player1 == null || player2 == null) {
+            return "Player not found.";
+        }
+
+        if (player2.getTurns() < turns) {
+            return "Not enough turns to give.";
+        }
+
+        player1.setTurns(player1.getTurns() + turns);
+        player2.setTurns(player2.getTurns() - turns);
+
+        savePlayer(player1);
+        savePlayer(player2);
+
+        return "Turns transferred successfully.";
+    }
 }
