@@ -15,5 +15,7 @@ public interface PlayerRepository extends JpaRepository<Player, String> {
 
     @Query("SELECT p FROM Player p WHERE p.id IN :ids")
     List<Player> findManyPlayersByManyIds(@Param("ids") List<String> ids);
+
+
 }
 

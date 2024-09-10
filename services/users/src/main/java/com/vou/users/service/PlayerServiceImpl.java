@@ -1,16 +1,22 @@
 package com.vou.users.service;
 
+import com.vou.users.client.NotificationsServiceClient;
+import com.vou.users.common.ActiveStatus;
 import com.vou.users.dao.PlayerRepository;
-import com.vou.users.entity.Brand;
+import com.vou.users.dto.AddUsersRequestDto;
 import com.vou.users.entity.Player;
+import com.vou.users.model.NotificationInfo;
+import com.vou.users.model.NotificationRelatedPairId;
 import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.kafka.core.KafkaTemplate;
+import com.vou.users.model.NotificationData;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,9 +28,17 @@ public class PlayerServiceImpl implements PlayerService {
     private PlayerRepository playerRepository;
 
     @Autowired
-    public PlayerServiceImpl(PlayerRepository thePlayerRepository) {
+    public PlayerServiceImpl(PlayerRepository thePlayerRepository, KafkaTemplate<String, NotificationData> kafkaTemplateNotificationInfo, NotificationsServiceClient notificationsServiceClient) {
         playerRepository = thePlayerRepository;
+        this.kafkaTemplateNotificationInfo = kafkaTemplateNotificationInfo;
+        this.notificationsServiceClient = notificationsServiceClient;
     }
+
+    @Autowired
+    private KafkaTemplate<String, NotificationData> kafkaTemplateNotificationInfo;
+
+    private final NotificationsServiceClient notificationsServiceClient;
+
 
     @Override
     @Transactional
@@ -114,17 +128,26 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    public String requestTurns(String id, String phone, int turns) {
+    public String requestTurns(String id, String email, int turns) {
         Player player1 = findPlayerById(id);
-        Player player2 = findPlayerByPhone(phone);
+        Player player2 = findByEmail(email);
 
         if (player2 == null) {
-            return "Player with phone " + phone + " not found.";
+            return "Player with email " + email + " not found.";
         }
 
-        String message = player1.getFullName() + " has just sent a request asking for " + turns + " game turns from you.";
-        String kafkaMessage = String.format("{\"id1\":\"%s\", \"turns\":%d, \"message\":\"%s\"}", id, turns, message);
-//        kafkaTemplate.send("turnsRequestTopic", player2.getId(), kafkaMessage);
+        String title = player1.getFullName() + " has just sent a request asking for " + turns + " game turns from you.";
+        String description = "You can accept or decline the request.";
+
+        NotificationInfo notificationInfo = new NotificationInfo(title, description, "fa-check");
+        NotificationData notificationData = new NotificationData(notificationInfo, Collections.singletonList(player2.getId()));
+        String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(notificationInfo, Collections.singletonList(player2.getId())));
+
+        notificationsServiceClient.addMoreDataToNotification(Collections.singletonList(new NotificationRelatedPairId(notificationId, "senderId", player1.getId(), ActiveStatus.ACTIVE)));
+
+        kafkaTemplateNotificationInfo.send("event-notification", notificationData);
+
+        System.out.println("Notification IDDD: " + notificationId);
 
         return "Request sent to " + player2.getFullName();
     }
