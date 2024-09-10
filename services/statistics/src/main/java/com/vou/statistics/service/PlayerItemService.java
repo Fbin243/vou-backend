@@ -94,6 +94,17 @@ public class PlayerItemService implements IPlayerItemService {
     
         // Match playerItems with their corresponding items using itemMap
         for (PlayerItem playerItem : playerItems) {
+            boolean check = false;
+            for (ReturnItemDto returnItemDto : returnItemDtos) {
+                if (returnItemDto.getItem().getId() == playerItem.getItemId()) {
+                    check = true;
+                    returnItemDto.setNumberOfItem(returnItemDto.getNumberOfItem() + playerItem.getQuantity());
+                    break;
+                }
+            }
+            if (check) {
+                continue;
+            }
             ItemDto correspondingItem = itemMap.get(playerItem.getItemId());
             if (correspondingItem != null) {
                 returnItemDtos.add(new ReturnItemDto(correspondingItem, playerItem.getQuantity()));
