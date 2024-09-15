@@ -1,5 +1,7 @@
 package com.vou.sessions.config;
 
+import com.vou.sessions.kafka.deserializer.EventSessionInfoDeserializer;
+import com.vou.sessions.model.EventSessionInfo;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
@@ -16,43 +18,40 @@ import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.util.backoff.FixedBackOff;
 
-import com.vou.sessions.kafka.deserializer.EventSessionInfoDeserializer;
-import com.vou.sessions.model.EventSessionInfo;
-
 import java.util.HashMap;
 import java.util.Map;
 
 @EnableKafka
 @Configuration
 public class KafkaConsumerConfig {
-
-    private static final Logger log = LoggerFactory.getLogger(KafkaConsumerConfig.class);
-    @Value("${spring.kafka.bootstrap-servers}")
-    private String bootstrapServers;
-
-    @Bean
-    public ConsumerFactory<String, EventSessionInfo> consumerFactory() {
-        Map<String, Object> configProps = new HashMap<>();
-        configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        log.info("KAFKA CONFIG: {}", bootstrapServers);
-        configProps.put(ConsumerConfig.GROUP_ID_CONFIG, "group_id");
-        configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, EventSessionInfoDeserializer.class);
-        configProps.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
-        configProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        return new DefaultKafkaConsumerFactory<>(configProps);
-    }
-
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, EventSessionInfo> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, EventSessionInfo> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory());
-        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
-        factory.setConcurrency(1);  // Increase the number of threads
-
-        // Configure retry and backoff policy
-        factory.setCommonErrorHandler(new DefaultErrorHandler(
-                new FixedBackOff(1000L, 5))); // 1 second backoff, 5 retry attempts
-        return factory;
-    }
+	
+	private static final Logger log = LoggerFactory.getLogger(KafkaConsumerConfig.class);
+	@Value("${spring.kafka.bootstrap-servers}")
+	private String bootstrapServers;
+	
+	@Bean
+	public ConsumerFactory<String, EventSessionInfo> consumerFactory() {
+		Map<String, Object> configProps = new HashMap<>();
+		configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+		log.info("KAFKA CONFIG: {}", bootstrapServers);
+		configProps.put(ConsumerConfig.GROUP_ID_CONFIG, "group_id");
+		configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+		configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, EventSessionInfoDeserializer.class);
+		configProps.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+		configProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+		return new DefaultKafkaConsumerFactory<>(configProps);
+	}
+	
+	@Bean
+	public ConcurrentKafkaListenerContainerFactory<String, EventSessionInfo> kafkaListenerContainerFactory() {
+		ConcurrentKafkaListenerContainerFactory<String, EventSessionInfo> factory = new ConcurrentKafkaListenerContainerFactory<>();
+		factory.setConsumerFactory(consumerFactory());
+		factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
+		factory.setConcurrency(1);  // Increase the number of threads
+		
+		// Configure retry and backoff policy
+		factory.setCommonErrorHandler(new DefaultErrorHandler(
+			new FixedBackOff(1000L, 5))); // 1 second backoff, 5 retry attempts
+		return factory;
+	}
 }

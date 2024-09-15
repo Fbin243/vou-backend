@@ -29,6 +29,7 @@
     <properties>
         <java.version>17</java.version>
         <spring-cloud.version>2023.0.3</spring-cloud.version>
+        <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
     </properties>
     <dependencies>
         <dependency>
@@ -71,6 +72,11 @@
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
             <version>1.12.765</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.1</version> <!-- Hoặc phiên bản mới nhất -->
         </dependency>
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
@@ -128,17 +134,17 @@
                 <artifactId>jib-maven-plugin</artifactId>
                 <version>3.4.1</version>
                 <configuration>
-<!--					<from>-->
-<!--						<image>-->
-<!--							eclipse-temurin:17.0.3_7-jre-focal-->
-<!--						</image>-->
-<!--						<platforms>-->
-<!--							<platform>-->
-<!--								<architecture>arm64</architecture>-->
-<!--								<os>linux</os>-->
-<!--							</platform>-->
-<!--						</platforms>-->
-<!--					</from>-->
+                    <from>
+                        <image>
+                            eclipse-temurin:17.0.3_7-jre-focal
+                        </image>
+                        <platforms>
+                            <platform>
+                                <architecture>arm64</architecture>
+                                <os>linux</os>
+                            </platform>
+                        </platforms>
+                    </from>
                     <to>
                         <image>haina2410/${project.artifactId}</image>
                     </to>
