@@ -59,7 +59,7 @@ public class VoucherUsedTransactionStrategy implements TransactionStrategy {
                 for (int i = 0; i < voucherUsedTransaction.getQuantity(); ++i) {
                     int index = rand.nextInt(vouchers.size());
                     playerVoucherService.addPlayerVoucher(new PlayerVoucherDto(voucherUsedTransaction.getPlayerId(), voucherUsedTransaction.getArtifactId(), currentVoucher.getBrand_id(), currentVoucher.getVoucherCode(), -1));
-                    playerVoucherService.addPlayerVoucher(new PlayerVoucherDto(voucherUsedTransaction.getPlayerId(), vouchers.get(index).getId(), vouchers.get(index).getBrand_id(), currentVoucher.getVoucherCode(), 1));
+                    playerVoucherService.addPlayerVoucher(new PlayerVoucherDto(voucherUsedTransaction.getPlayerId(), vouchers.get(index).getId(), vouchers.get(index).getBrand_id(), vouchers.get(index).getVoucherCode(), 1));
                 }
                 // playerItemService.addItemToPlayer(voucherUsedTransaction.getPlayerId(), voucherDto.getArtifactId(), voucherUsedTransaction.getQuantity());
             } else {

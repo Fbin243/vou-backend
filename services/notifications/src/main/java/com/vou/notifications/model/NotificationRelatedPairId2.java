@@ -16,7 +16,7 @@ import jakarta.persistence.*;
 @AllArgsConstructor
 @Getter
 @Setter
-public class NotificationRelatedPairId implements Serializable {
+public class NotificationRelatedPairId2 implements Serializable {
     @Column(name = "notification_id", nullable = false)
     private String notificationId;
 
@@ -26,6 +26,6 @@ public class NotificationRelatedPairId implements Serializable {
     @Column(name = "related_id", nullable = false)
     private String relatedId;
 
-    // @Column(name = "active_status", nullable = false)
-    // private ActiveStatus activeStatus;
+    @Column(name = "active_status", nullable = false)
+    private ActiveStatus activeStatus;
 }

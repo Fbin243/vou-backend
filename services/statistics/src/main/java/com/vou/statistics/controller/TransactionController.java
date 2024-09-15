@@ -266,6 +266,7 @@ public class TransactionController {
                 NotificationData notificationData = new NotificationData(notificationInfo, Collections.singletonList(_transaction.getRecipientId()));
                 String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(notificationInfo, Collections.singletonList(_transaction.getRecipientId())));
                 
+
                 System.out.println("Notification IDDD: " + notificationId);
 
                 // notificationsServiceClient.sendNotification(notificationData);
@@ -302,6 +303,8 @@ public class TransactionController {
                 String notificationId = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(notificationInfoReceiver, Collections.singletonList(_transaction.getRecipientId())));
                 String notificationId2 = notificationsServiceClient.addUsersToNotification(new AddUsersRequestDto(notificationInfoSender, Collections.singletonList(_transaction.getPlayerId())));
                 
+                // String notificationId3 = notificationsServiceClient.saveAdditionalInfo(new AddUsersRequestDto(notificationInfoReceiver, Collections.singletonList(_transaction.getPlayerId())));
+
                 System.out.println("Notification IDDD: " + notificationId);
                 System.out.println("Notification IDDD: " + notificationId2);
 
