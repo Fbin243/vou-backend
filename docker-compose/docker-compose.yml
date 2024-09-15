@@ -19,7 +19,7 @@ services:
       vou_network:
         aliases:
           - loki
-
+  
   write:
     image: grafana/loki:3.0.0
     command: "-config.file=/etc/loki/config.yaml -target=write"
@@ -38,7 +38,7 @@ services:
       - minio
     networks:
       <<: *loki-dns
-
+  
   alloy:
     image: grafana/alloy:v1.0.0
     volumes:
@@ -52,7 +52,7 @@ services:
     extends:
       file: common-config.yml
       service: network-config
-
+  
   minio:
     image: minio/minio:RELEASE.2024-05-27T19-17-46Z
     entrypoint:
@@ -79,7 +79,7 @@ services:
     extends:
       file: common-config.yml
       service: network-config
-
+  
   prometheus:
     image: prom/prometheus:v2.50.1
     container_name: prometheus
@@ -90,9 +90,7 @@ services:
     extends:
       file: common-config.yml
       service: network-config
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-
+  
   grafana:
     image: grafana/grafana:11.0.0
     environment:
@@ -118,7 +116,7 @@ services:
     extends:
       file: common-config.yml
       service: network-config
-
+  
   backend:
     image: grafana/loki:3.0.0
     volumes:
@@ -132,7 +130,7 @@ services:
     extends:
       file: common-config.yml
       service: network-config
-
+  
   gateway:
     image: nginx:1.25.5
     depends_on:
@@ -145,46 +143,46 @@ services:
         cat <<EOF > /etc/nginx/nginx.conf
         user  nginx;
         worker_processes  5;  ## Default: 1
-
+        
         events {
           worker_connections   1000;
         }
-
+        
         http {
           resolver 127.0.0.11;
-
+        
           server {
             listen             3100;
-
+        
             location = / {
               return 200 'OK';
               auth_basic off;
             }
-
+        
             location = /api/prom/push {
               proxy_pass       http://write:3100\$$request_uri;
             }
-
+        
             location = /api/prom/tail {
               proxy_pass       http://read:3100\$$request_uri;
               proxy_set_header Upgrade \$$http_upgrade;
               proxy_set_header Connection "upgrade";
             }
-
+        
             location ~ /api/prom/.* {
               proxy_pass       http://read:3100\$$request_uri;
             }
-
+        
             location = /loki/api/v1/push {
               proxy_pass       http://write:3100\$$request_uri;
             }
-
+        
             location = /loki/api/v1/tail {
               proxy_pass       http://read:3100\$$request_uri;
               proxy_set_header Upgrade \$$http_upgrade;
               proxy_set_header Connection "upgrade";
             }
-
+        
             location ~ /loki/api/.* {
               proxy_pass       http://read:3100\$$request_uri;
             }
@@ -202,10 +200,9 @@ services:
     extends:
       file: common-config.yml
       service: network-config
-
+  
   ############### MY SQL #####################
   mysqldb:
-    image: mysql:8.0
     ports:
       - 3300:3306
     container_name: mysqldb
@@ -217,7 +214,7 @@ services:
     extends:
       file: common-config.yml
       service: db-config
-
+  
   ############## MESSAGE BROKER #####################
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
@@ -230,9 +227,9 @@ services:
     extends:
       file: common-config.yml
       service: base-config
-
+  
   kafka:
-    image: confluentinc/cp-kafka
+    image: confluentinc/cp-kafka:latest
     container_name: kafka
     depends_on:
       - zookeeper
@@ -250,10 +247,10 @@ services:
     extends:
       file: common-config.yml
       service: base-config
-
+  
   ###################### SERVICES ##########################
   discovery-server:
-    image: haina2410/discovery-server
+    image: fbin243/discovery-server
     container_name: discovery-server
     ports:
       - 8761:8761
@@ -268,9 +265,9 @@ services:
       service: base-config
     environment:
       SPRING_APPLICATION_NAME: "discovery-server"
-
+  
   users:
-    image: haina2410/users
+    image: fbin243/users
     container_name: users
     ports:
       - 8081:8081
@@ -291,9 +288,9 @@ services:
     extends:
       file: common-config.yml
       service: discovery-config
-
+  
   identity:
-    image: haina2410/identity
+    image: fbin243/identity
     container_name: identity
     ports:
       - 8071:8071
@@ -315,9 +312,9 @@ services:
     extends:
       file: common-config.yml
       service: discovery-config
-
+  
   games:
-    image: haina2410/games
+    image: fbin243/games
     container_name: games
     ports:
       - 8082:8082
@@ -338,9 +335,9 @@ services:
     extends:
       file: common-config.yml
       service: discovery-config
-
+  
   events:
-    image: haina2410/events
+    image: fbin243/events
     container_name: events
     ports:
       - 8083:8083
@@ -362,9 +359,9 @@ services:
     extends:
       file: common-config.yml
       service: discovery-config
-
+  
   sessions:
-    image: haina2410/sessions
+    image: fbin243/sessions
     container_name: sessions
     env_file:
       - ../.env
@@ -379,14 +376,18 @@ services:
     environment:
       SPRING_APPLICATION_NAME: "sessions"
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9093
+      TZ: Asia/Ho_Chi_Minh
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     depends_on:
       - kafka
     extends:
       file: common-config.yml
       service: discovery-config
-
+  
   notifications:
-    image: haina2410/notifications
+    image: fbin243/notifications
     container_name: notifications
     ports:
       - 8086:8086
@@ -397,17 +398,41 @@ services:
       retries: 10
       start_period: 10s
     environment:
-      GOOGLE_APPLICATION_CREDENTIALS: /google/serviceAccountKey.json
       SPRING_APPLICATION_NAME: "notifications"
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9093
+      GOOGLE_APPLICATION_CREDENTIALS: /google/serviceAccountKey.json
     depends_on:
       - kafka
     extends:
       file: common-config.yml
       service: discovery-config
-
+  
+  statistics:
+    image: fbin243/statistics
+    container_name: statistics
+    env_file:
+      - ../.env
+    ports:
+      - 8085:8085
+    healthcheck:
+      test: "curl --fail --silent localhost:8085/statistics/actuator/health | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    depends_on:
+      mysqldb:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: "statistics"
+      DISCOVERY_SERVER_URI: "http://discovery-server:8761"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9093
+    extends:
+      file: common-config.yml
+      service: discovery-config
+  
   api-gateway:
-    image: haina2410/api-gateway
+    image: fbin243/api-gateway
     container_name: api-gateway
     ports:
       - 8888:8888
@@ -422,27 +447,15 @@ services:
         condition: service_healthy
       users:
         condition: service_healthy
-    environment:
-      DISCOVERY_SERVER_URI: "http://discovery-server:8761"
-    extends:
-      file: common-config.yml
-      service: discovery-config
-
-  statistics:
-    image: haina2410/statistics
-    container_name: statistics
-    env_file:
-      - ../.env
-    ports:
-      - 8085:8085
-    healthcheck:
-      test: "curl --fail --silent localhost:8085/actuator/health/readiness | grep UP || exit 1"
-      interval: 20s
-      timeout: 5s
-      retries: 10
-      start_period: 10s
-    depends_on:
-      mysqldb:
+      games:
+        condition: service_healthy
+      sessions:
+        condition: service_healthy
+      events:
+        condition: service_healthy
+      statistics:
+        condition: service_healthy
+      notifications:
         condition: service_healthy
     environment:
       DISCOVERY_SERVER_URI: "http://discovery-server:8761"
@@ -458,4 +471,3 @@ networks:
 ################ VOLUME ###############
 volumes:
   mysql-data:
-  metabase-data:
